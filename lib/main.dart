@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_docs/pages/signup_page.dart';
+import 'package:market_doctor/pages/signup_page.dart';
 
 void main() {
   runApp(const MyApp());

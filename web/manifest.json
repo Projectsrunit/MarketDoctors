@@ -1,6 +1,6 @@
 {
-    "name": "market_docs",
-    "short_name": "market_docs",
+    "name": "market_doctor",
+    "short_name": "market_doctor",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,6 +1,6 @@
 // signup_page.dart
 import 'package:flutter/material.dart';
-import 'package:market_docs/pages/login_page.dart';
+import 'package:market_doctor/pages/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
