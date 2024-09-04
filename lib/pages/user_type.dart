@@ -15,8 +15,7 @@ class ChooseUserTypePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Title Text
-            Text(
+            const Text(
               'Choose User Type',
               style: TextStyle(
                 fontSize: 24, // Bold large font size
@@ -24,7 +23,7 @@ class ChooseUserTypePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Just so we know you more and help you enjoy using the app',
               style: TextStyle(
                 fontSize: 16, // Medium font size
@@ -32,106 +31,88 @@ class ChooseUserTypePage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-
-            // First Row with two columns (Doctor and Patient)
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
+                  child: ElevatedButton(
+                    onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const SignUpPage(),
                         ),
                       );
                     },
-                    child: Container(
+                    style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      margin: const EdgeInsets.only(bottom: 16, right: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue, // Button color
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.local_hospital,
-                              color: Colors.white, size: 40),
-                          SizedBox(height: 10),
-                          Text(
-                            'Doctor',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.local_hospital, size: 40),
+                        SizedBox(height: 10),
+                        Text('Doctor'),
+                      ],
                     ),
                   ),
                 ),
+                const SizedBox(width: 16),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
+                  child: ElevatedButton(
+                    onPressed: () {
                       // Navigate to Patient Page or perform action
                     },
-                    child: Container(
+                    style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      margin: const EdgeInsets.only(bottom: 16, left: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.green, // Button color
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.person, color: Colors.white, size: 40),
-                          SizedBox(height: 10),
-                          Text(
-                            'Patient',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.person, size: 40),
+                        SizedBox(height: 10),
+                        Text('Patient'),
+                      ],
                     ),
                   ),
                 ),
               ],
             ),
-
-            // Second Row with one column (CHEW)
-            GestureDetector(
-              onTap: () {
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
                 // Navigate to CHEW Page or perform action
               },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.orange, // Button color
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 35),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.medical_services, color: Colors.white, size: 40),
-                    SizedBox(height: 10),
-                    Text(
-                      'CHEW',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.medical_services, size: 40),
+                  SizedBox(height: 10),
+                  Text('CHEW'),
+                ],
               ),
             ),
           ],
