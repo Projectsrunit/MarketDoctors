@@ -1,7 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class UploadCredentialsPage extends StatelessWidget {
   const UploadCredentialsPage({super.key});
+
+  Future<void> _pickFile(BuildContext context) async {
+    try {
+      // Pick a single file
+      final result = await FilePicker.platform.pickFiles();
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.single;
+
+        // Show file details or use the file
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('File selected: ${file.name}'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No file selected.'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to pick file.'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +61,7 @@ class UploadCredentialsPage extends StatelessWidget {
 
                 // Subheading Text
                 const Text(
-                  'Regulation requires you to upload certificate as a community health worker. Your data will stay safe and private with us.',
+                  'Regulation requires you to upload a certificate as a community health worker. Your data will stay safe and private with us.',
                   style: TextStyle(
                     fontSize: 16,
                   ),
@@ -42,6 +73,11 @@ class UploadCredentialsPage extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     // Handle folder upload action
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Folder upload not implemented.'),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
@@ -68,7 +104,7 @@ class UploadCredentialsPage extends StatelessWidget {
                 // Select File from Gallery Button
                 OutlinedButton(
                   onPressed: () {
-                    // Handle file selection action
+                    _pickFile(context);
                   },
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
