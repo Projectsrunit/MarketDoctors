@@ -43,8 +43,8 @@ class ChooseActionPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // Login Button (OutlinedButton)
-            OutlinedButton(
+            // Login Button (ElevatedButton)
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -52,11 +52,15 @@ class ChooseActionPage extends StatelessWidget {
                   ),
                 );
               },
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                side: const BorderSide(color: Colors.blue), // Border color
+                elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               child: const Center(
@@ -64,8 +68,7 @@ class ChooseActionPage extends StatelessWidget {
                   'Login',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -74,7 +77,7 @@ class ChooseActionPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Signup Button (ElevatedButton)
-            OutlinedButton(
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -82,11 +85,15 @@ class ChooseActionPage extends StatelessWidget {
                   ),
                 );
               },
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                side: const BorderSide(color: Colors.blue),
+                elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               child: const Center(
@@ -94,8 +101,7 @@ class ChooseActionPage extends StatelessWidget {
                   'Sign Up',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
