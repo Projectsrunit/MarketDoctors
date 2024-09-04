@@ -1,6 +1,7 @@
 // login_page.dart
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/signup_page.dart';
+import 'package:market_doctor/pages/chew_home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -150,22 +151,27 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            // Handle the login logic
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Logging in...'),
-                              ),
-                            );
-                          }
+                          // if (_formKey.currentState?.validate() ?? false) {
+                          //   // Handle the login logic
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //     const SnackBar(
+                          //       content: Text('Logging in...'),
+                          //     ),
+                          //   );
+                          // }
+                          // Navigate to ChewHome
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ChewHome()),
+                          );
                         },
-                        child: const Text('Login'),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        child: const Text('Login'),                        
                       ),
                       const SizedBox(height: 20),
                       // Sign-Up Text and Link
