@@ -74,13 +74,17 @@ class ChooseActionPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Signup Button (ElevatedButton)
-            ElevatedButton(
+            OutlinedButton(
               onPressed: () {
-                // Navigate to Signup Page
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ChooseUserTypePage(),
+                  ),
+                );
               },
-              style: ElevatedButton.styleFrom(
+              style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.green, // Button color
+                side: const BorderSide(color: Colors.blue),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -90,7 +94,7 @@ class ChooseActionPage extends StatelessWidget {
                   'Sign Up',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white,
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
