@@ -1,7 +1,7 @@
 // login_page.dart
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/signup_page.dart';
-import 'package:market_doctor/pages/chew_home.dart';
+import 'package:market_doctor/pages/chew/chew_home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

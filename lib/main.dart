@@ -28,6 +28,12 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor:
+              Colors.blueGrey, // Ensure bottom bar has a background color
+          selectedItemColor: Colors.white, // Color for selected item
+          unselectedItemColor: Colors.black, // Color for unselected items
+        ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark, // Dark mode theme
@@ -44,6 +50,11 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey, // Same for dark theme
+          selectedItemColor: Colors.red,
+          unselectedItemColor: Colors.grey,
         ),
       ),
       themeMode: ThemeMode.system, // Uses the system theme mode
