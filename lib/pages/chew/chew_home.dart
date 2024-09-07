@@ -27,6 +27,7 @@ class _ChewHomeState extends State<ChewHome> {
       appBar: chewAppBar(),
       body: PageView(
         controller: pageController,
+        //detect a back button press and dont log out the person
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -119,6 +120,11 @@ class _ChewHomeState extends State<ChewHome> {
                             child: _buildDoctorItem(
                                 "Dr. C", "Pediatrician", "Free"),
                           ),
+                          SizedBox(
+                            width: itemWidth,
+                            child: _buildDoctorItem(
+                                "Dr. D", "Opthalmologist", "Free"),
+                          ),
                         ],
                       );
                     },
@@ -130,6 +136,7 @@ class _ChewHomeState extends State<ChewHome> {
           CasesPage(),
           SizedBox(
               //this is the index 2 which is to be skipped
+              //write a function which automatically takes someone to the next or previous page
               ),
           PaymentsMainWidget(),
           ProfilePage(pageController: pageController),
