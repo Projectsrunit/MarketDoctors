@@ -1,197 +1,158 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
+import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/stats_row.dart';
 import 'package:market_doctor/pages/chew/profile_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class ChewHome extends StatefulWidget {
-  @override
-  _ChewHomeState createState() => _ChewHomeState();
-}
-
-class _ChewHomeState extends State<ChewHome> {
-  int cases = 0;
-  int doctorsOnline = 0;
-  int users = 0;
-  bool showMore = false;
-  PageController pageController = PageController();
-
-  void pushNewCase() {
-    print('going to push1');
-  }
+class ChewHome extends StatelessWidget {
+  final int cases = 0;
+  final int doctorsOnline = 0;
+  final int users = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: chewAppBar(),
-      body: PageView(
-        controller: pageController,
-        //detect a back button press and dont log out the person
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatsRow(),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Recent cases",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(),
-                        Text("DD/MM"),
-                      ],
-                    ),
-                  ),
-                  // SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      children: [
-                        _buildCaseItem("John Doe", "25", "New York", "01/09"),
-                        _buildCaseItem(
-                            "Jane Smith", "30", "Los Angeles", "02/09"),
-                        _buildCaseItem(
-                            "Michael Johnson", "40", "Chicago", "03/09"),
-                        if (showMore) ...[
-                          _buildCaseItem("Alice Brown", "35", "Miami", "04/09"),
-                          _buildCaseItem(
-                              "Robert Davis", "28", "Houston", "05/09"),
-                        ],
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              showMore = !showMore;
-                            });
-                          },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 12), // Reduce size
-                            minimumSize:
-                                Size(0, 0), // Optional: to fully control size
-                          ),
-                          child: Text(showMore ? "Show less" : "See more"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      "Available doctors",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      double itemWidth = (constraints.maxWidth - 10) /
-                          2; // Calculate width for 2 items per row
-                      return Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          SizedBox(
-                            width: itemWidth,
-                            child: _buildDoctorItem(
-                                "Dr. A", "Cardiologist", "Free"),
-                          ),
-                          SizedBox(
-                            width: itemWidth,
-                            child: _buildDoctorItem("Dr. B", "Dentist", "Paid"),
-                          ),
-                          SizedBox(
-                            width: itemWidth,
-                            child: _buildDoctorItem(
-                                "Dr. C", "Pediatrician", "Free"),
-                          ),
-                          SizedBox(
-                            width: itemWidth,
-                            child: _buildDoctorItem(
-                                "Dr. D", "Opthalmologist", "Free"),
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
-          ),
-          CasesPage(),
-          SizedBox(
-              //this is the index 2 which is to be skipped
-              //write a function which automatically takes someone to the next or previous page
-              ),
-          PaymentsMainWidget(),
-          ProfilePage(pageController: pageController),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatsRow(),
-                  SizedBox(height: 20),
-                  AddCaseForm1(pageController: pageController),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatsRow(),
-                  SizedBox(height: 20),
-                  AddCaseForm2(pageController: pageController),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatsRow(),
-                  SizedBox(height: 20),
-                  AddCaseForm3(pushNewCase: pushNewCase),
-                ],
-              ),
-            ),
-          ),
-          UpdateProfileChew(),
-          ManagePaymentsChew(),
-          UpdateQualificationChew(),
-        ],
-      ),
+      //detect a back button press and dont log out the person
+      body: ChewHomeBody(),
+      //     ProfilePage(pageController: pageController),
+      //     AddCaseForms(),
+      //     UpdateProfileChew(),
+      //     ManagePaymentsChew(),
+      //     UpdateQualificationChew(),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: Text("Chat with a doctor"),
-        icon: Icon(Icons.message),
+  onPressed: () {},
+  // icon: Icon(FontAwesomeIcons.whatsapp),
+  label: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(FontAwesomeIcons.whatsapp, size: 32),
+      SizedBox(height: 4), 
+      Text(
+        "Chat with a doctor",
+        style: TextStyle(fontSize: 12), 
       ),
-      bottomNavigationBar: BottomNavBar(pageController: pageController),
+    ],
+  ),
+),
+
+      bottomNavigationBar: BottomNavBar(),
     );
   }
+}
+
+class ChewHomeBody extends StatefulWidget {
+
+  @override
+  State<ChewHomeBody> createState() => _ChewHomeBodyState();
+}
+
+class _ChewHomeBodyState extends State<ChewHomeBody> {
+  bool showMore = false;
+
+  @override
+  Widget build(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StatsRow(),
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "Recent cases",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(),
+              Text("DD/MM"),
+            ],
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  _buildCaseItem("John Doe", "25", "New York", "01/09"),
+                  _buildCaseItem("Jane Smith", "30", "Los Angeles", "02/09"),
+                  _buildCaseItem("Michael Johnson", "40", "Chicago", "03/09"),
+                  if (showMore) ...[
+                    _buildCaseItem("Alice Brown", "35", "Miami", "04/09"),
+                    _buildCaseItem("Robert Davis", "28", "Houston", "05/09"),
+                  ],
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        showMore = !showMore;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 12
+                          ),
+                      minimumSize: Size(0, 0), 
+                    ),
+                    child: Text(showMore ? "Show less" : "See more"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            "Available doctors",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(height: 10),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            double itemWidth = (constraints.maxWidth - 10) / 2;
+            return Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildDoctorItem("Dr. A", "Cardiologist", "Free"),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildDoctorItem("Dr. B", "Dentist", "Paid"),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildDoctorItem("Dr. C", "Pediatrician", "Free"),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildDoctorItem("Dr. D", "Opthalmologist", "Free"),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildCaseItem(String name, String age, String location, String date) {
     return Padding(
@@ -256,129 +217,59 @@ class _ChewHomeState extends State<ChewHome> {
   }
 }
 
-AppBar chewAppBar() {
-  return AppBar(
-    automaticallyImplyLeading: false,
-    toolbarHeight: 35,
-    title: Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(Icons.ac_unit),
-          ),
-          SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              "CHEW",
-            ),
-          ),
-        ],
-      ),
-    ),
-    actions: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: IconButton(
-          icon: Icon(Icons.notifications),
-          onPressed: () {},
-        ),
-      ),
-    ],
-  );
-}
+class AddCaseForms extends StatelessWidget {
 
-class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({
-    super.key,
-    required this.pageController,
-  });
-
-  final PageController pageController;
+  void pushNewCase() {
+    print('going to push1');
+  }
+  
+  final PageController pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blueGrey,
-      child: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.business), label: "Cases"),
-          BottomNavigationBarItem(
-            icon: GestureDetector(
-              onTap: () {
-                showMenu(
-                  context: context,
-                  position: RelativeRect.fromLTRB(100, 600, 100, 100),
-                  items: [
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.add,
-                              color: Colors.blue), // Icon for "Add a case"
-                          SizedBox(width: 10),
-                          Text('Add a case'),
-                        ],
-                      ),
-                      onTap: () {
-                        pageController.jumpToPage(5);
-                      },
-                    ),
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.medication,
-                              color:
-                                  Colors.green), // Icon for "Make prescription"
-                          SizedBox(width: 10),
-                          Text('Make prescription'),
-                        ],
-                      ),
-                      onTap: () {
-                        pageController.jumpToPage(8);
-                      },
-                    ),
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.chat, color: Colors.orange),
-                          SizedBox(width: 10),
-                          Text('Chat with a doctor'),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ChatWithDoctor(pageController: pageController),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-              child: SizedBox(
-                height: 60,
-                child: Icon(Icons.arrow_upward),
+    return PageView(
+      controller: pageController,
+      children: [
+        Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StatsRow(),
+              SizedBox(height: 20),
+              AddCaseForm1(pageController: pageController),
+            ],
+          ),
+        ),
+      ),
+      Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StatsRow(),
+                  SizedBox(height: 20),
+                  AddCaseForm2(pageController: pageController),
+                ],
               ),
             ),
-            label: "",
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.credit_card), label: "Payment"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
-        currentIndex: 0,
-        onTap: (index) {
-          if (index != 2) {
-            pageController.jumpToPage(index);
-          }
-        },
-        backgroundColor: Colors.blueGrey,
-      ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StatsRow(),
+                  SizedBox(height: 20),
+                  AddCaseForm3(pushNewCase: pushNewCase),
+                ],
+              ),
+            ),
+          ),
+      ]
     );
   }
 }
@@ -423,7 +314,7 @@ class ChatWithDoctor extends StatelessWidget {
           }).toList(),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(pageController: pageController),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -532,7 +423,7 @@ class AvailableDocsDetails extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(pageController: pageController),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -584,7 +475,7 @@ class RealChatWithDoctor extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(pageController: pageController),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

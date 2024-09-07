@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Color(0xFF617DEF), // Background color
+            backgroundColor: Color(0xFF617DEF),
             foregroundColor: Colors.white, // Text color for light mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
