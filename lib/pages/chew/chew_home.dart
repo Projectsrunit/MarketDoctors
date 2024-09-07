@@ -35,57 +35,94 @@ class _ChewHomeState extends State<ChewHome> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   StatsRow(),
-                  SizedBox(height: 20),
-                  Text(
-                    "Recent cases",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Recent cases",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(),
-                      Text("DD/MM"),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Column(
-                    children: [
-                      _buildCaseItem("John Doe", "25", "New York", "01/09"),
-                      _buildCaseItem(
-                          "Jane Smith", "30", "Los Angeles", "02/09"),
-                      _buildCaseItem(
-                          "Michael Johnson", "40", "Chicago", "03/09"),
-                      if (showMore) ...[
-                        _buildCaseItem("Alice Brown", "35", "Miami", "04/09"),
-                        _buildCaseItem(
-                            "Robert Davis", "28", "Houston", "05/09"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(),
+                        Text("DD/MM"),
                       ],
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            showMore = !showMore;
-                          });
-                        },
-                        child: Text(showMore ? "Show less" : "See more"),
-                      ),
-                    ],
+                    ),
+                  ),
+                  // SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      children: [
+                        _buildCaseItem("John Doe", "25", "New York", "01/09"),
+                        _buildCaseItem(
+                            "Jane Smith", "30", "Los Angeles", "02/09"),
+                        _buildCaseItem(
+                            "Michael Johnson", "40", "Chicago", "03/09"),
+                        if (showMore) ...[
+                          _buildCaseItem("Alice Brown", "35", "Miami", "04/09"),
+                          _buildCaseItem(
+                              "Robert Davis", "28", "Houston", "05/09"),
+                        ],
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              showMore = !showMore;
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12), // Reduce size
+                            minimumSize:
+                                Size(0, 0), // Optional: to fully control size
+                          ),
+                          child: Text(showMore ? "Show less" : "See more"),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    "Available doctors",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      "Available doctors",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   SizedBox(height: 10),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      _buildDoctorItem("Dr. A", "Cardiologist", "Free"),
-                      _buildDoctorItem("Dr. B", "Dentist", "Paid"),
-                      _buildDoctorItem("Dr. C", "Pediatrician", "Free"),
-                    ],
-                  ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      double itemWidth = (constraints.maxWidth - 10) /
+                          2; // Calculate width for 2 items per row
+                      return Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          SizedBox(
+                            width: itemWidth,
+                            child: _buildDoctorItem(
+                                "Dr. A", "Cardiologist", "Free"),
+                          ),
+                          SizedBox(
+                            width: itemWidth,
+                            child: _buildDoctorItem("Dr. B", "Dentist", "Paid"),
+                          ),
+                          SizedBox(
+                            width: itemWidth,
+                            child: _buildDoctorItem(
+                                "Dr. C", "Pediatrician", "Free"),
+                          ),
+                        ],
+                      );
+                    },
+                  )
                 ],
               ),
             ),
@@ -150,19 +187,36 @@ class _ChewHomeState extends State<ChewHome> {
   }
 
   Widget _buildCaseItem(String name, String age, String location, String date) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(age, style: TextStyle(fontSize: 12)),
-            Text(location, style: TextStyle(fontSize: 12)),
-          ],
-        ),
-        Text(date),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Text("Age: "),
+                  Text(age, style: TextStyle(fontSize: 14)),
+                ],
+              ),
+              Row(
+                children: [
+                  Text("Location: "),
+                  Text(location, style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ],
+          ),
+          Text(
+            date,
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
     );
   }
 
@@ -197,26 +251,32 @@ class _ChewHomeState extends State<ChewHome> {
 
 AppBar chewAppBar() {
   return AppBar(
-    leading: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          backgroundColor: Colors.white,
-          child: Icon(Icons.ac_unit),
-        ),
-        SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            "CHEW",
-            overflow: TextOverflow.ellipsis,
+    automaticallyImplyLeading: false,
+    toolbarHeight: 35,
+    title: Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(Icons.ac_unit),
           ),
-        ),
-      ],
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              "CHEW",
+            ),
+          ),
+        ],
+      ),
     ),
     actions: [
-      IconButton(
-        icon: Icon(Icons.notifications),
-        onPressed: () {},
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: IconButton(
+          icon: Icon(Icons.notifications),
+          onPressed: () {},
+        ),
       ),
     ],
   );
@@ -281,13 +341,14 @@ class BottomNavBar extends StatelessWidget {
                         ],
                       ),
                       onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ChatWithDoctor(pageController: pageController),
-    ),
-  );
-},
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChatWithDoctor(pageController: pageController),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 );
@@ -341,8 +402,7 @@ class ChatWithDoctor extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => AvailableDocsDetails(
                       doctor: doc,
-                      pageController:
-                          pageController, 
+                      pageController: pageController,
                     ),
                   ),
                 );
@@ -448,8 +508,10 @@ class AvailableDocsDetails extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            RealChatWithDoctor(doctor: doctor, pageController: pageController,),
+                        builder: (context) => RealChatWithDoctor(
+                          doctor: doctor,
+                          pageController: pageController,
+                        ),
                       ),
                     );
                   },

@@ -7,7 +7,6 @@ class StatsRow extends StatefulWidget {
   _StatsRowState createState() => _StatsRowState();
 }
 
-
 class _StatsRowState extends State<StatsRow> {
   int cases = 0;
   int doctorsOnline = 0;
@@ -31,25 +30,46 @@ class _StatsRowState extends State<StatsRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildStatItem("Cases", cases),
-        _buildStatItem("Doctors online", doctorsOnline),
-        _buildStatItem("Users", users),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      padding: EdgeInsets.all(20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildStatItem("Cases", cases,
+              textColor: Colors.white, labelFontSize: 18),
+          _buildStatItem("Doctors online", doctorsOnline,
+              textColor: Colors.white, labelFontSize: 18),
+          _buildStatItem("Users", users,
+              textColor: Colors.white, labelFontSize: 18),
+        ],
+      ),
     );
   }
 
-  Widget _buildStatItem(String label, int value) {
+  Widget _buildStatItem(String label, int value,
+      {Color textColor = Colors.black, double labelFontSize = 14}) {
     return Column(
       children: [
         Text(
           "$value",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
         ),
         SizedBox(height: 4),
-        Text(label),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: labelFontSize,
+            color: textColor,
+          ),
+        ),
       ],
     );
   }
