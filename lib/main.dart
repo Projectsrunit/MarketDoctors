@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/signup_page.dart';
-
+import 'package:market_doctor/pages/choose_action.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -150,7 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SignUpPage()),
+                            builder: (context) => const ChooseActionPage()),
                       );
                     }
                   },
