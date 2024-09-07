@@ -14,10 +14,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Removes the debug banner
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: Colors.purple,
+        primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.purple, // Background color
+            backgroundColor: Color(0xFF617DEF), // Background color
             foregroundColor: Colors.white, // Text color for light mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
@@ -37,10 +37,10 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark, // Dark mode theme
-        primaryColor: Colors.purple,
+        primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.purple, // Background color
+            backgroundColor: Color(0xFF617DEF), // Background color
             foregroundColor: Colors.white, // Text color for dark mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
