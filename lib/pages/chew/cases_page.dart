@@ -4,10 +4,10 @@ enum IconType { information, edit, delete }
 
 class CasesPage extends StatefulWidget {
   @override
-  _CasesPageState createState() => _CasesPageState();
+  CasesPageState createState() => CasesPageState();
 }
 
-class _CasesPageState extends State<CasesPage> {
+class CasesPageState extends State<CasesPage> {
   int? _activeIconIndex;
   int? _activeDetailsIndex;
 
@@ -120,19 +120,27 @@ class CaseInstance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor = isActive ? Colors.blue : Colors.white;
+    final Color iconColor = isActive ? Colors.blue : Colors.black;
 
-    return Row(
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  decoration: BoxDecoration(
+    border: Border.all(color: Colors.grey, width: 1), 
+    borderRadius: BorderRadius.circular(8), 
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    child: Row(
       children: [
         Expanded(
           child: Text('Person ${index + 1}'),
         ),
         IconButton(
-          icon: Icon(Icons.info, color: iconColor),
+          icon: Icon(Icons.info, color: iconColor), 
           onPressed: () => onIconTapped(IconType.information),
         ),
         IconButton(
-          icon: Icon(Icons.edit, color: iconColor),
+          icon: Icon(Icons.edit, color: iconColor), 
           onPressed: () => onIconTapped(IconType.edit),
         ),
         IconButton(
@@ -140,7 +148,9 @@ class CaseInstance extends StatelessWidget {
           onPressed: () => onIconTapped(IconType.delete),
         ),
       ],
-    );
+    ),
+  ),
+);
   }
 }
 
