@@ -16,10 +16,7 @@ class ChooseActionPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Company Logo
-            Image.asset(
-              '../../assets/md_logo.png', // Path to your logo image
-              height: 100, // Adjust the height as needed
-            ),
+            Image.asset('assets/images/logo.png'),
             const SizedBox(height: 20),
 
             // Title Text
