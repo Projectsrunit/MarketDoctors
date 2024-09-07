@@ -13,10 +13,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Removes the debug banner
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: Colors.purple,
+        primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.purple, // Background color
+            backgroundColor: Color(0xFF617DEF), // Background color
             foregroundColor: Colors.white, // Text color for light mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
@@ -27,13 +27,19 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor:
+              Colors.blueGrey, // Ensure bottom bar has a background color
+          selectedItemColor: Colors.white, // Color for selected item
+          unselectedItemColor: Colors.black, // Color for unselected items
+        ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark, // Dark mode theme
-        primaryColor: Colors.purple,
+        primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.purple, // Background color
+            backgroundColor: Color(0xFF617DEF), // Background color
             foregroundColor: Colors.white, // Text color for dark mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
@@ -43,6 +49,11 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey, // Same for dark theme
+          selectedItemColor: Colors.red,
+          unselectedItemColor: Colors.grey,
         ),
       ),
       themeMode: ThemeMode.system, // Uses the system theme mode
