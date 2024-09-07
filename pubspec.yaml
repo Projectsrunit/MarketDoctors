@@ -24,6 +24,9 @@ flutter:
   generate: true
   assets:
     - assets/images/logo.png
+    - assets/images/people.jpeg
+    - assets/images/wheelchair.jpeg
+
   
 
     
