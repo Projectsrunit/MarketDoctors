@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 
 enum IconType { information, edit, delete }
 
@@ -62,47 +64,89 @@ class CasesPageState extends State<CasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    return Scaffold(
+      appBar: chewAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
           children: [
-            Expanded(
-              child: Text('Search cases'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search cases...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            // Handle search action
+                          },
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Icon(Icons.people),
+                        Text(
+                          'Cases',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ]),
             ),
             Expanded(
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search cases...',
-                  border: OutlineInputBorder(),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ...List.generate(16, (index) {
+                      return Column(
+                        children: [
+                          CaseInstance(
+                            index: index,
+                            isActive: _activeIconIndex == index,
+                            onIconTapped: (iconType) =>
+                                _onIconTapped(index, iconType),
+                          ),
+                          if (_activeDetailsIndex == index)
+                            CaseInstanceDetails(
+                              editable: _activeIconIndex == index &&
+                                      _activeIconIndex == index
+                                  ? true
+                                  : false,
+                            ),
+                        ],
+                      );
+                    }),
+                  ],
                 ),
               ),
             ),
           ],
         ),
-        SizedBox(height: 20),
-        Text(
-          'Cases',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        ...List.generate(6, (index) {
-          return Column(
-            children: [
-              CaseInstance(
-                index: index,
-                isActive: _activeIconIndex == index,
-                onIconTapped: (iconType) => _onIconTapped(index, iconType),
-              ),
-              if (_activeDetailsIndex == index)
-                CaseInstanceDetails(
-                  editable: _activeIconIndex == index &&
-                      _activeIconIndex == index
-                          ? true
-                          : false,
-                ),
-            ],
-          );
-        }),
-      ],
+      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -124,33 +168,33 @@ class CaseInstance extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  decoration: BoxDecoration(
-    border: Border.all(color: Colors.grey, width: 1), 
-    borderRadius: BorderRadius.circular(8), 
-  ),
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: Text('Person ${index + 1}'),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text('Person ${index + 1}'),
+            ),
+            IconButton(
+              icon: Icon(Icons.info, color: iconColor),
+              onPressed: () => onIconTapped(IconType.information),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit, color: iconColor),
+              onPressed: () => onIconTapped(IconType.edit),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete, color: iconColor),
+              onPressed: () => onIconTapped(IconType.delete),
+            ),
+          ],
         ),
-        IconButton(
-          icon: Icon(Icons.info, color: iconColor), 
-          onPressed: () => onIconTapped(IconType.information),
-        ),
-        IconButton(
-          icon: Icon(Icons.edit, color: iconColor), 
-          onPressed: () => onIconTapped(IconType.edit),
-        ),
-        IconButton(
-          icon: Icon(Icons.delete, color: iconColor),
-          onPressed: () => onIconTapped(IconType.delete),
-        ),
-      ],
-    ),
-  ),
-);
+      ),
+    );
   }
 }
 
@@ -226,7 +270,8 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, [String? unit]) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      [String? unit]) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
