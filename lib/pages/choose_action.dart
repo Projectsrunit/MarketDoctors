@@ -16,10 +16,7 @@ class ChooseActionPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Company Logo
-            Image.asset(
-              '../../assets/md_logo.png', // Path to your logo image
-              height: 100, // Adjust the height as needed
-            ),
+            Image.asset('assets/images/logo.png'),
             const SizedBox(height: 20),
 
             // Title Text
@@ -58,6 +55,9 @@ class ChooseActionPage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.blueGrey[700] // Darker button for dark mode
+                    : Color(0xFF617DEF), // Primary color for light mode
                 textStyle: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class ChooseActionPage extends StatelessWidget {
                   'Login',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.black,
+                    color: Colors.white, // White text for better contrast
                   ),
                 ),
               ),
@@ -91,6 +91,9 @@ class ChooseActionPage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.blueGrey[700] // Darker button for dark mode
+                    : Color(0xFF617DEF), // Primary color for light mode
                 textStyle: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -101,7 +104,7 @@ class ChooseActionPage extends StatelessWidget {
                   'Sign Up',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.black,
+                    color: Colors.white, // White text for better contrast
                   ),
                 ),
               ),

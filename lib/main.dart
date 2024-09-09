@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/signup_page.dart';
-
+import 'package:market_doctor/pages/choose_action.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -44,6 +43,11 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey, 
+          selectedItemColor: Colors.red,
+          unselectedItemColor: Colors.grey,
         ),
       ),
       themeMode: ThemeMode.system, // Uses the system theme mode
@@ -150,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SignUpPage()),
+                            builder: (context) => const ChooseActionPage()),
                       );
                     }
                   },
