@@ -10,57 +10,58 @@ class CasesPage extends StatefulWidget {
 }
 
 class CasesPageState extends State<CasesPage> {
-  int? _activeIconIndex;
-  int? _activeDetailsIndex;
+  int? _activeCaseIndex; 
+  IconType? _activeIconType; 
 
-  void _onIconTapped(int index, IconType iconType) {
+  void _onIconTapped(int caseIndex, IconType iconType) {
     setState(() {
-      if (_activeIconIndex == index) {
-        // Toggle off
-        _activeIconIndex = null;
-        _activeDetailsIndex = null;
+      if (_activeCaseIndex == caseIndex && _activeIconType == iconType) {
+        _activeCaseIndex = null;
+        _activeIconType = null;
       } else {
-        _activeIconIndex = index;
+        _activeCaseIndex = caseIndex;
+        _activeIconType = iconType;
+
         if (iconType == IconType.delete) {
-          _showDeleteConfirmationDialog(index);
-        } else {
-          _activeDetailsIndex = index;
+          _showDeleteConfirmationDialog(caseIndex);
         }
       }
     });
   }
 
   void _showDeleteConfirmationDialog(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Are you sure you want to delete this file?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _activeIconIndex = null;
-                });
-              },
-              child: Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Handle delete action
-                setState(() {
-                  _activeIconIndex = null;
-                });
-              },
-              child: Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Are you sure you want to delete this file?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _activeCaseIndex = null;
+                _activeIconType = null;
+              });
+            },
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Handle delete action (you can add specific logic here)
+              setState(() {
+                _activeCaseIndex = null;
+                _activeIconType = null;
+              });
+            },
+            child: Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -125,16 +126,14 @@ class CasesPageState extends State<CasesPage> {
                         children: [
                           CaseInstance(
                             index: index,
-                            isActive: _activeIconIndex == index,
+                            isActive: _activeCaseIndex == index,
+                            activeIconType: _activeIconType, 
                             onIconTapped: (iconType) =>
                                 _onIconTapped(index, iconType),
                           ),
-                          if (_activeDetailsIndex == index)
+                          if (_activeCaseIndex == index)
                             CaseInstanceDetails(
-                              editable: _activeIconIndex == index &&
-                                      _activeIconIndex == index
-                                  ? true
-                                  : false,
+                              editable: _activeCaseIndex == index && _activeIconType == IconType.edit,
                             ),
                         ],
                       );
@@ -154,17 +153,24 @@ class CasesPageState extends State<CasesPage> {
 class CaseInstance extends StatelessWidget {
   final int index;
   final bool isActive;
+  final IconType? activeIconType; 
   final Function(IconType) onIconTapped;
 
   CaseInstance({
     required this.index,
     required this.isActive,
+    required this.activeIconType,
     required this.onIconTapped,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor = isActive ? Colors.blue : Colors.black;
+    final Color infoIconColor =
+        isActive && activeIconType == IconType.information ? Colors.blue : Colors.black;
+    final Color editIconColor =
+        isActive && activeIconType == IconType.edit ? Colors.blue : Colors.black;
+    final Color deleteIconColor =
+        isActive && activeIconType == IconType.delete ? Colors.blue : Colors.black;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -180,15 +186,15 @@ class CaseInstance extends StatelessWidget {
               child: Text('Person ${index + 1}'),
             ),
             IconButton(
-              icon: Icon(Icons.info, color: iconColor),
+              icon: Icon(Icons.info, color: infoIconColor),
               onPressed: () => onIconTapped(IconType.information),
             ),
             IconButton(
-              icon: Icon(Icons.edit, color: iconColor),
+              icon: Icon(Icons.edit, color: editIconColor),
               onPressed: () => onIconTapped(IconType.edit),
             ),
             IconButton(
-              icon: Icon(Icons.delete, color: iconColor),
+              icon: Icon(Icons.delete, color: deleteIconColor),
               onPressed: () => onIconTapped(IconType.delete),
             ),
           ],
@@ -201,13 +207,15 @@ class CaseInstance extends StatelessWidget {
 class CaseInstanceDetails extends StatefulWidget {
   final bool editable;
 
-  CaseInstanceDetails({required this.editable});
+  CaseInstanceDetails({
+    required this.editable,
+  });
 
   @override
-  _CaseInstanceDetailsState createState() => _CaseInstanceDetailsState();
+  CaseInstanceDetailsState createState() => CaseInstanceDetailsState();
 }
 
-class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
+class CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _bloodPressureController = TextEditingController();
@@ -223,62 +231,94 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   @override
   void initState() {
     super.initState();
-    // Here you would make your API call and initialize the controllers with data
-    // For example:
-    // _fetchDataFromApi();
+    // Initialize the controllers with data from the API here if needed.
   }
 
   void _saveData() {
-    // Handle save data to API
-    // For example:
-    // Api.saveData({
-    //   'email': _emailController.text,
-    //   'phone': _phoneController.text,
-    //   // Add other fields here
-    // });
+    // Handle save data to the API here.
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTextField('Email', _emailController),
-        _buildTextField('Phone Number', _phoneController),
-        SizedBox(height: 20),
-        Text(
-          'Medical Details',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.circular(8),
         ),
-        SizedBox(height: 10),
-        _buildTextField('Blood Pressure', _bloodPressureController, 'mmHg'),
-        _buildTextField('Gender', _genderController),
-        _buildTextField('Weight', _weightController, 'kg'),
-        _buildTextField('Height', _heightController, 'cm'),
-        _buildTextField('BMI', _bmiController),
-        _buildTextField('Blood Glucose', _bloodGlucoseController, 'mg/dL'),
-        _buildTextField('Existing Condition', _existingConditionController),
-        _buildTextField('Current Prescription', _currentPrescriptionController),
-        _buildTextArea('CHEW\'s Notes', _chewsNotesController),
-        SizedBox(height: 20),
-        if (widget.editable)
-          ElevatedButton(
-            onPressed: _saveData,
-            child: Text('Save'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField('Email', _emailController),
+              _buildTextField('Phone Number', _phoneController),
+              SizedBox(height: 20),
+              Text(
+                'Medical Details',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              _buildTextField('Blood Pressure', _bloodPressureController, 'mmHg'),
+              _buildGenderDropdown(_genderController),
+              _buildTextField('Weight', _weightController, 'kg'),
+              _buildTextField('Height', _heightController, 'cm'),
+              _buildTextField('BMI', _bmiController),
+              _buildTextField('Blood Glucose', _bloodGlucoseController, 'mg/dL'),
+              _buildTextField('Existing Condition', _existingConditionController),
+              _buildTextField('Current Prescription', _currentPrescriptionController),
+              _buildTextArea('CHEW\'s Notes', _chewsNotesController),
+              SizedBox(height: 20),
+              if (widget.editable)
+                ElevatedButton(
+                  onPressed: _saveData,
+                  child: Text('Save'),
+                ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
       [String? unit]) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixText: unit,
-        border: OutlineInputBorder(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixText: unit,
+          border: OutlineInputBorder(),
+        ),
         enabled: widget.editable,
+      ),
+    );
+  }
+
+  Widget _buildGenderDropdown(TextEditingController controller) {
+    String? selectedGender;
+    return DropdownButtonFormField<String>(
+      value: selectedGender,
+      onChanged: widget.editable
+          ? (value) {
+              setState(() {
+                selectedGender = value;
+                controller.text = value ?? '';
+              });
+            }
+          : null,
+      items: ['Male', 'Female']
+          .map((gender) => DropdownMenuItem<String>(
+                value: gender,
+                child: Text(gender),
+              ))
+          .toList(),
+      decoration: InputDecoration(
+        labelText: 'Gender',
+        border: OutlineInputBorder(),
       ),
     );
   }
