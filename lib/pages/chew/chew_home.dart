@@ -19,7 +19,6 @@ class ChewHome extends StatelessWidget {
       appBar: chewAppBar(),
       //detect a back button press and dont log out the person
       body: ChewHomeBody(),
-      //     ProfilePage(pageController: pageController),
       //     AddCaseForms(),
       //     UpdateProfileChew(),
       //     ManagePaymentsChew(),
