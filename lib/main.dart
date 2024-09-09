@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Removes the debug banner
+      debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Color(0xFF617DEF),
@@ -27,12 +27,6 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor:
-              Colors.blueGrey, // Ensure bottom bar has a background color
-          selectedItemColor: Colors.white, // Color for selected item
-          unselectedItemColor: Colors.black, // Color for unselected items
         ),
       ),
       darkTheme: ThemeData(
@@ -50,11 +44,6 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.blueGrey, // Same for dark theme
-          selectedItemColor: Colors.red,
-          unselectedItemColor: Colors.grey,
         ),
       ),
       themeMode: ThemeMode.system, // Uses the system theme mode
