@@ -31,9 +31,10 @@ flutter:
     - assets/images/wheelchair.jpeg
     - assets/images/email-campaign.jpeg
     - assets/images/medical-folder.png
-    - assets/images/doctor-image.png
+    - assets/images/doctor.png
     - assets/icons/arrow_up.png
     - assets/.env
+
 
   # assets:
   #  - images/a_dot_burr.jpeg
