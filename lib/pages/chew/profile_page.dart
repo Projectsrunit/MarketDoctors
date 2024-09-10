@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'dart:math';
-import 'package:market_doctor/pages/chew/stats_row.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -25,7 +26,7 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
-            _buildGeneralList(),
+            _buildGeneralList(context),
             SizedBox(height: 8), // List of rows under "General"
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -39,7 +40,7 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
-            _buildSystemList(), // List of rows under "System"
+            _buildSystemList(context), // List of rows under "System"
           ],
         ),
       ),
@@ -47,38 +48,103 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-Widget _buildGeneralList() {
-  return Column(
-    children: [
-      _buildArrowRow(Icons.account_circle, "Profile information", () {
-        // pageController.jumpToPage(8);
-      }),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildArrowRow(Icons.payment, "Manage payments", () {
-        // pageController.jumpToPage(9);
-      }),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildArrowRow(Icons.school, "Update qualifications", () {
-        // pageController.jumpToPage(10);
-      }),
-    ],
-  );
-}
+  Widget _buildGeneralList(context) {
+    return Column(
+      children: [
+        _buildArrowRow(Icons.account_circle, "Profile information", () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => UpdateProfileChew()));
+        }),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildArrowRow(Icons.payment, "Manage payments", () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ManagePaymentsChew()));
+        }),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildArrowRow(Icons.school, "Update qualifications", () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdateQualificationChew()));
+        }),
+      ],
+    );
+  }
 
-Widget _buildSystemList() {
-  return Column(
-    children: [
-      _buildNoArrowRow(Icons.dark_mode, "Dark mode", () {}),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(Icons.lock, "Change password", _showPasswordPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(Icons.pin, "Change transaction pin", _showPinPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(Icons.notifications, "Allow notifications", () {}),
-    ],
-  );
-}
+  Widget _buildSystemList(context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
 
+    return Column(
+      children: [
+        _buildModeToggleRow(
+            context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.lock, "Change password", _showPasswordPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.pin, "Change transaction pin", _showPinPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.logout, "Log out", () {}),
+      ],
+    );
+  }
+
+  Widget _buildModeToggleRow(BuildContext context, IconData icon, String label,
+      VoidCallback onToggle) {
+    return InkWell(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(label),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: Theme.of(context).brightness == Brightness.dark,
+                onChanged: (value) {
+                  onToggle();
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotifToggleRow(IconData icon, String label,
+      VoidCallback onToggle) {
+    return InkWell(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(label),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: true,
+                onChanged: (value) {
+                  onToggle();
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildArrowRow(IconData icon, String label, VoidCallback onTap) {
     return InkWell(
@@ -267,10 +333,10 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
 
 class UpdateProfileChew extends StatefulWidget {
   @override
-  _UpdateProfileChewState createState() => _UpdateProfileChewState();
+  UpdateProfileChewState createState() => UpdateProfileChewState();
 }
 
-class _UpdateProfileChewState extends State<UpdateProfileChew> {
+class UpdateProfileChewState extends State<UpdateProfileChew> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -322,58 +388,64 @@ class _UpdateProfileChewState extends State<UpdateProfileChew> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        StatsRow(),
-        SizedBox(height: 20),
-        Text(
-          'Update Profile',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 20),
-        TextField(
-          controller: firstNameController,
-          decoration: InputDecoration(labelText: 'First Name'),
-        ),
-        SizedBox(height: 10),
-        TextField(
-          controller: lastNameController,
-          decoration: InputDecoration(labelText: 'Last Name'),
-        ),
-        SizedBox(height: 10),
-        Row(
+    return Scaffold(
+      appBar: chewAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: TextField(
-                controller: phoneNumberController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
-              ),
+            SizedBox(height: 20),
+            Text(
+              'Update Profile',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: () => _sendOTP('number'),
-              child: Text('Verify'),
+            SizedBox(height: 20),
+            TextField(
+              controller: firstNameController,
+              decoration: InputDecoration(labelText: 'First Name'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: lastNameController,
+              decoration: InputDecoration(labelText: 'Last Name'),
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: phoneNumberController,
+                    decoration: InputDecoration(labelText: 'Phone Number'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _sendOTP('number'),
+                  child: Text('Verify'),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _sendOTP('email'),
+                  child: Text('Verify'),
+                ),
+              ],
             ),
           ],
         ),
-        SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-              ),
-            ),
-            SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: () => _sendOTP('email'),
-              child: Text('Verify'),
-            ),
-          ],
-        ),
-      ],
+      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

@@ -165,12 +165,13 @@ class CaseInstance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color infoIconColor =
-        isActive && activeIconType == IconType.information ? Colors.blue : Colors.black;
-    final Color editIconColor =
-        isActive && activeIconType == IconType.edit ? Colors.blue : Colors.black;
-    final Color deleteIconColor =
-        isActive && activeIconType == IconType.delete ? Colors.blue : Colors.black;
+  final isDarkMode = Theme.of(context).brightness == Brightness.light;
+  final Color infoIconColor =
+      isActive && activeIconType == IconType.information ? Colors.blue : (isDarkMode ? Colors.black : Colors.white);
+  final Color editIconColor =
+      isActive && activeIconType == IconType.edit ? Colors.blue : (isDarkMode ? Colors.black : Colors.white);
+  final Color deleteIconColor =
+      isActive && activeIconType == IconType.delete ? Colors.blue : (isDarkMode ? Colors.black : Colors.white);
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
