@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/choose_action.dart';
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  await dotenv.load(fileName: "assets/.env");
   runApp(const MyApp());
 }
 
@@ -51,7 +54,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.blueGrey, 
+          backgroundColor: Colors.blueGrey,
           selectedItemColor: Colors.red,
           unselectedItemColor: Colors.grey,
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:market_doctor/pages/success_page.dart';
 
 class UploadCredentialsPage extends StatelessWidget {
@@ -48,7 +50,6 @@ class UploadCredentialsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Heading Text
                     const Text(
                       'Upload Credentials',
                       style: TextStyle(
@@ -59,7 +60,6 @@ class UploadCredentialsPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Subheading Text
                     const Text(
                       'Regulation requires you to upload a certificate as a community health worker. Your data will stay safe and private with us.',
                       style: TextStyle(
@@ -67,38 +67,65 @@ class UploadCredentialsPage extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 50),
 
-                    // Upload Folder Button
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Handle folder upload action
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Folder upload not implemented.'),
-                          ),
-                        );
+                    // Drag and Drop Container
+                    GestureDetector(
+                      onTap: () {
+                        _pickFile(context);
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 50,
-                        ),
-                        backgroundColor: Theme.of(context).primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      icon: const Icon(Icons.folder_open),
-                      label: const Text(
-                        'Upload Folder',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
+                      child: DottedBorder(
+                        color: Colors.grey,
+                        strokeWidth: 2,
+                        dashPattern: [8, 4],
+                        borderType: BorderType.RRect,
+                        radius: const Radius.circular(10),
+                        child: Container(
+                          height: 200,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/arrow_up.png', // Add your own SVG arrow image here
+                                height: 80,
+                                width: 80,
+                                color: Color(0xFF617DEF),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Drag & Drop your files here',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xFF617DEF),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'or',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Browse Files',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF617DEF),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
 
                     // Select File from Gallery Button
@@ -107,11 +134,11 @@ class UploadCredentialsPage extends StatelessWidget {
                         _pickFile(context);
                       },
                       style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           vertical: 16,
                           horizontal: 50,
                         ),
-                        side: const BorderSide(color: Colors.blue),
+                        side: const BorderSide(color: Color(0xFF617DEF)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -120,7 +147,7 @@ class UploadCredentialsPage extends StatelessWidget {
                         'Select File from Gallery',
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.blue,
+                          color: Color(0xFF617DEF),
                         ),
                       ),
                     ),
@@ -143,7 +170,7 @@ class UploadCredentialsPage extends StatelessWidget {
                   vertical: 16,
                   horizontal: 50,
                 ),
-                backgroundColor: Colors.blue,
+                backgroundColor: Color(0xFF617DEF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

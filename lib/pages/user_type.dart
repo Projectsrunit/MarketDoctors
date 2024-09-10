@@ -50,14 +50,19 @@ class ChooseUserTypePage extends StatelessWidget {
                       textStyle: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.local_hospital, size: 40),
-                        SizedBox(height: 10),
-                        Text('Doctor'),
+                      children: [
+                        Image.asset(
+                          'assets/images/doctor-image.png', // Replace with your doctor image path
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text('Doctor'),
                       ],
                     ),
                   ),
@@ -76,14 +81,19 @@ class ChooseUserTypePage extends StatelessWidget {
                       textStyle: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.person, size: 40),
-                        SizedBox(height: 10),
-                        Text('Patient'),
+                      children: [
+                        Image.asset(
+                          'assets/images/doctor-image.png', // Replace with your patient image path
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text('Patient'),
                       ],
                     ),
                   ),
@@ -104,14 +114,19 @@ class ChooseUserTypePage extends StatelessWidget {
                 textStyle: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.medical_services, size: 40),
-                  SizedBox(height: 10),
-                  Text('CHEW'),
+                children: [
+                  Image.asset(
+                    'assets/images/medical-folder.png', // Replace with your CHEW image path
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('CHEW'),
                 ],
               ),
             ),

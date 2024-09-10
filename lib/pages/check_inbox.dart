@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/verification_page.dart';
 import 'package:market_doctor/pages/upload_file.dart';
 
 class CheckInboxPage extends StatelessWidget {
@@ -22,15 +23,14 @@ class CheckInboxPage extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
             const Text(
               'An OTP has been sent to your email and phone number.',
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            Image.asset(
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyu25MHS1zMFvQ5_S-oWCIUZpf70SjkCMQgg&s',
-                height: 150), // Replace with your own image
+            Image.asset('assets/images/email-campaign.jpeg',
+                height: 300), // Replace with your own image
 
             const SizedBox(height: 40),
             TextButton(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/check_inbox.dart';
 import 'package:market_doctor/pages/login_page.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -14,16 +17,16 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _dobController = TextEditingController();
 
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
-
-  String _selectedCountryCode = '+234'; // Default to Nigeria's country code
+  String _selectedCountryCode = '+234';
   bool _termsAccepted = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -36,99 +39,137 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  void _signUp() {
+  Future<void> _signUp() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (!_termsAccepted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please accept the terms and conditions'),
-          ),
-        );
+        _showSnackBar('Please accept the terms and conditions');
       } else {
-        // Handle the sign-up logic here
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signing up...'),
-          ),
-        );
-        // Navigate to CheckInboxPage after signing up
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const CheckInboxPage(),
-          ),
-        );
+        setState(() {
+          _isLoading = true;
+        });
+
+        // API request setup
+        String baseUrl = dotenv.env['API_URL']!;
+        String url = '$baseUrl/api/auth/register';
+
+        Map<String, dynamic> signUpData = {
+          "firstName": _firstNameController.text.trim(),
+          "lastName": _lastNameController.text.trim(),
+          "email": _emailController.text.trim(),
+          "password": _passwordController.text,
+          "dateOfBirth": _dobController.text,
+          "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
+          "role": 2 // Assuming '2' is the role for users
+        };
+
+        try {
+          // Make the POST request
+          http.Response response = await http.post(
+            Uri.parse(url),
+            headers: {"Content-Type": "application/json"},
+            body: json.encode(signUpData),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            _showSnackBar('Sign up successful');
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const CheckInboxPage()),
+            );
+          } else {
+            _showSnackBar('Sign up failed: ${response.body}');
+          }
+        } catch (e) {
+          _showSnackBar('Error: $e');
+        } finally {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Sign Up'),
-      // ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Let’s get you signed up',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                const Text(
-                  "Already Signed Up? ",
-                  style: TextStyle(
-                    color: Color(0xFFb8b8b8),
-                    fontSize: 18,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'Log In',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 18,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 10),
+                _buildLoginPrompt(),
                 const SizedBox(height: 20),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      _buildNameFields(),
-                      const SizedBox(height: 16),
-                      _buildEmailField(),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(),
-                      const SizedBox(height: 16),
-                      _buildPhoneField(),
-                      const SizedBox(height: 16),
-                      _buildDobField(),
-                      const SizedBox(height: 16),
-                      _buildTermsAndConditions(),
-                      const SizedBox(height: 20),
-                      _buildSignUpButton(),
-                    ],
-                  ),
-                ),
+                _buildSignUpForm(),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLoginPrompt() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          "Already Signed Up? ",
+          style: TextStyle(color: Color(0xFFb8b8b8), fontSize: 16),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+          },
+          child: const Text(
+            'Log In',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF4672ff),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignUpForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          _buildNameFields(),
+          const SizedBox(height: 16),
+          _buildEmailField(),
+          const SizedBox(height: 16),
+          _buildPasswordField(),
+          const SizedBox(height: 16),
+          _buildPhoneField(),
+          const SizedBox(height: 16),
+          _buildDobField(),
+          const SizedBox(height: 16),
+          _buildTermsAndConditions(),
+          const SizedBox(height: 20),
+          _buildSignUpButton(),
+        ],
       ),
     );
   }
@@ -140,12 +181,7 @@ class _SignUpPageState extends State<SignUpPage> {
           child: _buildTextField(
             controller: _firstNameController,
             labelText: 'First Name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your first name';
-              }
-              return null;
-            },
+            validator: _validateName,
           ),
         ),
         const SizedBox(width: 10),
@@ -153,16 +189,18 @@ class _SignUpPageState extends State<SignUpPage> {
           child: _buildTextField(
             controller: _lastNameController,
             labelText: 'Last Name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your last name';
-              }
-              return null;
-            },
+            validator: _validateName,
           ),
         ),
       ],
     );
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your name';
+    }
+    return null;
   }
 
   Widget _buildEmailField() {
@@ -175,7 +213,7 @@ class _SignUpPageState extends State<SignUpPage> {
         if (value == null || value.isEmpty) {
           return 'Please enter your email';
         } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return 'Please enter a valid email address';
+          return 'Please enter a valid email';
         }
         return null;
       },
@@ -200,37 +238,36 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildPhoneField() {
-    return Row(
-      children: [
-        CountryCodePicker(
-          onChanged: (countryCode) {
-            setState(() {
-              _selectedCountryCode = countryCode.toString();
-              _phoneController.text =
-              '$_selectedCountryCode${_phoneController.text}';
-            });
-          },
-          initialSelection: 'NG',
-          favorite: ['+234', 'NG'],
+    return TextFormField(
+      controller: _phoneController,
+      keyboardType: TextInputType.phone,
+      inputFormatters: [LengthLimitingTextInputFormatter(10)],
+      decoration: InputDecoration(
+        labelText: 'Phone Number',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildTextField(
-            controller: _phoneController,
-            labelText: 'Phone Number',
-            keyboardType: TextInputType.phone,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(15),
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              return null;
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: CountryCodePicker(
+            onChanged: (countryCode) {
+              setState(() {
+                _selectedCountryCode = countryCode.toString();
+              });
             },
+            initialSelection: 'NG',
+            favorite: ['+234', 'NG'],
+            showFlag: true,
+            showDropDownButton: true,
           ),
         ),
-      ],
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your phone number';
+        }
+        return null;
+      },
     );
   }
 
@@ -272,13 +309,12 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       title: const Text('I accept the terms and conditions'),
       controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.zero,
       dense: true,
       subtitle: !_termsAccepted
           ? const Text(
-        'You need to accept terms and conditions to proceed',
-        style: TextStyle(color: Colors.red),
-      )
+              'You need to accept terms and conditions to proceed',
+              style: TextStyle(color: Colors.red),
+            )
           : null,
     );
   }
@@ -292,8 +328,8 @@ class _SignUpPageState extends State<SignUpPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        foregroundColor: Colors.white, // Text color
-        backgroundColor: Theme.of(context).primaryColor, // Background color
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
     );
   }

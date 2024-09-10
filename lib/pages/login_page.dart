@@ -1,4 +1,3 @@
-// login_page.dart
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/signup_page.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
@@ -51,13 +50,15 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don’t have an account? ",
-                        style: TextStyle(
-                          color: Color(0xFFb8b8b8),
-                          fontSize: 18,
-                        )),
-                    TextButton(
-                      onPressed: () {
+                    const Text(
+                      "Don’t have an account? ",
+                      style: TextStyle(
+                        color: Color(0xFFb8b8b8),
+                        fontSize: 18,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const SignUpPage(),
@@ -67,8 +68,9 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
-                          fontSize: 14, // Small font size for sign-up link
-                          color: Colors.white, // Customize color as needed
+                          fontSize: 18, // Small font size for sign-up link
+                          color: Color(0xFF4672ff),
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -120,61 +122,27 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        value: _selectedUserType,
-                        items: _userTypes
-                            .map((userType) => DropdownMenuItem<String>(
-                                  value: userType,
-                                  child: Text(userType),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedUserType = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'User Type',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          prefixIcon: const Icon(Icons.person),
-                        ),
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please select a user type';
-                          }
-                          return null;
-                        },
-                      ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
+                      TextButton(
                         onPressed: () {
-                          // if (_formKey.currentState?.validate() ?? false) {
-                          //   // Handle the login logic
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //     const SnackBar(
-                          //       content: Text('Logging in...'),
-                          //     ),
-                          //   );
-                          // }
-                          // Navigate to ChewHome
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ChewHome()),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ChewHome(),
+                            ),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
+                        style: TextButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          foregroundColor: Colors.white, // Text color
+                          backgroundColor: Theme.of(context)
+                              .primaryColor, // Background color
                         ),
-                        child: const Text('Login'),                        
+                        child: const Text('Log In'),
                       ),
                       const SizedBox(height: 20),
-                      // Sign-Up Text and Link
                     ],
                   ),
                 ),
