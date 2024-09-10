@@ -37,7 +37,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.home, size: 36, color: Colors.blue),
+                    icon: Icon(Icons.home, size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -52,7 +52,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.business_center, size: 36, color: Colors.blue),
+                    icon: Icon(Icons.business_center, size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => CasesPage()));
@@ -68,7 +68,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.credit_card, size: 36, color: Colors.blue),
+                    icon: Icon(Icons.credit_card, size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -84,7 +84,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.person, size: 36, color: Colors.blue),
+                    icon: Icon(Icons.person, size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -98,7 +98,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
             ],
           ),
         ),
-        // Positioned arrow button in the center
         Positioned(
           top: -12,
           child: GestureDetector(
@@ -117,7 +116,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     PopupMenuItem(
                       child: Row(
                         children: [
-                          Icon(Icons.add, color: Colors.blue),
+                          Icon(Icons.add, color: Color(0xFF617DEF)),
                           SizedBox(width: 10),
                           Text('Add a case'),
                         ],
@@ -170,7 +169,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 height: 70,
                 width: 70,
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color(0xFF617DEF),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/stats_row.dart';
-import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ChewHome extends StatelessWidget {
@@ -20,8 +17,6 @@ class ChewHome extends StatelessWidget {
       //detect a back button press and dont log out the person
       body: ChewHomeBody(),
       //     AddCaseForms(),
-      //     UpdateProfileChew(),
-      //     ManagePaymentsChew(),
       //     UpdateQualificationChew(),
       floatingActionButton: FloatingActionButton.extended(
   onPressed: () {},
