@@ -8,14 +8,14 @@ import 'package:market_doctor/pages/check_inbox.dart';
 import 'package:market_doctor/pages/login_page.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+class DoctorSignUpPage extends StatefulWidget {
+  const DoctorSignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<DoctorSignUpPage> createState() => _DoctorSignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -52,6 +52,7 @@ class _SignUpPageState extends State<SignUpPage> {
         String baseUrl = dotenv.env['API_URL']!;
         String url = '$baseUrl/api/auth/register';
 
+        // Prepare the data to be sent to the backend
         Map<String, dynamic> signUpData = {
           "firstName": _firstNameController.text.trim(),
           "lastName": _lastNameController.text.trim(),
@@ -59,7 +60,7 @@ class _SignUpPageState extends State<SignUpPage> {
           "password": _passwordController.text,
           "dateOfBirth": _dobController.text,
           "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
-          "role": 2 // Assuming '2' is the role for users
+          "role": 3
         };
 
         try {
