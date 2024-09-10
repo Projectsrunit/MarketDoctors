@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/signup_page.dart';
+import 'package:market_doctor/pages/chew/signup_page.dart';
+import 'package:market_doctor/pages/doctor/signup_page.dart';
+import 'package:market_doctor/pages/patient/signup_page.dart';
 
 class ChooseUserTypePage extends StatelessWidget {
   const ChooseUserTypePage({super.key});
@@ -38,12 +40,13 @@ class ChooseUserTypePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const SignUpPage(),
+                          builder: (context) => const DoctorSignUpPage(),
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      elevation: 5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -57,7 +60,7 @@ class ChooseUserTypePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/doctor-image.png', // Replace with your doctor image path
+                          'assets/images/doctor.png', // Replace with your CHEW image path
                           height: 80,
                           fit: BoxFit.cover,
                         ),
@@ -71,10 +74,15 @@ class ChooseUserTypePage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Navigate to Patient Page or perform action
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const PatientSignUpPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      elevation: 5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -88,7 +96,7 @@ class ChooseUserTypePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/doctor-image.png', // Replace with your patient image path
+                          'assets/images/medical-folder.png', // Replace with your patient image path
                           height: 80,
                           fit: BoxFit.cover,
                         ),
@@ -103,11 +111,16 @@ class ChooseUserTypePage extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to CHEW Page or perform action
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ChewSignUpPage(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 35),
+                elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -120,10 +133,10 @@ class ChooseUserTypePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/medical-folder.png', // Replace with your CHEW image path
-                    height: 80,
-                    fit: BoxFit.cover,
+                  Icon(
+                    Icons.people, // Replace the image with an icon
+                    size: 80,
+                    color: Colors.black, // Customize the icon color if needed
                   ),
                   const SizedBox(height: 10),
                   const Text('CHEW'),
