@@ -1,117 +1,181 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'dart:math';
-import 'package:market_doctor/pages/chew/stats_row.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
-  final PageController pageController;
-
-  ProfilePage({required this.pageController});
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        StatsRow(), // First child
-        Row(
+    return Scaffold(
+      appBar: chewAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
           children: [
-            Icon(Icons.person_outline), // Silhouette of a person
-            SizedBox(width: 8),
-            Text('General', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Icon(Icons.person_outline),
+                  SizedBox(width: 8),
+                  Text('General',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            _buildGeneralList(context),
+            SizedBox(height: 8), // List of rows under "General"
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Icon(Icons.settings),
+                  SizedBox(width: 8),
+                  Text('System',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            _buildSystemList(context), // List of rows under "System"
           ],
         ),
-        _buildGeneralList(), // List of rows under "General"
-        Row(
+      ),
+      bottomNavigationBar: BottomNavBar(),
+    );
+  }
+
+  Widget _buildGeneralList(context) {
+    return Column(
+      children: [
+        _buildArrowRow(Icons.account_circle, "Profile information", () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => UpdateProfileChew()));
+        }),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildArrowRow(Icons.payment, "Manage payments", () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ManagePaymentsChew()));
+        }),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildArrowRow(Icons.school, "Update qualifications", () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdateQualificationChew()));
+        }),
+      ],
+    );
+  }
+
+  Widget _buildSystemList(context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+
+    return Column(
+      children: [
+        _buildModeToggleRow(
+            context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.lock, "Change password", _showPasswordPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.pin, "Change transaction pin", _showPinPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(Icons.logout, "Log out", () {}),
+      ],
+    );
+  }
+
+  Widget _buildModeToggleRow(BuildContext context, IconData icon, String label,
+      VoidCallback onToggle) {
+    return InkWell(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
           children: [
-            Icon(Icons.settings),
+            Icon(icon, size: 20),
             SizedBox(width: 8),
-            Text('System', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(label),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: Theme.of(context).brightness == Brightness.dark,
+                onChanged: (value) {
+                  onToggle();
+                },
+              ),
+            )
           ],
         ),
-        _buildSystemList(), // List of rows under "System"
-      ],
+      ),
     );
   }
 
-  Widget _buildGeneralList() {
-    return Column(
-      children: [
-        _buildClickableRow(Icons.account_circle, "Profile information", () {
-          pageController.jumpToPage(8);
-        }),
-        _buildClickableRow(Icons.payment, "Manage payments", () {
-          pageController.jumpToPage(9);
-        }),
-        _buildClickableRow(Icons.school, "Update qualifications", () {
-          pageController.jumpToPage(10);
-        }),
-      ],
+  Widget _buildNotifToggleRow(IconData icon, String label,
+      VoidCallback onToggle) {
+    return InkWell(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(label),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: true,
+                onChanged: (value) {
+                  onToggle();
+                },
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildSystemList() {
-    return Column(
-      children: [
-        _buildToggleRow(Icons.dark_mode, "Dark mode"),
-        _buildPasswordRow(Icons.lock, "Change password"),
-        _buildPinRow(Icons.pin, "Change transaction pin"),
-        _buildToggleRow(Icons.notifications, "Allow notifications"),
-      ],
-    );
-  }
-
-  Widget _buildClickableRow(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildArrowRow(IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon, size: 20),
-          SizedBox(width: 8),
-          Text(label),
-          Spacer(),
-          Icon(Icons.arrow_forward_ios, size: 16),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 8),
+            Text(label),
+            Spacer(),
+            Icon(Icons.arrow_forward_ios, size: 16),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildToggleRow(IconData icon, String label) {
-    return Row(
-      children: [
-        Icon(icon, size: 20),
-        SizedBox(width: 8),
-        Text(label),
-        Spacer(),
-        Switch(value: false, onChanged: (bool newValue) {}),
-      ],
-    );
-  }
-
-  Widget _buildPasswordRow(IconData icon, String label) {
+  Widget _buildNoArrowRow(IconData icon, String label, VoidCallback onTap) {
     return InkWell(
-      onTap: () {
-        _showPasswordPopup();
-      },
-      child: Row(
-        children: [
-          Icon(icon, size: 20),
-          SizedBox(width: 8),
-          Text(label),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPinRow(IconData icon, String label) {
-    return InkWell(
-      onTap: () {
-        _showPinPopup();
-      },
-      child: Row(
-        children: [
-          Icon(icon, size: 20),
-          SizedBox(width: 8),
-          Text(label),
-        ],
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            SizedBox(width: 8),
+            Text(label),
+          ],
+        ),
       ),
     );
   }
@@ -127,11 +191,15 @@ class ProfilePage extends StatelessWidget {
 
 class UpdateQualificationChew extends StatefulWidget {
   @override
-  _UpdateQualificationChewState createState() => _UpdateQualificationChewState();
+  _UpdateQualificationChewState createState() =>
+      _UpdateQualificationChewState();
 }
 
 class _UpdateQualificationChewState extends State<UpdateQualificationChew> {
-  List<String> qualifications = ["B.Sc. Computer Science", "M.Sc. Information Technology"];
+  List<String> qualifications = [
+    "B.Sc. Computer Science",
+    "M.Sc. Information Technology"
+  ];
   final TextEditingController qualificationController = TextEditingController();
 
   void addQualification() {
@@ -146,11 +214,14 @@ class _UpdateQualificationChewState extends State<UpdateQualificationChew> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Manage qualifications', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        Text('Manage qualifications',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 10),
         Text('Qualification', style: TextStyle(fontSize: 18)),
         Column(
-          children: qualifications.map((qual) => ListTile(title: Text(qual))).toList(),
+          children: qualifications
+              .map((qual) => ListTile(title: Text(qual)))
+              .toList(),
         ),
         SizedBox(height: 20),
         Text('Add new', style: TextStyle(fontSize: 18)),
@@ -188,7 +259,9 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cancel')),
             ElevatedButton(onPressed: () {}, child: Text('Save')),
           ],
         );
@@ -204,7 +277,9 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
           title: Text('Confirm delete'),
           content: Text('Are you sure you want to delete this bank account?'),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cancel')),
             ElevatedButton(onPressed: () {}, child: Text('Delete')),
           ],
         );
@@ -217,12 +292,14 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Bank accounts', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        Text('Bank accounts',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 10),
         Text('Important reminders:'),
         Text('1. Payments are disbursed on the last day of the month.'),
         Text('2. All account numbers must match the name of the profile.'),
-        Text('3. Earnings must be greater than N20,000 before disbursement is made.'),
+        Text(
+            '3. Earnings must be greater than N20,000 before disbursement is made.'),
         SizedBox(height: 20),
         Divider(thickness: 2),
         Row(
@@ -230,7 +307,9 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('John Doe', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('John Doe',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Text('ABC Bank'),
                 Text('1234567890'),
               ],
@@ -254,10 +333,10 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
 
 class UpdateProfileChew extends StatefulWidget {
   @override
-  _UpdateProfileChewState createState() => _UpdateProfileChewState();
+  UpdateProfileChewState createState() => UpdateProfileChewState();
 }
 
-class _UpdateProfileChewState extends State<UpdateProfileChew> {
+class UpdateProfileChewState extends State<UpdateProfileChew> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -267,7 +346,7 @@ class _UpdateProfileChewState extends State<UpdateProfileChew> {
     int otp = _generateOTP();
     // Call API to send OTP (Simulated here)
     print("Sending OTP $otp to $type");
-    
+
     _showOTPPopup(type);
   }
 
@@ -309,58 +388,64 @@ class _UpdateProfileChewState extends State<UpdateProfileChew> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        StatsRow(),
-        SizedBox(height: 20),
-        Text(
-          'Update Profile',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 20),
-        TextField(
-          controller: firstNameController,
-          decoration: InputDecoration(labelText: 'First Name'),
-        ),
-        SizedBox(height: 10),
-        TextField(
-          controller: lastNameController,
-          decoration: InputDecoration(labelText: 'Last Name'),
-        ),
-        SizedBox(height: 10),
-        Row(
+    return Scaffold(
+      appBar: chewAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: TextField(
-                controller: phoneNumberController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
-              ),
+            SizedBox(height: 20),
+            Text(
+              'Update Profile',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: () => _sendOTP('number'),
-              child: Text('Verify'),
+            SizedBox(height: 20),
+            TextField(
+              controller: firstNameController,
+              decoration: InputDecoration(labelText: 'First Name'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: lastNameController,
+              decoration: InputDecoration(labelText: 'Last Name'),
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: phoneNumberController,
+                    decoration: InputDecoration(labelText: 'Phone Number'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _sendOTP('number'),
+                  child: Text('Verify'),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _sendOTP('email'),
+                  child: Text('Verify'),
+                ),
+              ],
             ),
           ],
         ),
-        SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-              ),
-            ),
-            SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: () => _sendOTP('email'),
-              child: Text('Verify'),
-            ),
-          ],
-        ),
-      ],
+      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

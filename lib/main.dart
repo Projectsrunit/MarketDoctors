@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
-  runApp(const MyApp());
+  ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: MyApp(),
+    );
+
 }
 
 class MyApp extends StatelessWidget {
@@ -12,14 +17,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Removes the debug banner
+      debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Color(0xFF617DEF), // Background color
+            backgroundColor: Color(0xFF617DEF),
             foregroundColor: Colors.white, // Text color for light mode
             padding: const EdgeInsets.symmetric(
               vertical: 12,
@@ -29,12 +36,6 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor:
-              Colors.blueGrey, // Ensure bottom bar has a background color
-          selectedItemColor: Colors.white, // Color for selected item
-          unselectedItemColor: Colors.black, // Color for unselected items
         ),
       ),
       darkTheme: ThemeData(
@@ -59,9 +60,20 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: Colors.grey,
         ),
       ),
-      themeMode: ThemeMode.system, // Uses the system theme mode
+      themeMode: themeNotifier.themeMode,
       home: const OnboardingScreen(),
     );
+  }
+}
+
+class ThemeNotifier extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  ThemeMode get themeMode => _themeMode;
+
+  void toggleTheme() {
+    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
   }
 }
 
