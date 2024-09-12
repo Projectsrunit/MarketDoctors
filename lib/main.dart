@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
-      debugShowCheckedModeBanner: true, 
+      debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Color(0xFF617DEF),
