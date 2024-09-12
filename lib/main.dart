@@ -5,10 +5,11 @@ import 'package:provider/provider.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
-  ChangeNotifierProvider(
+ runApp(ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
       child: MyApp(),
-    );
+      
+    ));
 
 }
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false, 
+      debugShowCheckedModeBanner: true, 
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Color(0xFF617DEF),
