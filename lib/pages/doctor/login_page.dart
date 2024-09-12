@@ -1,21 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/signup_page.dart';
-import 'package:market_doctor/pages/chew/chew_home.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For handling JSON
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/doctor/signup_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class DoctorLoginPage extends StatefulWidget {
+  const DoctorLoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<DoctorLoginPage> createState() => _DoctorLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String? _selectedUserType;
+  final _role = 3;
+  bool _isLoading = false;
 
-  final List<String> _userTypes = ['Patient', 'Doctor', 'CHEW'];
+  // Function to handle login
+  Future<void> _loginUser() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      String? baseUrl = dotenv.env['API_URL'];
+      if (baseUrl == null) {
+        _showMessage('Error: API URL not configured');
+        return;
+      }
+
+      try {
+        var url = Uri.parse('$baseUrl/api/auth/login');
+        var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'email': email,
+            'password': password,
+            'role': _role,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          var responseBody = jsonDecode(response.body);
+          _showMessage('Login successful!', isError: false);
+          // Handle successful login (navigate to another page, save token, etc.)
+          // For example, navigate to dashboard
+        } else {
+          var errorResponse = jsonDecode(response.body);
+          _showMessage(
+              'Login failed Wrong Credentials: ${errorResponse['message']}');
+        }
+      } catch (error) {
+        _showMessage('An error occurred. Please try again.');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Function to show success or error message
+  void _showMessage(String message, {bool isError = true}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 36, // Big font size for "Welcome Back"
+                        fontSize: 36,
                       ),
                 ),
                 Text(
@@ -44,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.normal,
-                        fontSize: 20, // Medium font size for login prompt
+                        fontSize: 20,
                       ),
                 ),
                 Row(
@@ -61,14 +121,14 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const SignUpPage(),
+                            builder: (context) => DoctorSignUpPage(),
                           ),
                         );
                       },
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
-                          fontSize: 18, // Small font size for sign-up link
+                          fontSize: 18,
                           color: Color(0xFF4672ff),
                           fontWeight: FontWeight.bold,
                         ),
@@ -76,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
                 Form(
                   key: _formKey,
@@ -123,25 +182,18 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ChewHome(),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                              onPressed: _loginUser,
+                              child: const Text('Log In'),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                             ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          foregroundColor: Colors.white, // Text color
-                          backgroundColor: Theme.of(context)
-                              .primaryColor, // Background color
-                        ),
-                        child: const Text('Log In'),
-                      ),
                       const SizedBox(height: 20),
                     ],
                   ),

@@ -5,10 +5,11 @@ import 'package:provider/provider.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
-  ChangeNotifierProvider(
+ runApp(ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
       child: MyApp(),
-    );
+      
+    ));
 
 }
 
