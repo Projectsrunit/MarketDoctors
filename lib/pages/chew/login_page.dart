@@ -60,7 +60,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         } else {
           var errorResponse = jsonDecode(response.body);
           _showMessage(
-              'Login failed Wrong Credentials: ${errorResponse['message']}');
+              'Login failed Wrong Credentials');
         }
       } catch (error) {
         _showMessage('An error occurred. Please try again.');
