@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
 
 class ChewLoginPage extends StatefulWidget {
@@ -50,8 +51,12 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           _showMessage('Login successful!', isError: false);
-          // Handle successful login (navigate to another page, save token, etc.)
-          // For example, navigate to dashboard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChewHome(), 
+            ),
+          );
         } else {
           var errorResponse = jsonDecode(response.body);
           _showMessage(
