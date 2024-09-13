@@ -3,12 +3,14 @@ import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
+
 void main() async {
   await dotenv.load(fileName: "assets/.env");
-  ChangeNotifierProvider(
+ runApp(ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
       child: MyApp(),
-    );
+      
+    ));
 
 }
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+        final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false, 
@@ -36,6 +38,12 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
           ),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor:
+              Colors.blueGrey, // Ensure bottom bar has a background color
+          selectedItemColor: Colors.white, // Color for selected item
+          unselectedItemColor: Colors.black, // Color for unselected items
         ),
       ),
       darkTheme: ThemeData(
@@ -65,7 +73,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class ThemeNotifier extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
@@ -92,21 +99,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingPageData(
       title: 'Quality Healthcare for All',
       description: 'Enjoy the benefits that come with having the best doctors.',
-      imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSKIgZkMuobyFFeMEO5supYUCx2B8vbrCKQ_1NZfKCkNSRREAkHo2Q7Y2ExlErCxrEN4&usqp=CAU',
+      imageUrl: 'assets/images/people-celebrating.png',
     ),
     OnboardingPageData(
       title: 'Healthcare Provision Just for You',
       description:
           'Explore opportunities you deserve. Discover care that safeguards you.',
-      imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDQ09N0Q99dRduX_sz8LWCoJl8_wVQgF8brQ&s',
+      imageUrl: 'assets/images/medical-care.png',
     ),
     OnboardingPageData(
       title: 'Accessible from Anywhere',
       description: 'Contact doctors, ready to offer assistance.',
-      imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDQ09N0Q99dRduX_sz8LWCoJl8_wVQgF8brQ&s',
+      imageUrl: 'assets/images/location-review.png',
     ),
   ];
 
@@ -211,13 +215,12 @@ class OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.network(
+          Image.asset(
             imageUrl,
-            height: 400, // Adjust the height to make the image larger
-            fit: BoxFit
-                .cover, // Ensures the image covers the space while maintaining its aspect ratio
+            height: 350,
+            fit: BoxFit.cover,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 35),
           Text(
             title,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -228,13 +231,13 @@ class OnboardingPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 18,
+                      fontSize: 20,
                     ) ??
-                const TextStyle(fontSize: 18),
+                const TextStyle(fontSize: 20),
             textAlign: TextAlign.center,
           ),
         ],

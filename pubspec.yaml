@@ -35,6 +35,9 @@ flutter:
     - assets/images/medical-folder.png
     - assets/images/doctor.png
     - assets/icons/arrow_up.png
+    - assets/images/people-celebrating.png
+    - assets/images/medical-care.png
+    - assets/images/location-review.png
     - assets/.env
 
 

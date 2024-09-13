@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/signup_page.dart';
-import 'package:market_doctor/pages/doctor/signup_page.dart';
-import 'package:market_doctor/pages/patient/signup_page.dart';
+import 'package:market_doctor/pages/chew/login_page.dart';
+import 'package:market_doctor/pages/doctor/login_page.dart';
+import 'package:market_doctor/pages/patient/login_page.dart';
 
 class ChooseUserTypePage extends StatelessWidget {
   const ChooseUserTypePage({super.key});
@@ -40,7 +40,7 @@ class ChooseUserTypePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const DoctorSignUpPage(),
+                          builder: (context) => const DoctorLoginPage(),
                         ),
                       );
                     },
@@ -76,7 +76,7 @@ class ChooseUserTypePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const PatientSignUpPage(),
+                          builder: (context) => const PatientLoginPage(),
                         ),
                       );
                     },
@@ -113,7 +113,7 @@ class ChooseUserTypePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ChewSignUpPage(),
+                    builder: (context) => const ChewLoginPage(),
                   ),
                 );
               },
