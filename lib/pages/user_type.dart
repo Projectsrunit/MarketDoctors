@@ -66,8 +66,7 @@ class ChooseUserTypePage extends StatelessWidget {
                       ),
                       backgroundColor: isDarkMode
                           ? Colors.grey[800]
-                          : Color(
-                              0xFF617DEF), // Change button color for dark mode
+                          : Colors.blueGrey[50], // Change button color for dark mode
                       foregroundColor: Colors.white,
                     ),
                     child: Column(
@@ -112,8 +111,7 @@ class ChooseUserTypePage extends StatelessWidget {
                       ),
                       backgroundColor: isDarkMode
                           ? Colors.grey[800]
-                          : Color(
-                              0xFF617DEF), // Change button color for dark mode
+                          : Colors.blueGrey[50], // Change button color for dark mode
                       foregroundColor: Colors.white,
                     ),
                     child: Column(
@@ -160,7 +158,7 @@ class ChooseUserTypePage extends StatelessWidget {
                 ),
                 backgroundColor: isDarkMode
                     ? Colors.grey[800]
-                    : Color(0xFF617DEF), // Adapt button color
+                    : Colors.blueGrey[50], // Adapt button color
                 foregroundColor: Colors.white,
               ),
               child: Column(
