@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/check_inbox.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:market_doctor/pages/patient/check_inbox.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
 
 class PatientSignUpPage extends StatefulWidget {
@@ -74,7 +74,7 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
           if (response.statusCode == 200 || response.statusCode == 201) {
             _showSnackBar('Sign up successful');
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const CheckInboxPage()),
+              MaterialPageRoute(builder: (context) => const PatientCheckInboxPage()),
             );
           } else {
             _showSnackBar('Sign up failed: ${response.body}');

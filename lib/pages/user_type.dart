@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
+
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
 
@@ -8,6 +9,12 @@ class ChooseUserTypePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the current theme's brightness (light or dark)
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    // Define a text color based on the theme
+    final Color textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose User Type'),
@@ -17,18 +24,20 @@ class ChooseUserTypePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Choose User Type',
               style: TextStyle(
-                fontSize: 24, // Bold large font size
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: textColor, // Adapt to light/dark theme
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Just so we know you more and help you enjoy using the app',
               style: TextStyle(
-                fontSize: 16, // Medium font size
+                fontSize: 16,
+                color: textColor, // Adapt to light/dark theme
               ),
               textAlign: TextAlign.center,
             ),
@@ -51,21 +60,31 @@ class ChooseUserTypePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 19,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
+                      backgroundColor: isDarkMode
+                          ? Colors.grey[800]
+                          : Color(
+                              0xFF617DEF), // Change button color for dark mode
+                      foregroundColor: Colors.white,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/doctor.png', // Replace with your CHEW image path
+                          'assets/images/doctor-image.png',
                           height: 80,
                           fit: BoxFit.cover,
                         ),
                         const SizedBox(height: 10),
-                        const Text('Doctor'),
+                        Text(
+                          'Doctor',
+                          style: TextStyle(
+                            color: textColor, // Adapt text color
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -87,21 +106,31 @@ class ChooseUserTypePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 19,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
+                      backgroundColor: isDarkMode
+                          ? Colors.grey[800]
+                          : Color(
+                              0xFF617DEF), // Change button color for dark mode
+                      foregroundColor: Colors.white,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/medical-folder.png', // Replace with your patient image path
+                          'assets/images/medical-folder.png',
                           height: 80,
                           fit: BoxFit.cover,
                         ),
                         const SizedBox(height: 10),
-                        const Text('Patient'),
+                        Text(
+                          'Patient',
+                          style: TextStyle(
+                            color: textColor, // Adapt text color
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -125,21 +154,30 @@ class ChooseUserTypePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 textStyle: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 19,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
+                backgroundColor: isDarkMode
+                    ? Colors.grey[800]
+                    : Color(0xFF617DEF), // Adapt button color
+                foregroundColor: Colors.white,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.people, // Replace the image with an icon
+                    Icons.people,
                     size: 80,
-                    color: Colors.black, // Customize the icon color if needed
+                    color: textColor, // Icon color adapts to theme
                   ),
                   const SizedBox(height: 10),
-                  const Text('CHEW'),
+                  Text(
+                    'CHEW',
+                    style: TextStyle(
+                      color: textColor, // Adapt text color
+                    ),
+                  ),
                 ],
               ),
             ),

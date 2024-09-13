@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/patient/success_page.dart';
+import 'package:market_doctor/pages/chew/success_page.dart';
 
-class PatientVerificationPage extends StatefulWidget {
-  const PatientVerificationPage({Key? key}) : super(key: key);
+class ChewVerificationPage extends StatefulWidget {
+  const ChewVerificationPage({Key? key}) : super(key: key);
 
   @override
-  State<PatientVerificationPage> createState() => _PatientVerificationPageState();
+  State<ChewVerificationPage> createState() => _ChewVerificationPageState();
 }
 
-class _PatientVerificationPageState extends State<PatientVerificationPage> {
+class _ChewVerificationPageState extends State<ChewVerificationPage> {
   final _otpControllers = List.generate(4, (index) => TextEditingController());
 
   void _verifyOtp() {
@@ -71,9 +71,9 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                       controller: _otpControllers[index],
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      maxLength: 1,  // Only 1 digit per field
+                      maxLength: 1, // Only 1 digit per field
                       decoration: InputDecoration(
-                        counterText: '',  // Hide the character counter
+                        counterText: '', // Hide the character counter
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -88,7 +88,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                   _verifyOtp();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const PatientSuccessPage(),
+                      builder: (context) => const ChewSuccessPage(),
                     ),
                   );
                 },

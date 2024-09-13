@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/patient/login_page.dart';
+import 'package:market_doctor/pages/chew/login_page.dart';
 
-class PatientSuccessPage extends StatelessWidget {
-  const PatientSuccessPage({super.key});
+class ChewSuccessPage extends StatelessWidget {
+  const ChewSuccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class PatientSuccessPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PatientLoginPage(),
+                      builder: (context) => const ChewLoginPage(),
                     ),
                   );
                 },
