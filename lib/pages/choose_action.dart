@@ -11,34 +11,42 @@ class ChooseActionPage extends StatelessWidget {
         title: const Text('Choose Action'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(
+            24.0), // Increased padding around the whole body
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch, // Stretch buttons to full width
           children: [
             // Company Logo
-            Image.asset('assets/images/logo.png'),
-            const SizedBox(height: 20),
+            Image.asset(
+              'assets/images/logo.png',
+              height: 150, // Adjusted logo height for better scaling
+            ),
+            const SizedBox(height: 40), // Increased space between logo and text
 
             // Title Text
             const Text(
               'Welcome to Market Doctor',
               style: TextStyle(
-                fontSize: 24, // Large font size
+                fontSize: 26, // Larger font size for title
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(
+                height: 20), // Increased space between title and description
 
             // Description Text
             const Text(
               'Please choose an option to continue:',
               style: TextStyle(
-                fontSize: 16, // Medium font size
+                fontSize:
+                    18, // Slightly larger font size for better readability
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 40), // Increased space before the buttons
 
             // Login Button (ElevatedButton)
             ElevatedButton(
@@ -50,31 +58,28 @@ class ChooseActionPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 5,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20), // Increased vertical padding
+                elevation: 6, // Slightly more elevation for a raised effect
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius:
+                      BorderRadius.circular(12), // More rounded corners
                 ),
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.blueGrey[700] // Darker button for dark mode
-                    : Color(0xFF617DEF), // Primary color for light mode
-                textStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                    ? Colors.white
+                    : Colors.blueGrey[10],
               ),
-              child: const Center(
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white, // White text for better contrast
-                  ),
+              child: const Text(
+                'Login',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20), // Increased space between buttons
 
             // Signup Button (ElevatedButton)
             ElevatedButton(
@@ -86,26 +91,22 @@ class ChooseActionPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 5,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20), 
+                elevation: 6,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.blueGrey[700] // Darker button for dark mode
-                    : Color(0xFF617DEF), // Primary color for light mode
-                textStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                    ? Colors.white
+                    : Colors.blueGrey[10],
               ),
-              child: const Center(
-                child: Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white, // White text for better contrast
-                  ),
+              child: const Text(
+                'Sign Up',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

@@ -16,7 +16,7 @@ dependencies:
   dotted_border: ^2.0.0
   flutter_dotenv: ^5.0.2
   http: ^0.13.5
-  font_awesome_flutter: ^10.0.0
+  font_awesome_flutter: ^10.0.0  
   provider: ^6.0.3
 
 dev_dependencies:
@@ -31,9 +31,9 @@ flutter:
     - assets/images/logo.png
     - assets/images/people.jpeg
     - assets/images/wheelchair.jpeg
-    - assets/images/email-campaign.jpeg
+    - assets/images/email-campaign.png
     - assets/images/medical-folder.png
-    - assets/images/doctor.png
+    - assets/images/doctor-image.png
     - assets/icons/arrow_up.png
     - assets/images/people-celebrating.png
     - assets/images/medical-care.png

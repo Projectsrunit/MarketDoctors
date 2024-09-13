@@ -60,7 +60,7 @@ class ChooseUserTypePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/doctor.png', // Replace with your CHEW image path
+                          'assets/images/doctor-image.png', // Replace with your CHEW image path
                           height: 80,
                           fit: BoxFit.cover,
                         ),

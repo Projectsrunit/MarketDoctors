@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/patient/login_page.dart';
+import 'package:market_doctor/pages/doctor/login_page.dart';
 
-class PatientSuccessPage extends StatelessWidget {
-  const PatientSuccessPage({super.key});
+class DoctorsSuccessPage extends StatelessWidget {
+  const DoctorsSuccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +50,14 @@ class PatientSuccessPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PatientLoginPage(),
+                      builder: (context) => const DoctorLoginPage(),
                     ),
                   );
                 },
                 child: const Text('Go to Login'),
                 style: ElevatedButton.styleFrom(
                   minimumSize:
-                      const Size(double.infinity, 50), // Full-width button
+                      const Size(double.infinity, 50), 
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

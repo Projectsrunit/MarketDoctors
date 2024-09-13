@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/verification_page.dart';
-import 'package:market_doctor/pages/upload_file.dart';
+import 'package:market_doctor/pages/chew/verification_page.dart';
 
-class CheckInboxPage extends StatelessWidget {
-  const CheckInboxPage({Key? key}) : super(key: key);
+class ChewCheckInboxPage extends StatelessWidget {
+  const ChewCheckInboxPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class CheckInboxPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const UploadCredentialsPage(),
+                    builder: (context) => const ChewVerificationPage(),
                   ),
                 );
               },
