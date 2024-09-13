@@ -54,13 +54,12 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => ChewHome(), 
+              builder: (context) => ChewHome(),
             ),
           );
         } else {
           var errorResponse = jsonDecode(response.body);
-          _showMessage(
-              'Login failed Wrong Credentials');
+          _showMessage('Login failed Wrong Credentials');
         }
       } catch (error) {
         _showMessage('An error occurred. Please try again.');
@@ -85,9 +84,6 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -95,7 +91,6 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Welcome Back Text
                 Text(
                   'Welcome Back,',
                   textAlign: TextAlign.center,

@@ -38,9 +38,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Verification Code'),
-      ),
+   
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(

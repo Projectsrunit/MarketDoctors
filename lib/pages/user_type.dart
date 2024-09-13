@@ -16,9 +16,6 @@ class ChooseUserTypePage extends StatelessWidget {
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose User Type'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -66,7 +63,8 @@ class ChooseUserTypePage extends StatelessWidget {
                       ),
                       backgroundColor: isDarkMode
                           ? Colors.grey[800]
-                          : Colors.blueGrey[50], // Change button color for dark mode
+                          : Colors.blueGrey[
+                              50], // Change button color for dark mode
                       foregroundColor: Colors.white,
                     ),
                     child: Column(
@@ -111,7 +109,8 @@ class ChooseUserTypePage extends StatelessWidget {
                       ),
                       backgroundColor: isDarkMode
                           ? Colors.grey[800]
-                          : Colors.blueGrey[50], // Change button color for dark mode
+                          : Colors.blueGrey[
+                              50], // Change button color for dark mode
                       foregroundColor: Colors.white,
                     ),
                     child: Column(
