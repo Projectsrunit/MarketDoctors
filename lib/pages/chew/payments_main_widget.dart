@@ -229,31 +229,7 @@ class MyEarningsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light
-                  ? Colors.grey[200]
-                  : Colors.grey[800],
-              borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Important reminders:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text('1. Payments are disbursed on the last day of the month.'),
-                Text(
-                    '2. All account numbers must match the name of the profile.'),
-                Text(
-                    '3. Earnings must be greater than N20,000 before disbursement is made.'),
-              ],
-            ),
-          ),
-        ),
+        ImportantRemindersWidget(),
         Divider(
           color: Theme.of(context).dividerColor, // Line color based on theme
           thickness: 1.0, // Line thickness
@@ -284,6 +260,41 @@ class MyEarningsWidget extends StatelessWidget {
         ),
         ...List.generate(4, (index) => EarningsInstance(index: index)),
       ],
+    );
+  }
+}
+
+class ImportantRemindersWidget extends StatelessWidget {
+  const ImportantRemindersWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.light
+              ? Colors.grey[200]
+              : Colors.grey[800],
+          borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Important reminders:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('1. Payments are disbursed on the last day of the month.'),
+            Text(
+                '2. All account numbers must match the name of the profile.'),
+            Text(
+                '3. Earnings must be greater than N20,000 before disbursement is made.'),
+          ],
+        ),
+      ),
     );
   }
 }
