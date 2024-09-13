@@ -1,7 +1,9 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 
@@ -118,8 +120,8 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNotifToggleRow(IconData icon, String label,
-      VoidCallback onToggle) {
+  Widget _buildNotifToggleRow(
+      IconData icon, String label, VoidCallback onToggle) {
     return InkWell(
       onTap: onToggle,
       child: Padding(
@@ -289,44 +291,72 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Bank accounts',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        Text('Important reminders:'),
-        Text('1. Payments are disbursed on the last day of the month.'),
-        Text('2. All account numbers must match the name of the profile.'),
-        Text(
-            '3. Earnings must be greater than N20,000 before disbursement is made.'),
-        SizedBox(height: 20),
-        Divider(thickness: 2),
-        Row(
+    return Scaffold(
+      appBar: chewAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('John Doe',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('ABC Bank'),
-                Text('1234567890'),
-              ],
+            Text('Bank accounts',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            ImportantRemindersWidget(),
+            Divider(thickness: 2),
+            Expanded(
+              child: SingleChildScrollView(
+                child: DottedBorder(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  strokeWidth: 2,
+                  dashPattern: [6, 3],
+                  borderType: BorderType.RRect,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'John Doe',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text('Bank: ABC Bank'),
+                            Text('Account Number: 1234567890'),
+                          ],
+                        ),
+                        Spacer(),
+                        ElevatedButton(
+                          onPressed: _confirmDelete,
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            Spacer(),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: _confirmDelete,
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: _showAddBankAccountPopup,
+                child: Text('Add a new bank account'),
+              ),
             ),
           ],
         ),
-        SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: _showAddBankAccountPopup,
-          child: Text('Add a new bank account'),
-        ),
-      ],
+      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
