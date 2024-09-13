@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/patient/success_page.dart';
 
-class VerificationPage extends StatefulWidget {
-  const VerificationPage({Key? key}) : super(key: key);
+class PatientVerificationPage extends StatefulWidget {
+  const PatientVerificationPage({Key? key}) : super(key: key);
 
   @override
-  State<VerificationPage> createState() => _VerificationPageState();
+  State<PatientVerificationPage> createState() => _PatientVerificationPageState();
 }
 
-class _VerificationPageState extends State<VerificationPage> {
-  final _otpController = TextEditingController();
+class _PatientVerificationPageState extends State<PatientVerificationPage> {
+  final _otpControllers = List.generate(4, (index) => TextEditingController());
 
   void _verifyOtp() {
-    // Handle OTP verification logic here
-    // For example, navigate to the next page or show a confirmation message
+    // Concatenate the four input values to form the OTP
+    final otp = _otpControllers.map((controller) => controller.text).join();
+    print("Entered OTP: $otp");
+    // Handle OTP verification logic here, e.g., make an API call to verify OTP
   }
 
   void _resendOtp() {
@@ -27,7 +29,9 @@ class _VerificationPageState extends State<VerificationPage> {
 
   @override
   void dispose() {
-    _otpController.dispose();
+    for (var controller in _otpControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -56,19 +60,32 @@ class _VerificationPageState extends State<VerificationPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              TextField(
-                controller: _otpController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'OTP',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
+
+              // Four TextFields for the OTP input
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(4, (index) {
+                  return SizedBox(
+                    width: 50,
+                    child: TextField(
+                      controller: _otpControllers[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,  // Only 1 digit per field
+                      decoration: InputDecoration(
+                        counterText: '',  // Hide the character counter
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
               ),
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
+                  _verifyOtp();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => const PatientSuccessPage(),

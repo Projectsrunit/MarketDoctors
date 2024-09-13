@@ -29,7 +29,7 @@ class CheckInboxPage extends StatelessWidget {
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            Image.asset('assets/images/email-campaign.jpeg',
+            Image.asset('assets/images/email-campaign.png',
                 height: 300), // Replace with your own image
 
             const SizedBox(height: 40),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/patient/verification_page.dart';
 
-class CheckInboxPage extends StatelessWidget {
-  const CheckInboxPage({Key? key}) : super(key: key);
+class PatientCheckInboxPage extends StatelessWidget {
+  const PatientCheckInboxPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class CheckInboxPage extends StatelessWidget {
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            Image.asset('assets/images/email-campaign.jpeg',
+            Image.asset('assets/images/email-campaign.png',
                 height: 300), // Replace with your own image
 
             const SizedBox(height: 40),
@@ -36,7 +36,7 @@ class CheckInboxPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const VerificationPage(),
+                    builder: (context) => const PatientVerificationPage(),
                   ),
                 );
               },
