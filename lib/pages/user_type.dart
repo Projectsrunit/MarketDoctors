@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
+import 'package:market_doctor/pages/chew/signup_page.dart';
 
 class ChooseUserTypePage extends StatelessWidget {
   const ChooseUserTypePage({super.key});
@@ -41,7 +42,7 @@ class ChooseUserTypePage extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16), // Reduced top margin
+            const SizedBox(height: 65), // Reduced top margin
             Row(
               children: [
                 Expanded(
@@ -68,7 +69,7 @@ class ChooseUserTypePage extends StatelessWidget {
                           color: Colors.black,
                         ),
                         backgroundColor:
-                            isDarkMode ? Colors.grey[800] : Colors.white,
+                            isDarkMode ? Colors.grey[800] :const Color.fromARGB(255, 226, 234, 238),
                         foregroundColor: Colors.white,
                       ),
                       child: Column(
@@ -116,7 +117,7 @@ class ChooseUserTypePage extends StatelessWidget {
                           color: Colors.black,
                         ),
                         backgroundColor:
-                            isDarkMode ? Colors.grey[800] : Colors.white,
+                            isDarkMode ? Colors.grey[800] : const Color.fromARGB(255, 226, 234, 238),
                         foregroundColor: Colors.white,
                       ),
                       child: Column(
@@ -146,7 +147,7 @@ class ChooseUserTypePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ChewLoginPage(),
+                    builder: (context) => const ChewLoginPage()
                   ),
                 );
               },
@@ -164,7 +165,7 @@ class ChooseUserTypePage extends StatelessWidget {
                 ),
                 backgroundColor: isDarkMode
                     ? Colors.grey[800]
-                    : Colors.white, // Adapt button color
+                    : const Color.fromARGB(255, 238, 244, 248),
                 foregroundColor: Colors.white,
               ),
               child: Column(
@@ -172,10 +173,10 @@ class ChooseUserTypePage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.people,
-                    size: 80,
+                    size: 65,
                     color: textColor, // Icon color adapts to theme
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   Text(
                     'CHEW',
                     style: TextStyle(

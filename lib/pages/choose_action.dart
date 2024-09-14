@@ -57,10 +57,10 @@ class ChooseActionPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                     vertical: 20), // Increased vertical padding
-                elevation: 6, // Slightly more elevation for a raised effect
+                elevation: 16, // Slightly more elevation for a raised effect
                 shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.circular(12), // More rounded corners
+                      BorderRadius.circular(19), // More rounded corners
                 ),
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
                     ? Colors.white
@@ -89,7 +89,7 @@ class ChooseActionPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                elevation: 6,
+                elevation: 16,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

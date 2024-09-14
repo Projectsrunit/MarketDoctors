@@ -3,15 +3,12 @@ import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
-
 void main() async {
   await dotenv.load(fileName: "assets/.env");
- runApp(ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
-      child: MyApp(),
-      
-    ));
-
+  runApp(ChangeNotifierProvider(
+    create: (_) => ThemeNotifier(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -19,50 +16,45 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false, 
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: Color(0xFF617DEF),
+        scaffoldBackgroundColor: Colors.white, // Background color for light theme
+        primaryColor: const Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Color(0xFF617DEF),
-            foregroundColor: Colors.white, // Text color for light mode
-            padding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 40,
-            ), // Padding inside the button
+            backgroundColor: const Color(0xFF617DEF),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Rounded corners
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor:
-              Colors.blueGrey, // Ensure bottom bar has a background color
-          selectedItemColor: Colors.white, // Color for selected item
-          unselectedItemColor: Colors.black, // Color for unselected items
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.black,
         ),
       ),
       darkTheme: ThemeData(
-        brightness: Brightness.dark, // Dark mode theme
-        primaryColor: Color(0xFF617DEF),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black, // Background color for dark theme
+        primaryColor: const Color(0xFF617DEF),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: Color(0xFF617DEF), // Background color
-            foregroundColor: Colors.white, // Text color for dark mode
-            padding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 40,
-            ), // Padding inside the button
+            backgroundColor: const Color(0xFF617DEF),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Rounded corners
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.blueGrey,
           selectedItemColor: Colors.red,
           unselectedItemColor: Colors.grey,
@@ -73,6 +65,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class ThemeNotifier extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
 
@@ -103,8 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPageData(
       title: 'Healthcare Provision Just for You',
-      description:
-          'Explore opportunities you deserve. Discover care that safeguards you.',
+      description: 'Explore opportunities you deserve. Discover care that safeguards you.',
       imageUrl: 'assets/images/medical-care.png',
     ),
     OnboardingPageData(
