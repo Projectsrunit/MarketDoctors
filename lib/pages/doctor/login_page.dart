@@ -28,10 +28,6 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
       String email = _emailController.text;
       String password = _passwordController.text;
       String? baseUrl = dotenv.env['API_URL'];
-      if (baseUrl == null) {
-        _showMessage('Error: API URL not configured');
-        return;
-      }
 
       try {
         var url = Uri.parse('$baseUrl/api/auth/login');

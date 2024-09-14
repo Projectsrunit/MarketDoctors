@@ -308,20 +308,21 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
 
   Widget _buildDobField() {
     return GestureDetector(
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
+     onTap: () async {
+  DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(1900),
+    lastDate: DateTime.now(),
+  );
 
-        if (pickedDate != null) {
-          setState(() {
-            _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-          });
-        }
-      },
+  if (pickedDate != null) {
+    setState(() {
+      _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+    });
+  }
+},
+
       child: AbsorbPointer(
         child: TextFormField(
           controller: _dobController,

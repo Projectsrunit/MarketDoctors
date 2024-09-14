@@ -29,10 +29,6 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
       String email = _emailController.text;
       String password = _passwordController.text;
       String? baseUrl = dotenv.env['API_URL'];
-      if (baseUrl == null) {
-        _showMessage('Error: API URL not configured');
-        return;
-      }
 
       try {
         var url = Uri.parse('$baseUrl/api/auth/login');
@@ -49,7 +45,6 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         );
 
         if (response.statusCode == 200) {
-          // ignore: unused_local_variable
           var responseBody = jsonDecode(response.body);
           _showMessage('Login successful!', isError: false);
           Navigator.pushReplacement(
@@ -59,9 +54,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             ),
           );
         } else {
-          // ignore: unused_local_variable
           var errorResponse = jsonDecode(response.body);
-          _showMessage('Login failed Wrong Credentials');
+          _showMessage('Login failed. Wrong credentials');
         }
       } catch (error) {
         _showMessage('An error occurred. Please try again.');
@@ -86,6 +80,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100], // Set background color here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -105,7 +100,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                 'Login to your account',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold, // Made bold
                       fontSize: 20,
                     ),
               ),
@@ -166,6 +161,9 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                             borderSide: BorderSide.none,
                           ),
                           prefixIcon: const Icon(Icons.email),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, // Make label text bold
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -202,6 +200,9 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                             borderSide: BorderSide.none, // Remove border
                           ),
                           prefixIcon: const Icon(Icons.lock),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, // Make label text bold
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -213,7 +214,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40), // Increased spacing before login button
                     _isLoading
                         ? const CircularProgressIndicator()
                         : TextButton(
@@ -228,7 +229,6 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                               backgroundColor: Theme.of(context).primaryColor,
                             ),
                           ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
