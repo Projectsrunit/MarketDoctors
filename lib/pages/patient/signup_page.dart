@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:country_code_picker/country_code_picker.dart';
+
+import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/patient/check_inbox.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
 
@@ -25,6 +26,7 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
   final _dobController = TextEditingController();
 
   String _selectedCountryCode = '+234';
+// String _selectedFlag = 'ng';
   bool _termsAccepted = false;
   bool _isLoading = false;
 
@@ -74,7 +76,8 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
           if (response.statusCode == 200 || response.statusCode == 201) {
             _showSnackBar('Sign up successful');
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const PatientCheckInboxPage()),
+              MaterialPageRoute(
+                  builder: (context) => const PatientCheckInboxPage()),
             );
           } else {
             _showSnackBar('Sign up failed: ${response.body}');
@@ -239,45 +242,72 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
   }
 
   Widget _buildPhoneField() {
-    return TextFormField(
-      controller: _phoneController,
-      keyboardType: TextInputType.phone,
-      inputFormatters: [LengthLimitingTextInputFormatter(10)],
-      decoration: InputDecoration(
-        labelText: 'Phone Number',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: CountryCodePicker(
-            onChanged: (countryCode) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: DropdownButtonFormField<String>(
+            value: _selectedCountryCode,
+            items: countryCodes.map((country) {
+              return DropdownMenuItem<String>(
+                value: country['code'],
+                child: Row(
+                  children: [
+                    // Display the flag using NetworkImage
+                    Image.network(
+                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                      width: 32,
+                      height: 20,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.flag); // Fallback icon
+                      },
+                    ),
+                    const SizedBox(width: 8), // Space between flag and code
+                    Text('(${country['code']})'),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
               setState(() {
-                _selectedCountryCode = countryCode.toString();
+                _selectedCountryCode = value!;
               });
             },
-            initialSelection: 'NG',
-            favorite: ['+234', 'NG'],
-            showFlag: true,
-            showDropDownButton: true,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
         ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your phone number';
-        }
-        return null;
-      },
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 3,
+          child: TextFormField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [LengthLimitingTextInputFormatter(10)],
+            decoration: InputDecoration(
+              prefixText: '$_selectedCountryCode ',
+              labelText: 'Phone Number',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your phone number';
+              }
+              return null;
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildDobField() {
-    return _buildTextField(
-      controller: _dobController,
-      labelText: 'Date of Birth',
-      readOnly: true,
-      prefixIcon: const Icon(Icons.calendar_today),
+    return GestureDetector(
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
@@ -285,52 +315,57 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
         );
+
         if (pickedDate != null) {
           setState(() {
             _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
           });
         }
       },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select your date of birth';
-        }
-        return null;
-      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          controller: _dobController,
+          decoration: InputDecoration(
+            labelText: 'Date of Birth',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select your date of birth';
+            }
+            return null;
+          },
+        ),
+      ),
     );
   }
 
   Widget _buildTermsAndConditions() {
-    return CheckboxListTile(
-      value: _termsAccepted,
-      onChanged: (bool? newValue) {
-        setState(() {
-          _termsAccepted = newValue ?? false;
-        });
-      },
-      title: const Text('I accept the terms and conditions'),
-      controlAffinity: ListTileControlAffinity.leading,
-      dense: true,
-      subtitle: !_termsAccepted
-          ? const Text(
-              'You need to accept terms and conditions to proceed',
-              style: TextStyle(color: Colors.red),
-            )
-          : null,
+    return Row(
+      children: [
+        Checkbox(
+          value: _termsAccepted,
+          onChanged: (value) {
+            setState(() {
+              _termsAccepted = value ?? false;
+            });
+          },
+        ),
+        const Text('I accept the terms and conditions'),
+      ],
     );
   }
 
   Widget _buildSignUpButton() {
-    return TextButton(
-      onPressed: _signUp,
-      child: const Text('Sign Up'),
-      style: TextButton.styleFrom(
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        foregroundColor: Colors.white,
-        backgroundColor: Theme.of(context).primaryColor,
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _signUp,
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : const Text('Sign Up'),
       ),
     );
   }
@@ -339,26 +374,20 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
     required TextEditingController controller,
     required String labelText,
     TextInputType keyboardType = TextInputType.text,
-    Icon? prefixIcon,
     bool obscureText = false,
-    bool readOnly = false,
-    void Function()? onTap,
+    Widget? prefixIcon,
     String? Function(String?)? validator,
-    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      readOnly: readOnly,
-      onTap: onTap,
-      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: labelText,
+        prefixIcon: prefixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        prefixIcon: prefixIcon,
       ),
       validator: validator,
     );

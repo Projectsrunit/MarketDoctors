@@ -49,6 +49,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         );
 
         if (response.statusCode == 200) {
+          // ignore: unused_local_variable
           var responseBody = jsonDecode(response.body);
           _showMessage('Login successful!', isError: false);
           Navigator.pushReplacement(
@@ -58,6 +59,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             ),
           );
         } else {
+          // ignore: unused_local_variable
           var errorResponse = jsonDecode(response.body);
           _showMessage('Login failed Wrong Credentials');
         }
