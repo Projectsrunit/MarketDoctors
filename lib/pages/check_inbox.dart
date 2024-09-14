@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/verification_page.dart';
 import 'package:market_doctor/pages/upload_file.dart';
 
 class CheckInboxPage extends StatelessWidget {
-  const CheckInboxPage({Key? key}) : super(key: key);
+  const CheckInboxPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Check Your Inbox'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,6 +37,7 @@ class CheckInboxPage extends StatelessWidget {
                   ),
                 );
               },
+              // ignore: sort_child_properties_last
               child: const Text('Next'),
               style: TextButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),

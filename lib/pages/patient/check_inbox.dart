@@ -7,9 +7,7 @@ class PatientCheckInboxPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Check Your Inbox'),
-      ),
+   
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -7,9 +7,6 @@ class ChooseActionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose Action'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(
             24.0), // Increased padding around the whole body
@@ -91,8 +88,7 @@ class ChooseActionPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20), 
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 elevation: 6,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

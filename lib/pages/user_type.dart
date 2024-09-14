@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
-
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
 
@@ -16,14 +15,14 @@ class ChooseUserTypePage extends StatelessWidget {
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose User Type'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox (height:160),
             Text(
               'Choose User Type',
               style: TextStyle(
@@ -31,8 +30,9 @@ class ChooseUserTypePage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: textColor, // Adapt to light/dark theme
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 8), // Reduced top margin
             Text(
               'Just so we know you more and help you enjoy using the app',
               style: TextStyle(
@@ -41,95 +41,101 @@ class ChooseUserTypePage extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16), // Reduced top margin
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const DoctorLoginPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      backgroundColor: isDarkMode
-                          ? Colors.grey[800]
-                          : Colors.blueGrey[50], // Change button color for dark mode
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/doctor-image.png',
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Doctor',
-                          style: TextStyle(
-                            color: textColor, // Adapt text color
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0), // Added padding for side margins
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const DoctorLoginPage(),
                           ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                        textStyle: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.white,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/doctor-image.png',
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Doctor',
+                            style: TextStyle(
+                              color: textColor, // Adapt text color
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 16), // Adjusted spacing between cards
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const PatientLoginPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      backgroundColor: isDarkMode
-                          ? Colors.grey[800]
-                          : Colors.blueGrey[50], // Change button color for dark mode
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/medical-folder.png',
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Patient',
-                          style: TextStyle(
-                            color: textColor, // Adapt text color
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0), // Added padding for side margins
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const PatientLoginPage(),
                           ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                        textStyle: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.white,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/medical-folder.png',
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Patient',
+                            style: TextStyle(
+                              color: textColor, // Adapt text color
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -158,7 +164,7 @@ class ChooseUserTypePage extends StatelessWidget {
                 ),
                 backgroundColor: isDarkMode
                     ? Colors.grey[800]
-                    : Colors.blueGrey[50], // Adapt button color
+                    : Colors.white, // Adapt button color
                 foregroundColor: Colors.white,
               ),
               child: Column(
