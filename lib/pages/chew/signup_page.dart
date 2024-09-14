@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/check_inbox.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
-import 'package:market_doctor/data/countries.dart'; // Import the country codes
+import 'package:market_doctor/data/countries.dart'; 
 
 class ChewSignUpPage extends StatefulWidget {
   const ChewSignUpPage({Key? key}) : super(key: key);
@@ -165,7 +165,7 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
           const SizedBox(height: 16),
           _buildPasswordField(),
           const SizedBox(height: 16),
-          _buildPhoneField(), 
+          _buildPhoneField(),
           const SizedBox(height: 16),
           _buildDobField(),
           const SizedBox(height: 16),
@@ -243,7 +243,7 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
   Widget _buildPhoneField() {
     return Row(
       children: [
-        Flexible(
+        Expanded(
           flex: 2,
           child: DropdownButtonFormField<String>(
             value: _selectedCountryCode,
@@ -252,13 +252,17 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
                 value: country['code'],
                 child: Row(
                   children: [
-                    // Image.asset(
-                    //   'assets/flags/${country['code']}.png',
-                    //   width: 32,
-                    //   height: 20,
-                    // ),
-                    const SizedBox(width: 8),
-                    Text('${country['name']} (${country['code']})'),
+                    // Display the flag using NetworkImage
+                    Image.network(
+                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                      width: 32,
+                      height: 20,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.flag); // Fallback icon
+                      },
+                    ),
+                    const SizedBox(width: 8), // Space between flag and code
+                    Text('(${country['code']})'),
                   ],
                 ),
               );
@@ -266,8 +270,6 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
             onChanged: (value) {
               setState(() {
                 _selectedCountryCode = value!;
-                // Optionally update the phone number field if needed
-                // _phoneController.text = '';
               });
             },
             decoration: InputDecoration(
@@ -278,15 +280,14 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
           ),
         ),
         const SizedBox(width: 10),
-        Flexible(
+        Expanded(
           flex: 3,
           child: TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             inputFormatters: [LengthLimitingTextInputFormatter(10)],
             decoration: InputDecoration(
-              prefixText:
-                  '$_selectedCountryCode ', // Display the country code as a prefix
+              prefixText: '$_selectedCountryCode ',
               labelText: 'Phone Number',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
