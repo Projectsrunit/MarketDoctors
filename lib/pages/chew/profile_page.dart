@@ -4,6 +4,7 @@ import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
+import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 
@@ -188,55 +189,6 @@ class ProfilePage extends StatelessWidget {
 
   void _showPinPopup() {
     // Show dialog for changing transaction pin
-  }
-}
-
-class UpdateQualificationChew extends StatefulWidget {
-  @override
-  _UpdateQualificationChewState createState() =>
-      _UpdateQualificationChewState();
-}
-
-class _UpdateQualificationChewState extends State<UpdateQualificationChew> {
-  List<String> qualifications = [
-    "B.Sc. Computer Science",
-    "M.Sc. Information Technology"
-  ];
-  final TextEditingController qualificationController = TextEditingController();
-
-  void addQualification() {
-    setState(() {
-      qualifications.add(qualificationController.text);
-      qualificationController.clear();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Manage qualifications',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        Text('Qualification', style: TextStyle(fontSize: 18)),
-        Column(
-          children: qualifications
-              .map((qual) => ListTile(title: Text(qual)))
-              .toList(),
-        ),
-        SizedBox(height: 20),
-        Text('Add new', style: TextStyle(fontSize: 18)),
-        TextField(
-          controller: qualificationController,
-          decoration: InputDecoration(labelText: 'Qualification'),
-        ),
-        ElevatedButton(
-          onPressed: addQualification,
-          child: Text('Save'),
-        ),
-      ],
-    );
   }
 }
 
