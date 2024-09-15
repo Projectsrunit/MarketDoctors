@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 
 class ChewHome extends StatelessWidget {
@@ -76,9 +77,12 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Expanded(
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -90,17 +94,20 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                       child: Container(
                         padding: EdgeInsets.all(16.0),
                         child: Icon(Icons.local_hospital,
-                            size: 50, color: Colors.red),
+                            size: 80, color: Colors.red),
                       ),
                     ),
                     SizedBox(height: 4.0),
                     Text('Cases',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
-              Expanded(
+              SizedBox(width: 8.0), 
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -111,17 +118,21 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                       ),
                       child: Container(
                         padding: EdgeInsets.all(16.0),
-                        child: Icon(Icons.person, size: 50, color: Colors.blue),
+                        child: Icon(Icons.person,
+                            size: 80, color: Colors.blue),
                       ),
                     ),
                     SizedBox(height: 4.0),
                     Text('Doctors',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
-              Expanded(
+              SizedBox(width: 8.0),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -133,13 +144,12 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                       child: Container(
                         padding: EdgeInsets.all(16.0),
                         child: Icon(Icons.person_outline,
-                            size: 50, color: Colors.green),
+                            size: 80, color: Colors.green),
                       ),
                     ),
                     SizedBox(height: 4.0),
                     Text('Patients',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -181,7 +191,7 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
           Column(
             children: [
               _DoctorCard(
-                imageUrl: 'https://via.placeholder.com/100',
+                imageUrl: 'https://via.placeholder.com/120',
                 name: 'Dr. John Doe',
                 profession: 'Cardiologist',
                 rating: 4.5,
@@ -191,7 +201,7 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
               ),
               SizedBox(height: 16.0),
               _DoctorCard(
-                imageUrl: 'https://via.placeholder.com/100',
+                imageUrl: 'https://via.placeholder.com/120',
                 name: 'Dr. Jane Smith',
                 profession: 'Dermatologist',
                 rating: 4.0,
@@ -235,16 +245,19 @@ class _DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+        child: Container(
+      height: 124,
+      padding: const EdgeInsets.all(2.0),
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.network(imageUrl, width: 100, height: 100),
+            padding: const EdgeInsets.all(2.0),
+            child: Image.network(imageUrl, width: 120, height: 120),
           ),
-          SizedBox(width: 8.0),
-          Expanded(
-            child: Column(
+          SizedBox(width: 4),
+          Flex(
               crossAxisAlignment: CrossAxisAlignment.start,
+              direction: Axis.vertical,
               children: [
                 Text(name,
                     style: TextStyle(
@@ -252,75 +265,104 @@ class _DoctorCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     )),
                 Text(profession),
-                SizedBox(height: 8.0), // Space between text and buttons
-                TextButton(
-                  onPressed: onViewProfilePressed,
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                    textStyle: TextStyle(fontSize: 10), // Smaller text size
-                  ),
-                  child: Text('View Profile'),
-                ),
-                SizedBox(height: 4.0), // Space between buttons
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 16), // Smaller icon size
-                    SizedBox(width: 4.0),
-                    Text('$rating', style: TextStyle(color: Colors.amber, fontSize: 12)),
-                  ],
-                ),
-                SizedBox(height: 4.0), // Space between buttons
-                TextButton(
-                  onPressed: onChatPressed,
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                    textStyle: TextStyle(fontSize: 10), // Smaller text size
-                  ),
-                  child: Text('Chat with doctor'),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 8.0),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
+                GestureDetector(
+                  onTap: onViewProfilePressed,
+                  child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
+                        color: Color(0xFF617DEF),
+                        borderRadius: BorderRadius.circular(2)),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                    constraints: BoxConstraints(
+                      minHeight: 20,
+                      maxHeight: 25,
+                      maxWidth: double.infinity,
+                    ),
+                    child: Text('View Profile',
+                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 16),
+                      SizedBox(width: 4.0),
+                      Text('$rating',
+                          style: TextStyle(color: Colors.amber, fontSize: 14)),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: onChatPressed,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Color(0xFF617DEF),
+                        borderRadius: BorderRadius.circular(2)),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                    constraints: BoxConstraints(
+                      minHeight: 24,
+                    ),
+                    child: Text('Chat with doctor',
+                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                  ),
+                ),
+              ]),
+          SizedBox(width: 8.0),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
+              child: Flex(
+                direction: Axis.vertical,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
+                      Text(
+                        'available',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                    onTap: onBookAppointmentPressed,
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                          color: Color(0xFF617DEF),
+                          borderRadius: BorderRadius.circular(2)),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: 'Book\n',
+                                style: TextStyle(color: Colors.white)),
+                            TextSpan(
+                                text: 'Appointment',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(width: 4.0),
-                  Text('available'),
                 ],
               ),
-              SizedBox(height: 8.0), // Space between the text and button
-              TextButton(
-                onPressed: onBookAppointmentPressed,
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                  textStyle: TextStyle(fontSize: 10), // Smaller text size
-                ),
-                child: Text('Book Appointment'),
-              ),
-            ],
+            ),
           ),
         ],
       ),
-    );
+    ));
   }
 }
