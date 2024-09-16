@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/user_type.dart';
+import 'package:market_doctor/pages/user_type2.dart';
 
 class ChooseActionPage extends StatelessWidget {
   const ChooseActionPage({super.key});
@@ -83,7 +84,7 @@ class ChooseActionPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ChooseUserTypePage(),
+                    builder: (context) => const ChooseUserTypePageTwo(),
                   ),
                 );
               },

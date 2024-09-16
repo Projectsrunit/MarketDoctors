@@ -4,19 +4,18 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:market_doctor/pages/chew/check_inbox.dart';
+import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
-import 'package:market_doctor/pages/patient/check_inbox.dart';
-import 'package:market_doctor/pages/patient/login_page.dart';
 
 class PatientSignUpPage extends StatefulWidget {
   const PatientSignUpPage({Key? key}) : super(key: key);
 
   @override
-  State<PatientSignUpPage> createState() => _PatientSignUpPageState();
+  State<PatientSignUpPage> createState() => _PatientSignUpPage();
 }
 
-class _PatientSignUpPageState extends State<PatientSignUpPage> {
+class _PatientSignUpPage extends State<PatientSignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -26,7 +25,6 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
   final _dobController = TextEditingController();
 
   String _selectedCountryCode = '+234';
-// String _selectedFlag = 'ng';
   bool _termsAccepted = false;
   bool _isLoading = false;
 
@@ -77,7 +75,7 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
             _showSnackBar('Sign up successful');
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                  builder: (context) => const PatientCheckInboxPage()),
+                  builder: (context) => const ChewCheckInboxPage()),
             );
           } else {
             _showSnackBar('Sign up failed: ${response.body}');
@@ -134,12 +132,12 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
       children: [
         const Text(
           "Already Signed Up? ",
-          style: TextStyle(color: Color(0xFFb8b8b8), fontSize: 16),
+          style: TextStyle(color: Colors.black, fontSize: 16),  // Changed to black
         ),
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const PatientLoginPage()),
+              MaterialPageRoute(builder: (context) => const ChewLoginPage()),
             );
           },
           child: const Text(
@@ -253,16 +251,15 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
                 value: country['code'],
                 child: Row(
                   children: [
-                    // Display the flag using NetworkImage
                     Image.network(
                       country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
                       width: 32,
                       height: 20,
                       errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.flag); // Fallback icon
+                        return const Icon(Icons.flag);
                       },
                     ),
-                    const SizedBox(width: 8), // Space between flag and code
+                    const SizedBox(width: 8),
                     Text('(${country['code']})'),
                   ],
                 ),
@@ -274,8 +271,13 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
               });
             },
             decoration: InputDecoration(
-              border: OutlineInputBorder(
+              fillColor: Colors.grey[200],
+              filled: true,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
           ),
@@ -290,8 +292,17 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
             decoration: InputDecoration(
               prefixText: '$_selectedCountryCode ',
               labelText: 'Phone Number',
-              border: OutlineInputBorder(
+              fillColor: Colors.grey[200],
+              filled: true,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
             validator: (value) {
@@ -308,36 +319,28 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
 
   Widget _buildDobField() {
     return GestureDetector(
-     onTap: () async {
-  DateTime? pickedDate = await showDatePicker(
-    context: context,
-    initialDate: DateTime.now(),
-    firstDate: DateTime(1900),
-    lastDate: DateTime.now(),
-  );
-
-  if (pickedDate != null) {
-    setState(() {
-      _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-    });
-  }
-},
-
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime(2000),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+        );
+        if (pickedDate != null) {
+          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+          _dobController.text = formattedDate;
+        }
+      },
       child: AbsorbPointer(
         child: TextFormField(
           controller: _dobController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Date of Birth',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            prefixIcon: Icon(Icons.calendar_today),
+            fillColor: Color.fromARGB(255, 247, 244, 244),
+            filled: true,
+            border: InputBorder.none,
           ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select your date of birth';
-            }
-            return null;
-          },
         ),
       ),
     );
@@ -354,22 +357,41 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
             });
           },
         ),
-        const Text('I accept the terms and conditions'),
+        const Expanded(
+          child: Text(
+            'I accept the terms and conditions',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildSignUpButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _signUp,
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : const Text('Sign Up'),
+ Widget _buildSignUpButton() {
+  return ElevatedButton(
+    onPressed: _isLoading ? null : _signUp,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue, // Background color
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      minimumSize: const Size(double.infinity, 48),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
-    );
-  }
+    ),
+    child: _isLoading
+        ? const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          )
+        : const Text(
+            'Sign Up',
+            style: TextStyle(
+              color: Colors.white, // Text color
+              fontWeight: FontWeight.bold, // Bold text
+            ),
+          ),
+  );
+}
+
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -379,18 +401,34 @@ class _PatientSignUpPageState extends State<PatientSignUpPage> {
     Widget? prefixIcon,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        labelText: labelText,
-        prefixIcon: prefixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[200], // Light grey background
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),  // Shadow position
+          ),
+        ],
       ),
-      validator: validator,
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,  // Bold label text
+          ),
+          prefixIcon: prefixIcon,
+          border: InputBorder.none,  // Removes the border
+          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10.0),
+        ),
+        validator: validator,
+      ),
     );
   }
 }
