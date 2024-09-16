@@ -25,17 +25,20 @@ class _DashboardPageState extends State<DashboardPage> {
                   onPressed: () {}, // Clock action
                 ),
                 const SizedBox(width: 8),
-                const Text('@user', style: TextStyle(color: Colors.black,fontSize: 15)),
+                const Text('@user',
+                    style: TextStyle(color: Colors.black, fontSize: 15)),
               ],
             ),
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.access_time_outlined, color: Colors.black),
+                  icon: const Icon(Icons.access_time_outlined,
+                      color: Colors.black),
                   onPressed: () {}, // Clock action
                 ),
                 IconButton(
-                  icon: const Icon(Icons.notification_add_outlined, color: Colors.black),
+                  icon: const Icon(Icons.notification_add_outlined,
+                      color: Colors.black),
                   onPressed: () {}, // Notification action
                 ),
               ],
@@ -65,19 +68,70 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildSearchbar() {
-    return TextField(
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[200],
-        hintText: 'Search Cases, Appointments, Pharmacy',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
+  return Row(
+    children: [
+      // Search bar with shadow
+      Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search Cases, Appointment, Pharmacy',
+              hintStyle: TextStyle(color: Colors.grey[500]), // Subtle hint color
+              prefixIcon: const Icon(Icons.search, color: Colors.black), // Search icon inside
+              contentPadding: const EdgeInsets.symmetric(vertical: 12.0), // Comfortable padding
+              border: InputBorder.none, 
+            ),
+          ),
         ),
       ),
-    );
-  }
+      const SizedBox(width: 10), 
+      Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 2), // Shadow position
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10), // Matching the button's border radius
+        ),
+        child: TextButton.icon(
+          onPressed: () {
+            // Handle filter action
+          },
+          icon: const Icon(Icons.filter_list, color: Colors.black), // Filter icon
+          label: const Text(
+            'Filter',
+            style: TextStyle(color: Colors.black), // Text for the filter button
+          ),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0), // Consistent padding
+            backgroundColor: Colors.white, // White background for consistency with search bar
+            foregroundColor: Colors.black, // Black text/icon color
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
 
   Widget _buildDashboardCards() {
     return GridView.count(
@@ -140,7 +194,7 @@ class _DashboardPageState extends State<DashboardPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         image: const DecorationImage(
-          image: AssetImage('assets/images/banner.png'),
+          image: AssetImage('assets/images/doctor-image.png'),
           fit: BoxFit.cover,
         ),
       ),
