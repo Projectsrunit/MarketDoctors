@@ -41,6 +41,9 @@ flutter:
     - assets/images/people-celebrating.png
     - assets/images/medical-care.png
     - assets/images/location-review.png
+    - assets/images/cases-image.png
+    - assets/images/pills-image.png
+    - assets/images/advert-image.png
     - assets/.env
 
 
