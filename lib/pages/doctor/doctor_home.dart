@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 
@@ -278,23 +280,40 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16), 
+        const SizedBox(
+            height: 16), // Spacing between the heading and the card rows
+        // Row for smaller cards showing time and date with a blue line in between
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSmallAppointmentCard(
               time: '02:00 PM',
               date: 'April 2, 2024',
             ),
+            const SizedBox(width: 4), // Spacing between the card and the line
+            Container(
+              width: 70,
+              height: 2,
+              color: Color(0xFF4672ff),
+            ),
+            const SizedBox(width: 4),
             _buildSmallAppointmentCard(
               time: '02:00 PM',
               date: 'April 2, 2024',
             ),
+            const SizedBox(width: 4), // Spacing between the card and the line
+
+            Container(
+              width: 30,
+              height: 2,
+              color: Color(0xFF4672ff),
+            ),
           ],
         ),
-        const SizedBox(height: 16), 
+        const SizedBox(height: 16), // Spacing between rows of cards
+        // Row for larger cards showing label and doctor’s name
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildLargeAppointmentCard(
               label: 'Video Consultation',
@@ -302,7 +321,7 @@ class _DashboardPageState extends State<DashboardPage> {
               time: '02:00 PM',
               date: 'April 2, 2024',
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16), // Spacing between larger cards
             _buildLargeAppointmentCard(
               label: 'Audio Consultation',
               doctorName: 'Dr. John Ogundipe',
@@ -326,17 +345,23 @@ class _DashboardPageState extends State<DashboardPage> {
         borderRadius: BorderRadius.circular(10),
         color: Color(0xFF617DEF),
       ),
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(5.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '$time, $date',
+            '$time',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
-              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            '$date',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
             ),
           ),
         ],
@@ -358,7 +383,6 @@ class _DashboardPageState extends State<DashboardPage> {
         color: Color(0xFF617DEF),
       ),
       padding: const EdgeInsets.all(12.0),
-      
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -374,7 +398,6 @@ class _DashboardPageState extends State<DashboardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-             
                 const SizedBox(height: 8),
                 Text(
                   label,
