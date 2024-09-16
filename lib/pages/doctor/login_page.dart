@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/patient/signup_page.dart';
-
+import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/doctor/signup_page.dart';
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
 
@@ -46,8 +46,12 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           _showMessage('Login successful!', isError: false);
-          // Handle successful login (navigate to another page, save token, etc.)
-          // For example, navigate to dashboard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DashboardPage(),
+            ),
+          );
         } else {
           var errorResponse = jsonDecode(response.body);
           _showMessage('Login failed Wrong Credentials.}');
@@ -112,7 +116,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => PatientSignUpPage(),
+                          builder: (context) => DoctorSignUpPage(),
                         ),
                       );
                     },
