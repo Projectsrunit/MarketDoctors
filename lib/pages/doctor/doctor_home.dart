@@ -144,12 +144,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildDashboardCards() {
-    const SizedBox(height: 15);
-
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 3,
-      crossAxisSpacing: 16,
+      crossAxisSpacing: 10,
       mainAxisSpacing: 16,
       children: [
         _buildDashboardCardWithLabel(
@@ -183,8 +181,9 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              height: 250,
+              padding: const EdgeInsets.symmetric(
+                  vertical: 20.0), 
+              // height: 100, 
               decoration: BoxDecoration(
                 color: Color(0xFF617DEF).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
@@ -192,15 +191,18 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Center(
                 child: image != null
                     ? Image(image: image, fit: BoxFit.contain)
-                    : Icon(icon, size: 40, color: Color(0xFF617DEF)),
+                    : Icon(icon,
+                        size: 40,
+                        color: Color(0xFF617DEF)), // Increased icon size
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(
+              height: 10), 
           Text(
             label,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 14, 
               fontWeight: FontWeight.w500,
               color: Colors.black,
             ),
