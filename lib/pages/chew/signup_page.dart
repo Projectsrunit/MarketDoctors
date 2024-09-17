@@ -233,10 +233,23 @@ Widget _buildPasswordField() {
     decoration: InputDecoration(
       labelText: 'Password',
       prefixIcon: const Icon(Icons.lock),
-      filled: true, // Specify if the field should be filled
       fillColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850] // Dark mode fill color
-          : Colors.white,    // Light mode fill color
+          ? Colors.grey[850]
+          : Colors.grey[300], // Light mode grey background
+      filled: true,
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(
+          color: Colors.grey, // Grey border
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(
+          color: Colors.grey, // Grey border when focused
+        ),
+      ),
     ),
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -252,7 +265,8 @@ Widget _buildPasswordField() {
 
 
 
-  Widget _buildPhoneField() {
+
+ Widget _buildPhoneField() {
   return Row(
     children: [
       Expanded(
@@ -286,24 +300,19 @@ Widget _buildPasswordField() {
           decoration: InputDecoration(
             fillColor: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850]
-                : Colors.white,
+                : Colors.grey[300], // Light mode grey background
             filled: true,
-            border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white // White border in dark mode
-                    : Colors.transparent, // No border in light mode
+              borderSide: const BorderSide(
+                color: Colors.grey, // Grey border
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.transparent,
+              borderSide: const BorderSide(
+                color: Colors.grey, // Grey border when focused
               ),
             ),
           ),
@@ -321,23 +330,19 @@ Widget _buildPasswordField() {
             labelText: 'Phone Number',
             fillColor: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850]
-                : Colors.white,
+                : Colors.grey[300], // Light mode grey background
             filled: true,
             contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.transparent,
+              borderSide: const BorderSide(
+                color: Colors.grey, // Grey border
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.transparent,
+              borderSide: const BorderSide(
+                color: Colors.grey, // Grey border when focused
               ),
             ),
           ),
@@ -352,7 +357,6 @@ Widget _buildPasswordField() {
     ],
   );
 }
-
 Widget _buildDobField() {
   return GestureDetector(
     onTap: () async {
@@ -375,23 +379,19 @@ Widget _buildDobField() {
           prefixIcon: const Icon(Icons.calendar_today),
           fillColor: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[850]
-              : Colors.white,
+              : Colors.grey[300], // Light mode grey background
           filled: true,
           contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.transparent,
+            borderSide: const BorderSide(
+              color: Colors.grey, // Grey border
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.transparent,
+            borderSide: const BorderSide(
+              color: Colors.grey, // Grey border when focused
             ),
           ),
         ),
@@ -450,28 +450,40 @@ Widget _buildDobField() {
 Widget _buildTextField({
   required TextEditingController controller,
   required String labelText,
-  TextInputType keyboardType = TextInputType.text,
-  bool obscureText = false,
+  TextInputType? keyboardType,
   Widget? prefixIcon,
   String? Function(String?)? validator,
 }) {
   return TextFormField(
     controller: controller,
     keyboardType: keyboardType,
-    obscureText: obscureText,
-    validator: validator,
     decoration: InputDecoration(
       labelText: labelText,
       prefixIcon: prefixIcon,
       filled: true,
       fillColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850]
-          : Colors.white, // Adjusts based on the theme brightness
-      border: OutlineInputBorder(
+          ? Colors.grey[850] // Dark mode background
+          : Colors.grey[300],  // Light mode background (grey)
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(
+          color: Colors.grey[600]!, // Grey borders for light mode
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.blue, // Blue border on focus in light mode
+        ),
       ),
     ),
+    validator: validator,
   );
 }
 
 }
+
+
