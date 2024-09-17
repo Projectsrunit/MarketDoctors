@@ -97,34 +97,38 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Let’s get you signed up',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                _buildLoginPrompt(),
-                const SizedBox(height: 20),
-                _buildSignUpForm(),
-              ],
-            ),
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Theme.of(context).brightness == Brightness.dark
+        ? Colors.black   // Dark mode background
+        : Colors.white,  // Light mode background
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Let’s get you signed up',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 10),
+              _buildLoginPrompt(),
+              const SizedBox(height: 20),
+              _buildSignUpForm(),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildLoginPrompt() {
     return Row(
@@ -222,22 +226,31 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
     );
   }
 
-  Widget _buildPasswordField() {
-    return _buildTextField(
-      controller: _passwordController,
+Widget _buildPasswordField() {
+  return TextFormField(
+    controller: _passwordController,
+    obscureText: true,
+    decoration: InputDecoration(
       labelText: 'Password',
-      obscureText: true,
       prefixIcon: const Icon(Icons.lock),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        } else if (value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
-    );
-  }
+      filled: true, // Specify if the field should be filled
+      fillColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850] // Dark mode fill color
+          : Colors.white,    // Light mode fill color
+    ),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter your password';
+      } else if (value.length < 6) {
+        return 'Password must be at least 6 characters';
+      }
+      return null;
+    },
+  );
+}
+
+
+
 
   Widget _buildPhoneField() {
     return Row(
@@ -393,45 +406,31 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
 }
 
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    Widget? prefixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200], // Light grey background
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String labelText,
+  TextInputType keyboardType = TextInputType.text,
+  bool obscureText = false,
+  Widget? prefixIcon,
+  String? Function(String?)? validator,
+}) {
+  return TextFormField(
+    controller: controller,
+    keyboardType: keyboardType,
+    obscureText: obscureText,
+    validator: validator,
+    decoration: InputDecoration(
+      labelText: labelText,
+      prefixIcon: prefixIcon,
+      filled: true,
+      fillColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850]
+          : Colors.white, // Adjusts based on the theme brightness
+      border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),  // Shadow position
-          ),
-        ],
       ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,  // Bold label text
-          ),
-          prefixIcon: prefixIcon,
-          fillColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[850]
-            : Colors.white,
-          border: InputBorder.none,  // Removes the border
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10.0),
-        ),
-        validator: validator,
-      ),
-    );
-  }
+    ),
+  );
+}
+
 }

@@ -141,8 +141,8 @@ Future<void> _loginUser() async {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5), // Shadow color
-                            spreadRadius: 2, // How much the shadow spreads
+                            color: Colors.grey.withOpacity(0.4), // Shadow color
+                            spreadRadius: 1, // How much the shadow spreads
                             blurRadius: 5, // How blurry the shadow is
                             offset: const Offset(0, 3), // Shadow position
                           ),
@@ -182,10 +182,10 @@ Future<void> _loginUser() async {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5), // Shadow color
-                            spreadRadius: 2, // How much the shadow spreads
+                            color: Colors.grey.withOpacity(0.4), // Shadow color
+                            spreadRadius: 1, // How much the shadow spreads
                             blurRadius: 5, // How blurry the shadow is
-                            offset: const Offset(0, 3), // Shadow position
+                            offset: const Offset(0, 5), // Shadow position
                           ),
                         ],
                       ),
