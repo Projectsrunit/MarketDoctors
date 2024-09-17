@@ -1,7 +1,9 @@
-// ignore_for_file: unnecessary_string_interpolations
+// ignore_for_file: unnecessary_string_interpolations, unused_field
 
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -16,39 +18,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Disable back button
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.person_2_rounded, color: Colors.black),
-                  onPressed: () {}, // Clock action
-                ),
-                const SizedBox(width: 8),
-                const Text('@user',
-                    style: TextStyle(color: Colors.black, fontSize: 15)),
-              ],
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.access_time_outlined,
-                      color: Colors.black),
-                  onPressed: () {}, // Clock action
-                ),
-                IconButton(
-                  icon: const Icon(Icons.notification_add_outlined,
-                      color: Colors.black),
-                  onPressed: () {}, // Notification action
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      appBar: doctorAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -66,25 +36,26 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 
   Widget _buildSearchbar() {
     return Row(
       children: [
-        // Search bar with shadow
         Expanded(
           child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 16.0),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius:
+                  BorderRadius.circular(10), // Border radius added here
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.3),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: const Offset(0, 2),
+                  offset: const Offset(0, 2), // Shadow position
                 ),
               ],
             ),
@@ -105,6 +76,9 @@ class _DashboardPageState extends State<DashboardPage> {
         const SizedBox(width: 10),
         Container(
           decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.circular(10), // Border radius here as well
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.3),
@@ -113,8 +87,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 offset: const Offset(0, 2), // Shadow position
               ),
             ],
-            borderRadius: BorderRadius.circular(
-                10), // Matching the button's border radius
           ),
           child: TextButton.icon(
             onPressed: () {
@@ -130,8 +102,7 @@ class _DashboardPageState extends State<DashboardPage> {
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(
                   horizontal: 15.0, vertical: 12.0), // Consistent padding
-              backgroundColor: Colors
-                  .white, // White background for consistency with search bar
+              backgroundColor: Colors.white, // White background for consistency
               foregroundColor: Colors.black, // Black text/icon color
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10), // Rounded corners
@@ -153,7 +124,14 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           image: AssetImage('assets/images/cases-image.png'),
           label: 'Cases',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      DoctorCasesPage()), // Replace with your CasesPage widget
+            );
+          },
         ),
         _buildDashboardCardWithLabel(
           image: AssetImage('assets/images/pills-image.png'),
@@ -181,9 +159,8 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 20.0), 
-              // height: 100, 
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              // height: 100,
               decoration: BoxDecoration(
                 color: Color(0xFF617DEF).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
@@ -197,12 +174,11 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
           ),
-          const SizedBox(
-              height: 10), 
+          const SizedBox(height: 10),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 14, 
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Colors.black,
             ),
