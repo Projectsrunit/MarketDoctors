@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/chew/chew_home.dart';
-import 'package:market_doctor/pages/chew/signup_page.dart';
-
-
-
-
+import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/doctor/signup_page.dart';
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
 
@@ -53,7 +49,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => ChewHome(),
+              builder: (context) => DashboardPage(),
             ),
           );
         } else {
@@ -112,7 +108,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => ChewSignUpPage(),
+                          builder: (context) => DoctorSignUpPage(),
                         ),
                       );
                     },

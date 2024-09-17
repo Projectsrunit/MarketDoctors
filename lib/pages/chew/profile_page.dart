@@ -4,6 +4,7 @@ import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
+import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 
@@ -191,55 +192,6 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class UpdateQualificationChew extends StatefulWidget {
-  @override
-  _UpdateQualificationChewState createState() =>
-      _UpdateQualificationChewState();
-}
-
-class _UpdateQualificationChewState extends State<UpdateQualificationChew> {
-  List<String> qualifications = [
-    "B.Sc. Computer Science",
-    "M.Sc. Information Technology"
-  ];
-  final TextEditingController qualificationController = TextEditingController();
-
-  void addQualification() {
-    setState(() {
-      qualifications.add(qualificationController.text);
-      qualificationController.clear();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Manage qualifications',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        Text('Qualification', style: TextStyle(fontSize: 18)),
-        Column(
-          children: qualifications
-              .map((qual) => ListTile(title: Text(qual)))
-              .toList(),
-        ),
-        SizedBox(height: 20),
-        Text('Add new', style: TextStyle(fontSize: 18)),
-        TextField(
-          controller: qualificationController,
-          decoration: InputDecoration(labelText: 'Qualification'),
-        ),
-        ElevatedButton(
-          onPressed: addQualification,
-          child: Text('Save'),
-        ),
-      ],
-    );
-  }
-}
-
 class ManagePaymentsChew extends StatefulWidget {
   @override
   _ManagePaymentsChewState createState() => _ManagePaymentsChewState();
@@ -423,7 +375,8 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: 20),
             Text(
@@ -431,46 +384,85 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: firstNameController,
-              decoration: InputDecoration(labelText: 'First Name'),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: lastNameController,
-              decoration: InputDecoration(labelText: 'Last Name'),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: phoneNumberController,
-                    decoration: InputDecoration(labelText: 'Phone Number'),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(8)
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Flex(
+                  direction: Axis.vertical,
+                  children: [
+                            TextField(
+                controller: firstNameController,
+                decoration: InputDecoration(labelText: 'First Name'),
+                            ),
+                            SizedBox(height: 10),
+                            TextField(
+                controller: lastNameController,
+                decoration: InputDecoration(labelText: 'Last Name'),
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: phoneNumberController,
+                      decoration: InputDecoration(labelText: 'Phone Number'),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => _sendOTP('number'),
+                    child: Text('Verify'),
+                  ),
+                ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(labelText: 'Email'),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => _sendOTP('email'),
+                    child: Text('Verify'),
+                  ),
+                ],
+                            ),
+                            SizedBox(height: 20),
+                            Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // update action
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 32,
+                    ),
+                    backgroundColor: const Color(0xFF617DEF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Update',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _sendOTP('number'),
-                  child: Text('Verify'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                            ),
+                            ],
                   ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _sendOTP('email'),
-                  child: Text('Verify'),
-                ),
-              ],
+              ),
             ),
           ],
         ),

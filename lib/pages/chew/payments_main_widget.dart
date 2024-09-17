@@ -24,9 +24,9 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          _isPaymentsSelected ? Colors.blue : Colors.white,
+                          _isPaymentsSelected ? Color(0xFF617DEF) : Colors.white,
                       foregroundColor:
-                          _isPaymentsSelected ? Colors.white : Colors.blue,
+                          _isPaymentsSelected ? Colors.white : Color(0xFF617DEF),
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(8), // Rounded corners
@@ -44,9 +44,9 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          !_isPaymentsSelected ? Colors.blue : Colors.white,
+                          !_isPaymentsSelected ? Color(0xFF617DEF) : Colors.white,
                       foregroundColor:
-                          !_isPaymentsSelected ? Colors.white : Colors.blue,
+                          !_isPaymentsSelected ? Colors.white : Color(0xFF617DEF),
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(8), // Rounded corners
