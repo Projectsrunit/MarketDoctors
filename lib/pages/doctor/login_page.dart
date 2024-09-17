@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/patient/signup_page.dart';
+import 'package:market_doctor/pages/chew/chew_home.dart';
+import 'package:market_doctor/pages/chew/signup_page.dart';
+
+
+
 
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
@@ -46,11 +50,15 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           _showMessage('Login successful!', isError: false);
-          // Handle successful login (navigate to another page, save token, etc.)
-          // For example, navigate to dashboard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChewHome(),
+            ),
+          );
         } else {
           var errorResponse = jsonDecode(response.body);
-          _showMessage('Login failed Wrong Credentials.}');
+          _showMessage('Login failed. Wrong credentials');
         }
       } catch (error) {
         _showMessage('An error occurred. Please try again.');
@@ -75,6 +83,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -85,34 +94,25 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
               Text(
                 'Welcome Back,',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 36,
-                    ),
+                style: Theme.of(context).textTheme.displaySmall,
               ),
               Text(
                 'Login to your account',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 20,
-                    ),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     "Don’t have an account? ",
-                    style: TextStyle(
-                      color: Color(0xFFb8b8b8),
-                      fontSize: 18,
-                    ),
+                    style: TextStyle(fontSize: 18),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => PatientSignUpPage(),
+                          builder: (context) => ChewSignUpPage(),
                         ),
                       );
                     },
@@ -120,14 +120,14 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Color(0xFF4672ff),
+                        color: Color.fromARGB(255, 111, 136, 223),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
               Form(
                 key: _formKey,
                 child: Column(
@@ -149,12 +149,17 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
                           ),
                           prefixIcon: const Icon(Icons.email),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, // Make label text bold
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -185,12 +190,17 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none, // Remove border
                           ),
                           prefixIcon: const Icon(Icons.lock),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, // Make label text bold
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -202,23 +212,27 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40), // Increased spacing before login button
                     _isLoading
                         ? const CircularProgressIndicator()
                         : TextButton(
                             onPressed: _loginUser,
-                            child: const Text('Log In'),
                             style: TextButton.styleFrom(
                               minimumSize: const Size(double.infinity, 50),
-                              elevation: 10,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(22),
                               ),
                               foregroundColor: Colors.white,
-                              backgroundColor: Theme.of(context).primaryColor,
+                              backgroundColor: const Color.fromARGB(255, 111, 136, 223),
+                            ),
+                            child: const Text(
+                              'Log In',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
                             ),
                           ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),

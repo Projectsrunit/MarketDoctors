@@ -59,7 +59,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
           "password": _passwordController.text,
           "dateOfBirth": _dobController.text,
           "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
-          "role": 3
+          "role": 4
         };
 
         try {
@@ -98,6 +98,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -129,9 +130,10 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           "Already Signed Up? ",
-          style: TextStyle(color: Colors.black, fontSize: 16),  // Changed to black
+          style: TextStyle(color: Colors.black, fontSize: 16), 
+           // Changed to black
         ),
         GestureDetector(
           onTap: () {

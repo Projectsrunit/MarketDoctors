@@ -110,7 +110,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                   const Text(
                     "Don’t have an account? ",
                     style: TextStyle(
-                      color: Color(0xFFb8b8b8),
+                      color: Color.fromARGB(255, 10, 10, 10),
                       fontSize: 18,
                     ),
                   ),
@@ -126,14 +126,14 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Color(0xFF4672ff),
+                        color: Color.fromARGB(255,111, 136, 223),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
               Form(
                 key: _formKey,
                 child: Column(
@@ -157,7 +157,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
                           ),
                           prefixIcon: const Icon(Icons.email),
@@ -196,7 +196,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none, // Remove border
                           ),
                           prefixIcon: const Icon(Icons.lock),
@@ -219,15 +219,20 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                         ? const CircularProgressIndicator()
                         : TextButton(
                             onPressed: _loginUser,
-                            child: const Text('Log In'),
                             style: TextButton.styleFrom(
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(22),
                               ),
                               foregroundColor: Colors.white,
-                              backgroundColor: Theme.of(context).primaryColor,
+                              backgroundColor: const Color.fromARGB(255,111, 136, 223),
+                              
                             ),
+                            child: const Text('Log In', style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                fontSize: 17,// Make button text bold
+                               
+                              ),),
                           ),
                   ],
                 ),

@@ -424,6 +424,9 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
             fontWeight: FontWeight.bold,  // Bold label text
           ),
           prefixIcon: prefixIcon,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850]
+            : Colors.white,
           border: InputBorder.none,  // Removes the border
           contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10.0),
         ),
