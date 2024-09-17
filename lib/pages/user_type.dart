@@ -35,10 +35,11 @@ class ChooseUserTypePage extends StatelessWidget {
             ),
             const SizedBox(height: 8), // Reduced top margin
             Text(
-              'Just so we know you more and help you enjoy using the app',
+              'Welcome!',
               style: TextStyle(
-                fontSize: 16,
-                color: textColor, // Adapt to light/dark theme
+                fontSize: 20,
+                        color: Color.fromARGB(255, 111, 136, 223),
+                        fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),

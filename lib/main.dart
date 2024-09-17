@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white, // Background color for light theme
-        primaryColor: const Color(0xFF617DEF),
+        primaryColor: const Color.fromARGB(255, 111, 136, 223),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             backgroundColor: const Color(0xFF617DEF),
@@ -44,10 +44,10 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black, // Background color for dark theme
-        primaryColor: const Color(0xFF617DEF),
+        primaryColor: const Color.fromARGB(255, 111, 136, 223),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: const Color(0xFF617DEF),
+            backgroundColor: const Color.fromARGB(255, 111, 136, 223),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
             shape: RoundedRectangleBorder(

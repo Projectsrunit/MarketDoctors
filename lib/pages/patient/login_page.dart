@@ -20,52 +20,61 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
   bool _isLoading = false;
 
   // Function to handle login
-  Future<void> _loginUser() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  // Function to handle login
+Future<void> _loginUser() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
 
-      String email = _emailController.text;
-      String password = _passwordController.text;
-      String? baseUrl = dotenv.env['API_URL'];
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String? baseUrl = dotenv.env['API_URL'];
 
-      try {
-        var url = Uri.parse('$baseUrl/api/auth/login');
-        var response = await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'email': email,
-            'password': password,
-            'role': _role,
-          }),
+    try {
+      var url = Uri.parse('$baseUrl/api/auth/login');
+      var response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'role': _role,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        _showMessage('Welcome Back!', isError: false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChewHome(),
+          ),
         );
+      } else {
+        var errorResponse = jsonDecode(response.body);
+         String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
 
-        if (response.statusCode == 200) {
-          var responseBody = jsonDecode(response.body);
-          _showMessage('Login successful!', isError: false);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChewHome(),
-            ),
-          );
+        // Check if the error message is 'Role does not match'
+        if (errorMessage == 'Role does not match') {
+          _showMessage('Please log in with a different user type.');
         } else {
-          var errorResponse = jsonDecode(response.body);
-          _showMessage('Login failed. Wrong credentials');
+          _showMessage(errorMessage);
         }
-      } catch (error) {
-        _showMessage('An error occurred. Please try again.');
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
       }
+    } catch (error) {
+      _showMessage('An error occurred. Please try again.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+}
+
 
   // Function to show success or error message
   void _showMessage(String message, {bool isError = true}) {
