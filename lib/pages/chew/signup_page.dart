@@ -253,111 +253,152 @@ Widget _buildPasswordField() {
 
 
   Widget _buildPhoneField() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: DropdownButtonFormField<String>(
-            value: _selectedCountryCode,
-            items: countryCodes.map((country) {
-              return DropdownMenuItem<String>(
-                value: country['code'],
-                child: Row(
-                  children: [
-                    Image.network(
-                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
-                      width: 32,
-                      height: 20,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.flag);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Text('(${country['code']})'),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedCountryCode = value!;
-              });
-            },
-            decoration: InputDecoration(
-              fillColor: Colors.grey[200],
-              filled: true,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+  return Row(
+    children: [
+      Expanded(
+        flex: 2,
+        child: DropdownButtonFormField<String>(
+          value: _selectedCountryCode,
+          items: countryCodes.map((country) {
+            return DropdownMenuItem<String>(
+              value: country['code'],
+              child: Row(
+                children: [
+                  Image.network(
+                    country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                    width: 32,
+                    height: 20,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.flag);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Text('(${country['code']})'),
+                ],
               ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          flex: 3,
-          child: TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [LengthLimitingTextInputFormatter(10)],
-            decoration: InputDecoration(
-              prefixText: '$_selectedCountryCode ',
-              labelText: 'Phone Number',
-              fillColor: Colors.grey[200],
-              filled: true,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              return null;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDobField() {
-    return GestureDetector(
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime(2000),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (pickedDate != null) {
-          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-          _dobController.text = formattedDate;
-        }
-      },
-      child: AbsorbPointer(
-        child: TextFormField(
-          controller: _dobController,
-          decoration: const InputDecoration(
-            labelText: 'Date of Birth',
-            prefixIcon: Icon(Icons.calendar_today),
-            fillColor: Color.fromARGB(255, 247, 244, 244),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedCountryCode = value!;
+            });
+          },
+          decoration: InputDecoration(
+            fillColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850]
+                : Colors.white,
             filled: true,
             border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white // White border in dark mode
+                    : Colors.transparent, // No border in light mode
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.transparent,
+              ),
+            ),
           ),
         ),
       ),
-    );
-  }
+      const SizedBox(width: 10),
+      Expanded(
+        flex: 3,
+        child: TextFormField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [LengthLimitingTextInputFormatter(10)],
+          decoration: InputDecoration(
+            prefixText: '$_selectedCountryCode ',
+            labelText: 'Phone Number',
+            fillColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850]
+                : Colors.white,
+            filled: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.transparent,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.transparent,
+              ),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your phone number';
+            }
+            return null;
+          },
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildDobField() {
+  return GestureDetector(
+    onTap: () async {
+      DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime(2000),
+        firstDate: DateTime(1900),
+        lastDate: DateTime.now(),
+      );
+      if (pickedDate != null) {
+        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+        _dobController.text = formattedDate;
+      }
+    },
+    child: AbsorbPointer(
+      child: TextFormField(
+        controller: _dobController,
+        decoration: InputDecoration(
+          labelText: 'Date of Birth',
+          prefixIcon: const Icon(Icons.calendar_today),
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[850]
+              : Colors.white,
+          filled: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.transparent,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.transparent,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
   Widget _buildTermsAndConditions() {
     return Row(
