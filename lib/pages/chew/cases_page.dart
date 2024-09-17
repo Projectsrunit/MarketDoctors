@@ -4,6 +4,7 @@ import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 enum IconType { information, edit, delete }
 
@@ -277,7 +278,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _bloodPressureController = TextEditingController();
-  final _genderController = TextEditingController();
+  String? _selectedGender;
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
   final _bmiController = TextEditingController();
@@ -287,11 +288,17 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _chewsNotesController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _selectedGender = widget.caseData['gender']?.isEmpty ?? true ? null : widget.caseData['gender'];
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     _emailController.text = widget.caseData['email'] ?? '';
     _phoneController.text = widget.caseData['phone_number'] ?? '';
     _bloodPressureController.text = widget.caseData['blood_pressure'] ?? '';
-    _genderController.text = widget.caseData['gender'] ?? '';
     _weightController.text = widget.caseData['weight'] ?? '';
     _heightController.text = widget.caseData['height'] ?? '';
     _bmiController.text = widget.caseData['bmi'] ?? '';
@@ -333,7 +340,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildGenderDropdown(_genderController),
+              _buildGenderDropdown(),
               SizedBox(
                 height: 4,
               ),
@@ -349,23 +356,22 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildTextField('Blood Glucose',
-                  _bloodGlucoseController, 'mg/dL'),
+              _buildTextField(
+                  'Blood Glucose', _bloodGlucoseController, 'mg/dL'),
               SizedBox(
                 height: 4,
               ),
-              _buildTextField('Existing Condition',
-                  _existingConditionController),
+              _buildTextField(
+                  'Existing Condition', _existingConditionController),
               SizedBox(
                 height: 4,
               ),
-              _buildTextField('Current Prescription',
-                  _currentPrescriptionController),
+              _buildTextField(
+                  'Current Prescription', _currentPrescriptionController),
               SizedBox(
                 height: 4,
               ),
-              _buildTextArea(
-                  'CHEW\'s Notes', _chewsNotesController),
+              _buildTextArea('CHEW\'s Notes', _chewsNotesController),
               SizedBox(height: 20),
               if (widget.editable)
                 ElevatedButton(
@@ -382,37 +388,92 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   }
 
   Future<void> _saveData() async {
+    print('going to save');
+      try {
+    Fluttertoast.showToast(
+      msg: 'Saving...',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  } catch (e) {
+    print('Error showing toast: $e');
+  }
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases/${widget.saveId}');
 
+  print('this is the selected gender $_selectedGender');
     final response = await http.put(
       url,
       headers: {
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        'email': _emailController.text,
-        'phone_number': _phoneController.text,
-        'blood_pressure': _bloodPressureController.text,
-        'gender': _genderController.text,
-        'weight': _weightController.text,
-        'height': _heightController.text,
-        'bmi': _bmiController.text,
-        'blood_glucose': _bloodGlucoseController.text,
-        'existing_condition': _existingConditionController.text,
-        'current_prescription': _currentPrescriptionController.text,
-        'chews_notes': _chewsNotesController.text,
-        'chew': 11,
+        'data': {
+          'gender': _selectedGender,
+          if (_emailController.text.isNotEmpty) 'email': _emailController.text,
+          if (_phoneController.text.isNotEmpty)
+            'phone_number': _phoneController.text,
+          if (_parseNumber(_bloodPressureController.text) != null)
+            'blood_pressure': _parseNumber(_bloodPressureController.text),
+          if (_parseNumber(_weightController.text) != null)
+            'weight': _parseNumber(_weightController.text),
+          if (_parseNumber(_heightController.text) != null)
+            'height': _parseNumber(_heightController.text),
+          if (_parseNumber(_bmiController.text) != null)
+            'bmi': _parseNumber(_bmiController.text),
+          if (_parseNumber(_bloodGlucoseController.text) != null)
+            'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+          if (_existingConditionController.text.isNotEmpty)
+            'existing_condition': _existingConditionController.text,
+          if (_currentPrescriptionController.text.isNotEmpty)
+            'current_prescription': _currentPrescriptionController.text,
+          if (_chewsNotesController.text.isNotEmpty)
+            'chews_notes': _chewsNotesController.text,
+          'chew': 11,
+        }
       }),
     );
 
     if (response.statusCode == 200) {
-      print('Data successfully updated');
-      // Handle success (e.g., show a confirmation message or navigate back)
+      print('this is the response ${response.body}');
+      try{
+      Fluttertoast.showToast(
+        msg: 'Data successfully updated',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      } catch(e) {
+        print('error in fluttertoast $e');
+      }
     } else {
-      print('Failed to update data: ${response.body}');
-      // Handle failure (e.g., show an error message)
+      try{
+      print('this is the response ${response.body}');
+      Fluttertoast.showToast(
+        msg: 'Failed. Please try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+       } catch(e) {
+        print('error in fluttertoast $e');
+      }
     }
+  }
+
+  double? _parseNumber(String text) {
+    final value = double.tryParse(text);
+    return value != null ? value : null;
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
@@ -430,23 +491,22 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
       ),
     );
   }
-  
-Widget _buildGenderDropdown(TextEditingController controller) {
-  final String? gender = controller.text.isNotEmpty ? controller.text : null;
 
+
+Widget _buildGenderDropdown() {
   return DropdownButtonFormField<String?>(
-    value: gender,
+    value: _selectedGender,
     onChanged: widget.editable
         ? (String? value) {
             setState(() {
-              controller.text = value ?? '';
+              _selectedGender = value;
             });
           }
         : null,
-    items: ['Male', 'Female']
+    items: [null, 'Male', 'Female']
         .map((genderOption) => DropdownMenuItem<String?>(
               value: genderOption,
-              child: Text(genderOption),
+              child: Text(genderOption ?? 'Select Gender'),
             ))
         .toList(),
     decoration: InputDecoration(
@@ -456,15 +516,15 @@ Widget _buildGenderDropdown(TextEditingController controller) {
   );
 }
 
-Widget _buildTextArea(String label, TextEditingController controller) {
-  return TextField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(),
-    ),
-    maxLines: 4,
-    enabled: widget.editable,
-  );
-}
+  Widget _buildTextArea(String label, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+      ),
+      maxLines: 4,
+      enabled: widget.editable,
+    );
+  }
 }
