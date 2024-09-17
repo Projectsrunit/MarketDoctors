@@ -227,38 +227,48 @@ Widget build(BuildContext context) {
   }
 
 Widget _buildPasswordField() {
-  return TextFormField(
-    controller: _passwordController,
-    obscureText: true,
-    decoration: InputDecoration(
-      labelText: 'Password',
-      prefixIcon: const Icon(Icons.lock),
-      fillColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850]
+  return Container(
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850] // Dark mode background
           : Colors.grey[300], // Light mode grey background
-      filled: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(
-          color: Colors.grey, // Grey border
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 2), // Shadow position
         ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(
-          color: Colors.grey, // Grey border when focused
-        ),
-      ),
+      ],
     ),
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your password';
-      } else if (value.length < 6) {
-        return 'Password must be at least 6 characters';
-      }
-      return null;
-    },
+    child: TextFormField(
+      controller: _passwordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: const Icon(Icons.lock),
+        filled: true,
+        fillColor: Colors.transparent, // Set fill color to transparent
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        } else if (value.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+        return null;
+      },
+    ),
   );
 }
 
@@ -266,53 +276,62 @@ Widget _buildPasswordField() {
 
 
 
- Widget _buildPhoneField() {
+Widget _buildPhoneField() {
   return Row(
     children: [
       Expanded(
         flex: 2,
-        child: DropdownButtonFormField<String>(
-          value: _selectedCountryCode,
-          items: countryCodes.map((country) {
-            return DropdownMenuItem<String>(
-              value: country['code'],
-              child: Row(
-                children: [
-                  Image.network(
-                    country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
-                    width: 32,
-                    height: 20,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.flag);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  Text('(${country['code']})'),
-                ],
-              ),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedCountryCode = value!;
-            });
-          },
-          decoration: InputDecoration(
-            fillColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[850]
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850] // Dark mode background
                 : Colors.grey[300], // Light mode grey background
-            filled: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey, // Grey border
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 2), // Shadow position
               ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey, // Grey border when focused
+            ],
+          ),
+          child: DropdownButtonFormField<String>(
+            value: _selectedCountryCode,
+            items: countryCodes.map((country) {
+              return DropdownMenuItem<String>(
+                value: country['code'],
+                child: Row(
+                  children: [
+                    Image.network(
+                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                      width: 32,
+                      height: 20,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.flag);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text('(${country['code']})'),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedCountryCode = value!;
+              });
+            },
+            decoration: InputDecoration(
+              fillColor: Colors.transparent, // Set fill color to transparent
+              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Remove border in light mode
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Remove border in light mode
               ),
             ),
           ),
@@ -321,37 +340,47 @@ Widget _buildPasswordField() {
       const SizedBox(width: 10),
       Expanded(
         flex: 3,
-        child: TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: [LengthLimitingTextInputFormatter(10)],
-          decoration: InputDecoration(
-            prefixText: '$_selectedCountryCode ',
-            labelText: 'Phone Number',
-            fillColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[850]
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850] // Dark mode background
                 : Colors.grey[300], // Light mode grey background
-            filled: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey, // Grey border
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 2), // Shadow position
               ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey, // Grey border when focused
-              ),
-            ),
+            ],
           ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your phone number';
-            }
-            return null;
-          },
+          child: TextFormField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [LengthLimitingTextInputFormatter(10)],
+            decoration: InputDecoration(
+              prefixText: '$_selectedCountryCode ',
+              labelText: 'Phone Number',
+              filled: true,
+              fillColor: Colors.transparent, // Set fill color to transparent
+              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Remove border in light mode
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Remove border in light mode
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your phone number';
+              }
+              return null;
+            },
+          ),
         ),
       ),
     ],
@@ -372,26 +401,36 @@ Widget _buildDobField() {
       }
     },
     child: AbsorbPointer(
-      child: TextFormField(
-        controller: _dobController,
-        decoration: InputDecoration(
-          labelText: 'Date of Birth',
-          prefixIcon: const Icon(Icons.calendar_today),
-          fillColor: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[850]
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[850] // Dark mode background
               : Colors.grey[300], // Light mode grey background
-          filled: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Colors.grey, // Grey border
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 2), // Shadow position
             ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Colors.grey, // Grey border when focused
+          ],
+        ),
+        child: TextFormField(
+          controller: _dobController,
+          decoration: InputDecoration(
+            labelText: 'Date of Birth',
+            prefixIcon: const Icon(Icons.calendar_today),
+            filled: true,
+            fillColor: Colors.transparent, // Set fill color to transparent
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none, // Remove border in light mode
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none, // Remove border in light mode
             ),
           ),
         ),
@@ -454,35 +493,46 @@ Widget _buildTextField({
   Widget? prefixIcon,
   String? Function(String?)? validator,
 }) {
-  return TextFormField(
-    controller: controller,
-    keyboardType: keyboardType,
-    decoration: InputDecoration(
-      labelText: labelText,
-      prefixIcon: prefixIcon,
-      filled: true,
-      fillColor: Theme.of(context).brightness == Brightness.dark
+  return Container(
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey[850] // Dark mode background
-          : Colors.grey[300],  // Light mode background (grey)
-      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
-          color: Colors.grey[600]!, // Grey borders for light mode
+          : Colors.grey[300], // Light mode grey background
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 2), // Shadow position
         ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.blue, // Blue border on focus in light mode
-        ),
-      ),
+      ],
     ),
-    validator: validator,
+    child: TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: prefixIcon,
+        filled: true,
+        fillColor: Colors.transparent, // Set fill color to transparent
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+      ),
+      validator: validator,
+    ),
   );
 }
+
+
+
 
 }
 
