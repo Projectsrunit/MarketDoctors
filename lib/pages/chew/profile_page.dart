@@ -7,6 +7,7 @@ import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
+import 'package:market_doctor/pages/choose_action.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -74,24 +75,30 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSystemList(context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+Widget _buildSystemList(BuildContext context) {
+  final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
 
-    return Column(
-      children: [
-        _buildModeToggleRow(
-            context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildNoArrowRow(Icons.lock, "Change password", _showPasswordPopup),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildNoArrowRow(Icons.pin, "Change transaction pin", _showPinPopup),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildNoArrowRow(Icons.logout, "Log out", () {}),
-      ],
-    );
-  }
+  return Column(
+    children: [
+      _buildModeToggleRow(
+          context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
+      Divider(color: Colors.grey[300], thickness: 1),
+      _buildNoArrowRow(context, Icons.lock, "Change password", _showPasswordPopup),
+      Divider(color: Colors.grey[300], thickness: 1),
+      _buildNoArrowRow(context, Icons.pin, "Change transaction pin", _showPinPopup),
+      Divider(color: Colors.grey[300], thickness: 1),
+      _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
+      Divider(color: Colors.grey[300], thickness: 1),
+      _buildNoArrowRow(context, Icons.logout, "Log out", () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ChooseActionPage()), // Replace with your login or welcome page
+        );
+      }),
+    ],
+  );
+}
+
 
   Widget _buildModeToggleRow(BuildContext context, IconData icon, String label,
       VoidCallback onToggle) {
@@ -167,9 +174,10 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNoArrowRow(IconData icon, String label, VoidCallback onTap) {
+ // Update this function to use pushReplacement and ensure the user cannot go back
+  Widget _buildNoArrowRow(BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return InkWell(
-      onTap: onTap,
+      onTap: onTap, // Pass the onTap function
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
         child: Row(
@@ -182,6 +190,8 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
+
 
   void _showPasswordPopup() {
     // Show dialog for changing password
