@@ -93,7 +93,7 @@ class ChewHomeBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(14.0),
                         child: Icon(Icons.local_hospital,
                             size: 80, color: Colors.red),
                       ),
