@@ -1,45 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:market_doctor/pages/chew/doctor_card.dart';
+import 'dart:convert';
 
-class ChatWithDoctor extends StatelessWidget {
-  final List<Map<String, dynamic>> doctors = [
-    {'name': 'Dr. John Doe', 'age': 45, 'location': 'New York'},
-    {'name': 'Dr. Jane Smith', 'age': 50, 'location': 'Los Angeles'},
-    {'name': 'Dr. Emily Davis', 'age': 35, 'location': 'Chicago'},
-    // Add more doctors as needed
-  ];
-  final PageController pageController;
+class DoctorView extends StatefulWidget {
+  @override
+  State<DoctorView> createState() => _DoctorViewState();
+}
 
-  ChatWithDoctor({required this.pageController});
+class _DoctorViewState extends State<DoctorView> {
+  List<dynamic> doctors = [];
+bool isLoading = true; 
+
+  @override
+  void initState() {
+    super.initState();
+    if (doctors.isEmpty) {
+      fetchDoctors();
+    }
+  }
+
+  Future<void> fetchDoctors() async {
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url = Uri.parse(
+        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        doctors = data;
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load doctors');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: chewAppBar(),
-      body: Column(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
         children: [
-          ...doctors.map((doc) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AvailableDocsDetails(
-                      doctor: doc,
-                      pageController: pageController,
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Popular Doctors',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+              ),
+            ],
+          ),
+          if (isLoading) ...[
+            SizedBox(
+              height: 200,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          ]
+         else 
+          Expanded(
+            child: ListView.separated(
+              itemCount: doctors.length,
+              separatorBuilder: (context, index) => SizedBox(height: 8.0),
+              itemBuilder: (context, index) {
+                final doc = doctors[index];
+                return DoctorCard(
+                  imageUrl:
+                      doc['picture_url'] ?? 'https://via.placeholder.com/120',
+                  name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
+                  profession: (doc['specialisation'] != null && doc['specialisation'].isNotEmpty) ? doc['specialisation'][0] : 'General Practice_',
+                  rating: 4.5,
+                  onChatPressed: () {},
+                  onViewProfilePressed: () {},
+                  onBookAppointmentPressed: () {},
                 );
               },
-              child: AvailableDocs(
-                name: doc['name'],
-                age: doc['age'],
-                location: doc['location'],
-              ),
-            );
-          }).toList(),
-        ],
+            ),
+          ),
+        ]),
       ),
       bottomNavigationBar: BottomNavBar(),
     );
@@ -68,12 +125,8 @@ class AvailableDocs extends StatelessWidget {
 
 class AvailableDocsDetails extends StatelessWidget {
   final Map<String, dynamic> doctor;
-  final PageController pageController;
 
-  AvailableDocsDetails({
-    required this.doctor,
-    required this.pageController,
-  });
+  AvailableDocsDetails({required this.doctor});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,9 +186,8 @@ class AvailableDocsDetails extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RealChatWithDoctor(
+                        builder: (context) => RealDoctorView(
                           doctor: doctor,
-                          pageController: pageController,
                         ),
                       ),
                     );
@@ -155,11 +207,10 @@ class AvailableDocsDetails extends StatelessWidget {
   }
 }
 
-class RealChatWithDoctor extends StatelessWidget {
+class RealDoctorView extends StatelessWidget {
   final Map<String, dynamic> doctor;
-  final PageController pageController;
 
-  RealChatWithDoctor({required this.doctor, required this.pageController});
+  RealDoctorView({required this.doctor});
 
   @override
   Widget build(BuildContext context) {
