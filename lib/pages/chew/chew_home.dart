@@ -93,7 +93,7 @@ class ChewHomeBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(14.0),
                         child: Icon(Icons.local_hospital,
                             size: 80, color: Colors.red),
                       ),
@@ -105,7 +105,7 @@ class ChewHomeBody extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8.0),
+              SizedBox(width: 5.0),
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
@@ -131,7 +131,7 @@ class ChewHomeBody extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8.0),
+              SizedBox(width: 5.0),
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
@@ -163,7 +163,10 @@ class ChewHomeBody extends StatelessWidget {
           SizedBox(height: 16.0),
           Container(
             height: 130,
-            color: Color(0xFF617DEF),
+            decoration: BoxDecoration(
+              color: Color(0xFF617DEF),
+              borderRadius: BorderRadius.circular(8)
+            ),
             child: Center(
               child: Text(
                 'for advertisement',
