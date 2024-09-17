@@ -134,10 +134,15 @@ Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          "Already Signed Up? ",
-          style: TextStyle(color: Colors.black, fontSize: 16),  // Changed to black
+         Text(
+        "Already Signed Up? ",
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white  // White text in dark mode
+              : Colors.black,  // Black text in light mode
+          fontSize: 16,
         ),
+      ),
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
@@ -228,6 +233,7 @@ Widget build(BuildContext context) {
 
 Widget _buildPasswordField() {
   return Container(
+     height: 60,
     decoration: BoxDecoration(
       color: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey[850] // Dark mode background
@@ -282,10 +288,12 @@ Widget _buildPhoneField() {
       Expanded(
         flex: 2,
         child: Container(
+           height: 60,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850] // Dark mode background
                 : Colors.grey[300], // Light mode grey background
+                
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
@@ -341,6 +349,7 @@ Widget _buildPhoneField() {
       Expanded(
         flex: 3,
         child: Container(
+           height: 60,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850] // Dark mode background
@@ -402,6 +411,7 @@ Widget _buildDobField() {
     },
     child: AbsorbPointer(
       child: Container(
+         height: 60,
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[850] // Dark mode background
@@ -492,8 +502,10 @@ Widget _buildTextField({
   TextInputType? keyboardType,
   Widget? prefixIcon,
   String? Function(String?)? validator,
+  double height = 60.0, // Default height, adjust as needed
 }) {
   return Container(
+    height: height, // Set the height of the container
     decoration: BoxDecoration(
       color: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey[850] // Dark mode background
@@ -516,7 +528,7 @@ Widget _buildTextField({
         prefixIcon: prefixIcon,
         filled: true,
         fillColor: Colors.transparent, // Set fill color to transparent
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // Increased vertical padding
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none, // Remove border in light mode
@@ -530,6 +542,7 @@ Widget _buildTextField({
     ),
   );
 }
+
 
 
 
