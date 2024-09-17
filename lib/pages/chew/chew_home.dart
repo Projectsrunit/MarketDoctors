@@ -275,7 +275,11 @@ class PopularsState extends State<Populars> {
             ),
           ],
         ] else ...[
-          Center(child: Text('No doctors available')) // Display message if no doctors are found
+          SizedBox(
+            height: 100,
+            child: Center(
+              child: Text('No doctors available')),
+          ) 
         ]
       ],
     );

@@ -13,7 +13,7 @@ class DoctorView extends StatefulWidget {
 
 class _DoctorViewState extends State<DoctorView> {
   List<dynamic> doctors = [];
-bool isLoading = true; 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -25,8 +25,8 @@ bool isLoading = true;
 
   Future<void> fetchDoctors() async {
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse(
-        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*');
+    final Uri url =
+        Uri.parse('$baseUrl/api/users?filters[role][\$eq]=3&populate=*');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -45,8 +45,7 @@ bool isLoading = true;
       appBar: chewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-        children: [
+        child: Column(children: [
           Row(
             children: [
               IconButton(
@@ -71,31 +70,39 @@ bool isLoading = true;
           if (isLoading) ...[
             SizedBox(
               height: 200,
-            child: Center(
-              child: CircularProgressIndicator(),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
-          ),
+          ] else if (doctors.isNotEmpty) ...[
+            Expanded(
+              child: ListView.separated(
+                itemCount: doctors.length,
+                separatorBuilder: (context, index) => SizedBox(height: 8.0),
+                itemBuilder: (context, index) {
+                  final doc = doctors[index];
+                  return DoctorCard(
+                    imageUrl:
+                        doc['picture_url'] ?? 'https://via.placeholder.com/120',
+                    name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
+                    profession: (doc['specialisation'] != null &&
+                            doc['specialisation'].isNotEmpty)
+                        ? doc['specialisation'][0]
+                        : 'General Practice_',
+                    rating: 4.5,
+                    onChatPressed: () {},
+                    onViewProfilePressed: () {},
+                    onBookAppointmentPressed: () {},
+                  );
+                },
+              ),
+            ),
+          ] else ...[
+            SizedBox(
+              height: 100,
+              child: Center(child: Text('No doctors available')),
+            )
           ]
-         else 
-          Expanded(
-            child: ListView.separated(
-              itemCount: doctors.length,
-              separatorBuilder: (context, index) => SizedBox(height: 8.0),
-              itemBuilder: (context, index) {
-                final doc = doctors[index];
-                return DoctorCard(
-                  imageUrl:
-                      doc['picture_url'] ?? 'https://via.placeholder.com/120',
-                  name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
-                  profession: (doc['specialisation'] != null && doc['specialisation'].isNotEmpty) ? doc['specialisation'][0] : 'General Practice_',
-                  rating: 4.5,
-                  onChatPressed: () {},
-                  onViewProfilePressed: () {},
-                  onBookAppointmentPressed: () {},
-                );
-              },
-            ),
-          ),
         ]),
       ),
       bottomNavigationBar: BottomNavBar(),
