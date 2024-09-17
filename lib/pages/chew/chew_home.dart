@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
+import 'package:market_doctor/pages/chew/doctor_view.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/chew/doctor_card.dart';
 
 class ChewHome extends StatelessWidget {
   final int cases = 0;
@@ -19,12 +24,7 @@ class ChewHome extends StatelessWidget {
   }
 }
 
-class ChewHomeBody extends StatefulWidget {
-  @override
-  State<ChewHomeBody> createState() => _ChewHomeBodyState();
-}
-
-class _ChewHomeBodyState extends State<ChewHomeBody> {
+class ChewHomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -81,7 +81,8 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -99,14 +100,16 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                     ),
                     SizedBox(height: 4.0),
                     Text('Cases',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
-              SizedBox(width: 8.0), 
+              SizedBox(width: 8.0),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => DoctorView()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -118,20 +121,21 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                       ),
                       child: Container(
                         padding: EdgeInsets.all(16.0),
-                        child: Icon(Icons.person,
-                            size: 80, color: Colors.blue),
+                        child: Icon(Icons.person, size: 80, color: Colors.blue),
                       ),
                     ),
                     SizedBox(height: 4.0),
                     Text('Doctors',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               SizedBox(width: 8.0),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context )=> CasesPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +153,8 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                     ),
                     SizedBox(height: 4.0),
                     Text('Patients',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -175,7 +180,9 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> DoctorView()));
+                },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   backgroundColor: Colors.transparent,
@@ -188,181 +195,89 @@ class _ChewHomeBodyState extends State<ChewHomeBody> {
             ],
           ),
           SizedBox(height: 16.0),
-          Column(
-            children: [
-              _DoctorCard(
-                imageUrl: 'https://via.placeholder.com/120',
-                name: 'Dr. John Doe',
-                profession: 'Cardiologist',
-                rating: 4.5,
-                onChatPressed: () {},
-                onViewProfilePressed: () {},
-                onBookAppointmentPressed: () {},
-              ),
-              SizedBox(height: 16.0),
-              _DoctorCard(
-                imageUrl: 'https://via.placeholder.com/120',
-                name: 'Dr. Jane Smith',
-                profession: 'Dermatologist',
-                rating: 4.0,
-                onChatPressed: () {
-                  // Add functionality for "Chat with doctor"
-                },
-                onViewProfilePressed: () {
-                  // Add functionality for "View Profile"
-                },
-                onBookAppointmentPressed: () {
-                  // Add functionality for "Book appointment"
-                },
-              ),
-            ],
-          ),
+          Populars(),
         ],
       ),
     );
   }
 }
 
-class _DoctorCard extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final String profession;
-  final double rating;
-  final VoidCallback onChatPressed;
-  final VoidCallback onViewProfilePressed;
-  final VoidCallback onBookAppointmentPressed;
+class Populars extends StatefulWidget {
+  @override
+  PopularsState createState() => PopularsState();
+}
 
-  _DoctorCard({
-    required this.imageUrl,
-    required this.name,
-    required this.profession,
-    required this.rating,
-    required this.onChatPressed,
-    required this.onViewProfilePressed,
-    required this.onBookAppointmentPressed,
-  });
+class PopularsState extends State<Populars> {
+  List<dynamic> doctors = [];
+  bool isLoading = true; 
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDoctors();
+  }
+
+  Future<void> fetchDoctors() async {
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url = Uri.parse(
+        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=0start=0&limit=2');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        doctors = data;
+        isLoading = false;
+      });
+    } else {
+      print('Failed to load doctors');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        child: Container(
-      height: 124,
-      padding: const EdgeInsets.all(2.0),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Image.network(imageUrl, width: 120, height: 120),
-          ),
-          SizedBox(width: 4),
-          Flex(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              direction: Axis.vertical,
-              children: [
-                Text(name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    )),
-                Text(profession),
-                GestureDetector(
-                  onTap: onViewProfilePressed,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
-                        borderRadius: BorderRadius.circular(2)),
-                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                    constraints: BoxConstraints(
-                      minHeight: 20,
-                      maxHeight: 25,
-                      maxWidth: double.infinity,
-                    ),
-                    child: Text('View Profile',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 16),
-                      SizedBox(width: 4.0),
-                      Text('$rating',
-                          style: TextStyle(color: Colors.amber, fontSize: 14)),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: onChatPressed,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
-                        borderRadius: BorderRadius.circular(2)),
-                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                    constraints: BoxConstraints(
-                      minHeight: 24,
-                    ),
-                    child: Text('Chat with doctor',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
-                  ),
-                ),
-              ]),
-          SizedBox(width: 8.0),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
-              child: Flex(
-                direction: Axis.vertical,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Text(
-                        'available',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  GestureDetector(
-                    onTap: onBookAppointmentPressed,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                          color: Color(0xFF617DEF),
-                          borderRadius: BorderRadius.circular(2)),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: 'Book\n',
-                                style: TextStyle(color: Colors.white)),
-                            TextSpan(
-                                text: 'Appointment',
-                                style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+    return Column(
+      children: [
+        if (isLoading) ...[
+            SizedBox(
+              height: 100,
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
             ),
+        ] else if (doctors.isNotEmpty) ...[
+          DoctorCard(
+            imageUrl: doctors[0]['picture_url'] ??
+                'https://via.placeholder.com/120',
+            name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
+            profession: (doctors[0]['specialisation'] != null &&
+                    doctors[0]['specialisation'].isNotEmpty)
+                ? doctors[0]['specialisation'][0]
+                : 'General Practice_',
+            rating: 4.5,
+            onChatPressed: () {},
+            onViewProfilePressed: () {},
+            onBookAppointmentPressed: () {},
           ),
-        ],
-      ),
-    ));
+          SizedBox(height: 16.0),
+          if (doctors.length > 1) ...[
+            DoctorCard(
+              imageUrl: doctors[1]['picture_url'] ??
+                  'https://via.placeholder.com/120',
+              name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
+              profession: (doctors[1]['specialisation'] != null &&
+                      doctors[1]['specialisation'].isNotEmpty)
+                  ? doctors[1]['specialisation'][0]
+                  : 'General Practice_',
+              rating: 4.0,
+              onChatPressed: () {},
+              onViewProfilePressed: () {},
+              onBookAppointmentPressed: () {},
+            ),
+          ],
+        ] else ...[
+          Center(child: Text('No doctors available')) // Display message if no doctors are found
+        ]
+      ],
+    );
   }
 }
