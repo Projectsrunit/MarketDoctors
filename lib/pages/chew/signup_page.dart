@@ -218,6 +218,7 @@ Widget build(BuildContext context) {
     return _buildTextField(
       controller: _emailController,
       labelText: 'Email',
+      
       keyboardType: TextInputType.emailAddress,
       prefixIcon: const Icon(Icons.email),
       validator: (value) {
@@ -253,6 +254,9 @@ Widget _buildPasswordField() {
       obscureText: true,
       decoration: InputDecoration(
         labelText: 'Password',
+         labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold, // Make the label text bold
+        ),
         prefixIcon: const Icon(Icons.lock),
         filled: true,
         fillColor: Colors.transparent, // Set fill color to transparent
@@ -371,6 +375,9 @@ Widget _buildPhoneField() {
             decoration: InputDecoration(
               prefixText: '$_selectedCountryCode ',
               labelText: 'Phone Number',
+               labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold, // Make the label text bold
+        ),
               filled: true,
               fillColor: Colors.transparent, // Set fill color to transparent
               contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -430,6 +437,9 @@ Widget _buildDobField() {
           controller: _dobController,
           decoration: InputDecoration(
             labelText: 'Date of Birth',
+             labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold, // Make the label text bold
+        ),
             prefixIcon: const Icon(Icons.calendar_today),
             filled: true,
             fillColor: Colors.transparent, // Set fill color to transparent
@@ -525,6 +535,9 @@ Widget _buildTextField({
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,
+         labelStyle: const TextStyle(
+          fontWeight: FontWeight.bold, // Make the label text bold
+        ),
         prefixIcon: prefixIcon,
         filled: true,
         fillColor: Colors.transparent, // Set fill color to transparent

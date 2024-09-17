@@ -23,28 +23,10 @@ class ChooseActionPage extends StatelessWidget {
             ),
             const SizedBox(height: 40), // Increased space between logo and text
 
-            // Title Text
-            const Text(
-              'Welcome to Market Doctor',
-              style: TextStyle(
-                fontSize: 26, // Larger font size for title
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(
                 height: 20), // Increased space between title and description
 
-            // Description Text
-            const Text(
-              'Please choose an option to continue:',
-              style: TextStyle(
-                fontSize:
-                    18, // Slightly larger font size for better readability
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 40), // Increased space before the buttons
+            // Increased space before the buttons
 
             // Login Button (ElevatedButton)
             ElevatedButton(
@@ -65,7 +47,7 @@ class ChooseActionPage extends StatelessWidget {
                 ),
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
                     ? Colors.white
-                    : Colors.blueGrey[10],
+                    : const Color.fromARGB(255, 226, 234, 238),
               ),
               child: const Text(
                 'Login',
@@ -96,10 +78,10 @@ class ChooseActionPage extends StatelessWidget {
                 ),
                 backgroundColor: Theme.of(context).brightness == Brightness.dark
                     ? Colors.white
-                    : Colors.blueGrey[10],
+                    :const Color.fromARGB(255, 226, 234, 238),
               ),
               child: const Text(
-                'Sign Up',
+                'Create an account',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
