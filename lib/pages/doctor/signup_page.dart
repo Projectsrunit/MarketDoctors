@@ -7,7 +7,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/check_inbox.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
-  class DoctorSignUpPage extends StatefulWidget {
+
+class DoctorSignUpPage extends StatefulWidget {
   const DoctorSignUpPage({Key? key}) : super(key: key);
 
   @override
@@ -59,7 +60,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
           "password": _passwordController.text,
           "dateOfBirth": _dobController.text,
           "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
-          "role": 4
+          "role": 3
         };
 
         try {
@@ -96,45 +97,52 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Let’s get you signed up',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                _buildLoginPrompt(),
-                const SizedBox(height: 20),
-                _buildSignUpForm(),
-              ],
-            ),
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Theme.of(context).brightness == Brightness.dark
+        ? Colors.black   // Dark mode background
+        : Colors.white,  // Light mode background
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Let’s get you signed up',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 10),
+              _buildLoginPrompt(),
+              const SizedBox(height: 20),
+              _buildSignUpForm(),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildLoginPrompt() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "Already Signed Up? ",
-          style: TextStyle(color: Colors.black, fontSize: 16), 
-           // Changed to black
+         Text(
+        "Already Signed Up? ",
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white  // White text in dark mode
+              : Colors.black,  // Black text in light mode
+          fontSize: 16,
         ),
+      ),
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
@@ -223,12 +231,41 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
     );
   }
 
-  Widget _buildPasswordField() {
-    return _buildTextField(
+Widget _buildPasswordField() {
+  return Container(
+     height: 60,
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850] // Dark mode background
+          : Colors.grey[300], // Light mode grey background
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 2), // Shadow position
+        ),
+      ],
+    ),
+    child: TextFormField(
       controller: _passwordController,
-      labelText: 'Password',
       obscureText: true,
-      prefixIcon: const Icon(Icons.lock),
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: const Icon(Icons.lock),
+        filled: true,
+        fillColor: Colors.transparent, // Set fill color to transparent
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+      ),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your password';
@@ -237,14 +274,36 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
         }
         return null;
       },
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildPhoneField() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
+
+
+
+
+Widget _buildPhoneField() {
+  return Row(
+    children: [
+      Expanded(
+        flex: 2,
+        child: Container(
+           height: 60,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850] // Dark mode background
+                : Colors.grey[300], // Light mode grey background
+                
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 2), // Shadow position
+              ),
+            ],
+          ),
           child: DropdownButtonFormField<String>(
             value: _selectedCountryCode,
             items: countryCodes.map((country) {
@@ -272,20 +331,39 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
               });
             },
             decoration: InputDecoration(
-              fillColor: Colors.grey[200],
-              filled: true,
-              border: InputBorder.none,
+              fillColor: Colors.transparent, // Set fill color to transparent
               contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide.none, // Remove border in light mode
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Remove border in light mode
               ),
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          flex: 3,
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        flex: 3,
+        child: Container(
+           height: 60,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[850] // Dark mode background
+                : Colors.grey[300], // Light mode grey background
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 2), // Shadow position
+              ),
+            ],
+          ),
           child: TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
@@ -293,17 +371,16 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             decoration: InputDecoration(
               prefixText: '$_selectedCountryCode ',
               labelText: 'Phone Number',
-              fillColor: Colors.grey[200],
               filled: true,
-              border: InputBorder.none,
+              fillColor: Colors.transparent, // Set fill color to transparent
               contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide.none, // Remove border in light mode
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide.none, // Remove border in light mode
               ),
             ),
             validator: (value) {
@@ -314,38 +391,63 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             },
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildDobField() {
-    return GestureDetector(
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime(2000),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (pickedDate != null) {
-          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-          _dobController.text = formattedDate;
-        }
-      },
-      child: AbsorbPointer(
+      ),
+    ],
+  );
+}
+Widget _buildDobField() {
+  return GestureDetector(
+    onTap: () async {
+      DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime(2000),
+        firstDate: DateTime(1900),
+        lastDate: DateTime.now(),
+      );
+      if (pickedDate != null) {
+        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+        _dobController.text = formattedDate;
+      }
+    },
+    child: AbsorbPointer(
+      child: Container(
+         height: 60,
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[850] // Dark mode background
+              : Colors.grey[300], // Light mode grey background
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 2), // Shadow position
+            ),
+          ],
+        ),
         child: TextFormField(
           controller: _dobController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Date of Birth',
-            prefixIcon: Icon(Icons.calendar_today),
-            fillColor: Color.fromARGB(255, 247, 244, 244),
+            prefixIcon: const Icon(Icons.calendar_today),
             filled: true,
-            border: InputBorder.none,
+            fillColor: Colors.transparent, // Set fill color to transparent
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none, // Remove border in light mode
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none, // Remove border in light mode
+            ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildTermsAndConditions() {
     return Row(
@@ -394,42 +496,57 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
 }
 
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    Widget? prefixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200], // Light grey background
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),  // Shadow position
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,  // Bold label text
-          ),
-          prefixIcon: prefixIcon,
-          border: InputBorder.none,  // Removes the border
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10.0),
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String labelText,
+  TextInputType? keyboardType,
+  Widget? prefixIcon,
+  String? Function(String?)? validator,
+  double height = 60.0, // Default height, adjust as needed
+}) {
+  return Container(
+    height: height, // Set the height of the container
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850] // Dark mode background
+          : Colors.grey[300], // Light mode grey background
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 2), // Shadow position
         ),
-        validator: validator,
+      ],
+    ),
+    child: TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: prefixIcon,
+        filled: true,
+        fillColor: Colors.transparent, // Set fill color to transparent
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // Increased vertical padding
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none, // Remove border in light mode
+        ),
       ),
-    );
-  }
+      validator: validator,
+    ),
+  );
 }
+
+
+
+
+
+}
+
+
