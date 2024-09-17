@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
-import 'package:market_doctor/pages/doctor/signup_page.dart';
+import 'package:market_doctor/pages/patient/signup_page.dart';
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
 
@@ -15,7 +15,7 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _role = 4;
+  final _role = 5;
   bool _isLoading = false;
 
   // Function to handle login
@@ -117,7 +117,7 @@ Future<void> _loginUser() async {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => DoctorSignUpPage(),
+                          builder: (context) => PatientSignUpPage(),
                         ),
                       );
                     },

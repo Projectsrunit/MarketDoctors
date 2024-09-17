@@ -5,8 +5,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/check_inbox.dart';
-import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
+import 'package:market_doctor/pages/doctor/login_page.dart';
 
 class DoctorSignUpPage extends StatefulWidget {
   const DoctorSignUpPage({Key? key}) : super(key: key);
@@ -147,7 +147,7 @@ Widget build(BuildContext context) {
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ChewLoginPage()),
+              MaterialPageRoute(builder: (context) => const DoctorLoginPage()),
             );
           },
           child: const Text(

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/check_inbox.dart';
-import 'package:market_doctor/pages/chew/login_page.dart';
+import 'package:market_doctor/pages/patient/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
 
   class PatientSignUpPage extends StatefulWidget {
@@ -146,7 +146,7 @@ Widget build(BuildContext context) {
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ChewLoginPage()),
+              MaterialPageRoute(builder: (context) => const PatientLoginPage()),
             );
           },
           child: const Text(
