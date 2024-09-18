@@ -40,7 +40,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.home, size: 36, color: Color(0xFF617DEF)),
+                    icon: Icon(Icons.home, size: 36, color: Colors.blue,),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -56,7 +56,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.business_center,
-                        size: 36, color: Color(0xFF617DEF)),
+                        size: 36, color: Colors.blue,),
                     onPressed: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => CasesPage()));
@@ -71,7 +71,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.credit_card,
-                        size: 36, color: Color(0xFF617DEF)),
+                        size: 36, color: Colors.blue,),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -87,7 +87,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 children: [
                   IconButton(
                     icon:
-                        Icon(Icons.person, size: 36, color: Color(0xFF617DEF)),
+                        Icon(Icons.person, size: 36, color: Colors.blue,),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -124,7 +124,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                       child: Row(
                         children: [
                           SizedBox(width: 10),
-                          Icon(Icons.add, color: Color(0xFF617DEF)),
+                          Icon(Icons.add, color: Colors.blue,),
                           SizedBox(width: 10),
                           Text('Add a case'),
                           SizedBox(width: 10),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/patient/login_page.dart';
-import 'package:market_doctor/pages/chew/signup_page.dart';
 
 class ChooseUserTypePage extends StatelessWidget {
   const ChooseUserTypePage({super.key});

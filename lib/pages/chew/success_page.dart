@@ -54,7 +54,7 @@ class ChewSuccessPage extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Go to Login'),
+                child: const Text('Proceed to Login'),
                 style: ElevatedButton.styleFrom(
                   minimumSize:
                       const Size(double.infinity, 50), // Full-width button

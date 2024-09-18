@@ -46,7 +46,7 @@ class DoctorCard extends StatelessWidget {
                   onTap: onViewProfilePressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
+                        color: Colors.blue,
                         borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
                     constraints: BoxConstraints(
@@ -74,7 +74,7 @@ class DoctorCard extends StatelessWidget {
                   onTap: onChatPressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
+                        color: Colors.blue,
                         borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
                     constraints: BoxConstraints(
@@ -119,7 +119,7 @@ class DoctorCard extends StatelessWidget {
                       padding:
                           EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       decoration: BoxDecoration(
-                          color: Color(0xFF617DEF),
+                          color: Colors.blue,
                           borderRadius: BorderRadius.circular(5)),
                       child: RichText(
                         textAlign: TextAlign.center,

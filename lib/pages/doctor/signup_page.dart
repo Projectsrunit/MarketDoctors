@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/chew/check_inbox.dart';
+import 'package:market_doctor/pages/doctor/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
 
@@ -75,7 +75,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             _showSnackBar('Sign up successful');
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                  builder: (context) => const ChewCheckInboxPage()),
+                  builder: (context) => const DoctorCheckInboxPage()),
             );
           } else {
             _showSnackBar('Sign up failed: ${response.body}');
