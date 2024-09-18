@@ -23,7 +23,7 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
         child: Container(
-      height: 124,
+      height: 135,
       padding: const EdgeInsets.all(2.0),
       child: Row(
         children: [
@@ -46,8 +46,8 @@ class DoctorCard extends StatelessWidget {
                   onTap: onViewProfilePressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
-                        borderRadius: BorderRadius.circular(2)),
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
                     constraints: BoxConstraints(
                       minHeight: 20,
@@ -69,12 +69,13 @@ class DoctorCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(height: 8,),
                 GestureDetector(
                   onTap: onChatPressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color(0xFF617DEF),
-                        borderRadius: BorderRadius.circular(2)),
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
                     constraints: BoxConstraints(
                       minHeight: 24,
@@ -83,6 +84,7 @@ class DoctorCard extends StatelessWidget {
                         style: TextStyle(fontSize: 14, color: Colors.white)),
                   ),
                 ),
+                SizedBox(height: 4,)
               ]),
           SizedBox(width: 8.0),
           Expanded(
@@ -117,23 +119,21 @@ class DoctorCard extends StatelessWidget {
                       padding:
                           EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       decoration: BoxDecoration(
-                          color: Color(0xFF617DEF),
-                          borderRadius: BorderRadius.circular(2)),
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(5)),
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           children: [
                             TextSpan(
-                                text: 'Book\n',
-                                style: TextStyle(color: Colors.white)),
-                            TextSpan(
-                                text: 'Appointment',
+                                text: 'Book',
                                 style: TextStyle(color: Colors.white)),
                           ],
                         ),
                       ),
                     ),
                   ),
+                  SizedBox(height: 4,)
                 ],
               ),
             ),

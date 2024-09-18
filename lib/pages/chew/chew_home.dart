@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/doctor_card.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ChewHome extends StatelessWidget {
   final int cases = 0;
@@ -41,9 +42,9 @@ class ChewHomeBody extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: "Search doctor, field, drugs",
                       prefixIcon: Icon(Icons.search),
-                      suffixIcon: null,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
+                        
                       ),
                     ),
                   ),
@@ -54,18 +55,8 @@ class ChewHomeBody extends StatelessWidget {
                     // Add search functionality here
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                            .textButtonTheme
-                            .style
-                            ?.backgroundColor
-                            ?.resolve({}) ??
-                        Color(0xFF617DEF),
-                    foregroundColor: Theme.of(context)
-                            .textButtonTheme
-                            .style
-                            ?.foregroundColor
-                            ?.resolve({}) ??
-                        Colors.white,
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -79,6 +70,7 @@ class ChewHomeBody extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              // Cases icon
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
@@ -93,9 +85,13 @@ class ChewHomeBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        child: Icon(Icons.local_hospital,
-                            size: 80, color: Colors.red),
+                        padding: EdgeInsets.all(28.0),
+                        color: Colors.lightBlue[50], // Light blue background
+                        child: Icon(
+                          FontAwesomeIcons.briefcaseMedical, // Medical case with a +
+                          size: 50,
+                          color: Colors.blue, // Blue icon
+                        ),
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -105,7 +101,8 @@ class ChewHomeBody extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8.0),
+              SizedBox(width: 5.0),
+              // Doctors icon
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
@@ -120,8 +117,13 @@ class ChewHomeBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        child: Icon(Icons.person, size: 80, color: Colors.blue),
+                        padding: EdgeInsets.all(28.0),
+                        color: Colors.lightBlue[50], // Light blue background
+                        child: Icon(
+                          FontAwesomeIcons.stethoscope, // Stethoscope icon
+                          size: 50,
+                          color: Colors.blue, // Blue icon
+                        ),
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -131,7 +133,8 @@ class ChewHomeBody extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8.0),
+              SizedBox(width: 5.0),
+              // Patients icon
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
@@ -146,9 +149,13 @@ class ChewHomeBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        child: Icon(Icons.person_outline,
-                            size: 80, color: Colors.green),
+                        padding: EdgeInsets.all(28.0),
+                        color: Colors.lightBlue[50], // Light blue background
+                        child: Icon(
+                          FontAwesomeIcons.userFriends, // Patients icon
+                          size: 50,
+                          color: Colors.blue, // Blue icon
+                        ),
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -163,7 +170,10 @@ class ChewHomeBody extends StatelessWidget {
           SizedBox(height: 16.0),
           Container(
             height: 130,
-            color: Color(0xFF617DEF),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(8)
+            ),
             child: Center(
               child: Text(
                 'for advertisement',

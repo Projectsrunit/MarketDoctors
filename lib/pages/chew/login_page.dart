@@ -4,7 +4,6 @@ import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
-
 class ChewLoginPage extends StatefulWidget {
   const ChewLoginPage({super.key});
 
@@ -20,7 +19,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   bool _isLoading = false;
 
   // Function to handle login
-  Future<void> _loginUser() async {
+ // Function to handle login
+Future<void> _loginUser() async {
   if (_formKey.currentState!.validate()) {
     setState(() {
       _isLoading = true;
@@ -54,7 +54,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           ),
         );
       } else {
-        var errorResponse = jsonDecode(response.body);
+       var errorResponse = jsonDecode(response.body);
          String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
 
         // Check if the error message is 'Role does not match'
@@ -88,7 +88,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Set background color here
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -99,28 +99,19 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
               Text(
                 'Welcome Back,',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 36,
-                    ),
+                style: Theme.of(context).textTheme.displaySmall,
               ),
               Text(
                 'Login to your account',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold, // Made bold
-                      fontSize: 20,
-                    ),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     "Don’t have an account? ",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 10, 10, 10),
-                      fontSize: 18,
-                    ),
+                    style: TextStyle(fontSize: 18),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -134,7 +125,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Color.fromARGB(255,111, 136, 223),
+                        color: Color.fromARGB(255, 111, 136, 223),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -150,8 +141,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5), // Shadow color
-                            spreadRadius: 2, // How much the shadow spreads
+                            color: Colors.grey.withOpacity(0.4), // Shadow color
+                            spreadRadius: 1, // How much the shadow spreads
                             blurRadius: 5, // How blurry the shadow is
                             offset: const Offset(0, 3), // Shadow position
                           ),
@@ -163,7 +154,9 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
@@ -189,8 +182,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5), // Shadow color
-                            spreadRadius: 2, // How much the shadow spreads
+                            color: Colors.grey.withOpacity(0.4), // Shadow color
+                            spreadRadius: 1, // How much the shadow spreads
                             blurRadius: 5, // How blurry the shadow is
                             offset: const Offset(0, 3), // Shadow position
                           ),
@@ -202,7 +195,9 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none, // Remove border
@@ -233,14 +228,15 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                                 borderRadius: BorderRadius.circular(22),
                               ),
                               foregroundColor: Colors.white,
-                              backgroundColor: const Color.fromARGB(255,111, 136, 223),
-                              
+                              backgroundColor: const Color.fromARGB(255, 111, 136, 223),
                             ),
-                            child: const Text('Log In', style: TextStyle(
-                                fontWeight: FontWeight.bold, 
-                                fontSize: 17,// Make button text bold
-                               
-                              ),),
+                            child: const Text(
+                              'Log In',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                            ),
                           ),
                   ],
                 ),

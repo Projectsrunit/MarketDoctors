@@ -162,9 +162,7 @@ class ChooseUserTypePageTwo extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
-                backgroundColor: isDarkMode
-                    ? Colors.grey[800]
-                    : const Color.fromARGB(255, 238, 244, 248),
+                backgroundColor:  isDarkMode ? Colors.grey[800] :const Color.fromARGB(255, 226, 234, 238),
                 foregroundColor: Colors.white,
               ),
               child: Column(
