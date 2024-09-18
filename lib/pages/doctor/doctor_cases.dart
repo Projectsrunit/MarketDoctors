@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 
 enum IconType { information, edit, delete }
@@ -189,7 +188,7 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }
@@ -274,6 +273,8 @@ class CaseInstanceDetails extends StatefulWidget {
 class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _dateOfBirthController = TextEditingController();
+  final _homeAddressController = TextEditingController();
   final _bloodPressureController = TextEditingController();
   final _genderController = TextEditingController();
   final _weightController = TextEditingController();
@@ -288,6 +289,8 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   Widget build(BuildContext context) {
     _emailController.text = widget.caseData['email'] ?? '';
     _phoneController.text = widget.caseData['phone_number'] ?? '';
+    _homeAddressController.text = widget.caseData['home_address'] ?? '';
+    _dateOfBirthController.text = widget.caseData['date_of_birth'] ?? '';
     _bloodPressureController.text = widget.caseData['blood_pressure'] ?? '';
     _genderController.text = widget.caseData['gender'] ?? '';
     _weightController.text = widget.caseData['weight'] ?? '';
@@ -298,7 +301,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
         widget.caseData['existing_condition'] ?? '';
     _currentPrescriptionController.text =
         widget.caseData['current_prescription'] ?? '';
-    _chewsNotesController.text = widget.caseData['chews_notes'] ?? '';
+    _chewsNotesController.text = widget.caseData['doctors_note'] ?? '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -315,23 +318,32 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildTextField('Email', _emailController),
+              _buildTextField('Date Of Birth', _dateOfBirthController),
+              SizedBox(
+                height: 4,
+              ),
+              _buildGenderDropdown(_genderController),
               SizedBox(
                 height: 4,
               ),
               _buildTextField('Phone Number', _phoneController),
+              SizedBox(
+                height: 4,
+              ),
+              _buildTextField('Address No', _homeAddressController),
+              SizedBox(
+                height: 4,
+              ),
+               _buildTextField('Email Address', _emailController),
               SizedBox(height: 20),
               Text(
-                'Medical Details',
+                'Medical History',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               _buildTextField(
                   'Blood Pressure', _bloodGlucoseController, 'mmHg'),
-              SizedBox(
-                height: 4,
-              ),
-              _buildGenderDropdown(_genderController),
+             
               SizedBox(
                 height: 4,
               ),
@@ -362,7 +374,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildTextArea('CHEW\'s Notes', _chewsNotesController),
+              _buildTextArea('Doctor\'s Notes', _chewsNotesController),
               SizedBox(height: 20),
               if (widget.editable)
                 ElevatedButton(
@@ -389,16 +401,18 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
       },
       body: json.encode({
         'email': _emailController.text,
+        'date_of_birth': _dateOfBirthController.text,
         'phone_number': _phoneController.text,
         'blood_pressure': _bloodPressureController.text,
         'gender': _genderController.text,
+        'home_address': _homeAddressController.text,
         'weight': _weightController.text,
         'height': _heightController.text,
         'bmi': _bmiController.text,
         'blood_glucose': _bloodGlucoseController.text,
         'existing_condition': _existingConditionController.text,
         'current_prescription': _currentPrescriptionController.text,
-        'chews_notes': _chewsNotesController.text,
+        'doctor_note': _chewsNotesController.text,
         'chew': 11,
       }),
     );
