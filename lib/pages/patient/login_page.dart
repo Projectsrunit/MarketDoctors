@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/signup_page.dart';
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
@@ -50,7 +50,7 @@ Future<void> _loginUser() async {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DashboardPage(),
+            builder: (context) => PatientHome(),
           ),
         );
       } else {

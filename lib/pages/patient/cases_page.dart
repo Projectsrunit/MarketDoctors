@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,12 +8,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 enum IconType { information, edit, delete }
 
-class CasesPage extends StatefulWidget {
+class PatientCasesPage extends StatefulWidget {
   @override
-  CasesPageState createState() => CasesPageState();
+  PatientCasesPageState createState() => PatientCasesPageState();
 }
 
-class CasesPageState extends State<CasesPage> {
+class PatientCasesPageState extends State<PatientCasesPage> {
   int? _activeCaseIndex;
   IconType? _activeIconType;
   List<dynamic> cases = [];
@@ -94,7 +94,7 @@ class CasesPageState extends State<CasesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -192,7 +192,7 @@ class CasesPageState extends State<CasesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
