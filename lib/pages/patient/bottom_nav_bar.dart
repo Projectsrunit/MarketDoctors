@@ -40,7 +40,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => PatientHome()),
+                        MaterialPageRoute(builder: (context) => PatientHome(patientId: '', patientName: '',)),
                       );
                     },
                   ),

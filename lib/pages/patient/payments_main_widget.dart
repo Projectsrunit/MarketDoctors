@@ -13,7 +13,7 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(

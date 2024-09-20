@@ -6,7 +6,7 @@ class AddCaseForms extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: AddCaseForm1(),
       bottomNavigationBar: PatientBottomNavBar(),
     );
@@ -176,7 +176,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -14,16 +14,23 @@ class PatientHome extends StatelessWidget {
   final int doctorsOnline = 0;
   final int users = 0;
 
+  // Add the required parameters
+  final String patientId;
+  final String patientName;
+
+  // Constructor to accept patientId and patientName
+  const PatientHome({Key? key, required this.patientId, required this.patientName}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
-      //detect a back button press and dont log out the person
+      appBar: patientAppBar(patientName), // Pass the patient name to appBar
       body: PatientHomeBody(),
-      bottomNavigationBar: PatientBottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(), 
     );
   }
 }
+
 
 class PatientHomeBody extends StatelessWidget {
   @override

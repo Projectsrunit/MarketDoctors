@@ -94,7 +94,7 @@ class CasesPageState extends State<CasesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

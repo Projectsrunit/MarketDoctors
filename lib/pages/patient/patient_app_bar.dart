@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-AppBar patientAppBar() {
+AppBar patientAppBar(String patientName) {
   return AppBar(
     automaticallyImplyLeading: false,
     title: Padding(
@@ -11,10 +11,11 @@ AppBar patientAppBar() {
             backgroundColor: Colors.white,
             child: Icon(Icons.person),
           ),
-          SizedBox(width: 8),
+          SizedBox(width: 6),
           Flexible(
             child: Text(
-              "PATIENT",
+              patientName, // Use the patient name here
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

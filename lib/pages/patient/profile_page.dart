@@ -13,7 +13,7 @@ class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -254,7 +254,7 @@ class _ManagePaymentsPatientState extends State<ManagePaymentsPatient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -381,7 +381,7 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(),
+      appBar: patientAppBar(''),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
