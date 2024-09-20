@@ -9,7 +9,7 @@ AppBar patientAppBar() {
         children: [
           CircleAvatar(
             backgroundColor: Colors.white,
-            child: Icon(Icons.ac_unit),
+            child: Icon(Icons.person),
           ),
           SizedBox(width: 8),
           Flexible(

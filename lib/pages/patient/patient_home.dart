@@ -88,14 +88,14 @@ class PatientHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.briefcaseMedical, // Medical case with a +
+                          FontAwesomeIcons.hospital, // Medical case with a +
                           size: 50,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Cases',
+                    Text('Hospitals',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
@@ -152,14 +152,14 @@ class PatientHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.userFriends, // Patients icon
+                          FontAwesomeIcons.pills, // Patients icon
                           size: 50,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Patients',
+                    Text('Pharmacy',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
