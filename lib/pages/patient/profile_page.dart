@@ -1,19 +1,19 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
-import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
+import 'package:market_doctor/pages/patient/update_qualification_patient.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 
-class ProfilePage extends StatelessWidget {
+class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: patientAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -48,7 +48,7 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 
@@ -57,19 +57,19 @@ class ProfilePage extends StatelessWidget {
       children: [
         _buildArrowRow(Icons.account_circle, "Profile information", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => UpdateProfileChew()));
+              MaterialPageRoute(builder: (context) => UpdateProfilePatient()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.payment, "Manage payments", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ManagePaymentsChew()));
+              MaterialPageRoute(builder: (context) => ManagePaymentsPatient()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.school, "Update qualifications", () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => UpdateQualificationChew()));
+                  builder: (context) => UpdateQualificationPatient()));
         }),
       ],
     );
@@ -202,12 +202,12 @@ Widget _buildSystemList(BuildContext context) {
   }
 }
 
-class ManagePaymentsChew extends StatefulWidget {
+class ManagePaymentsPatient extends StatefulWidget {
   @override
-  _ManagePaymentsChewState createState() => _ManagePaymentsChewState();
+  _ManagePaymentsPatientState createState() => _ManagePaymentsPatientState();
 }
 
-class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
+class _ManagePaymentsPatientState extends State<ManagePaymentsPatient> {
   void _showAddBankAccountPopup() {
     showDialog(
       context: context,
@@ -254,7 +254,7 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: patientAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -318,17 +318,17 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
 
-class UpdateProfileChew extends StatefulWidget {
+class UpdateProfilePatient extends StatefulWidget {
   @override
-  UpdateProfileChewState createState() => UpdateProfileChewState();
+  UpdateProfilePatientState createState() => UpdateProfilePatientState();
 }
 
-class UpdateProfileChewState extends State<UpdateProfileChew> {
+class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -381,7 +381,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: patientAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
@@ -477,7 +477,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }

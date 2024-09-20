@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/cases_page.dart';
-import 'package:market_doctor/pages/chew/doctor_view.dart';
+import 'package:market_doctor/pages/patient/doctor_view.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
