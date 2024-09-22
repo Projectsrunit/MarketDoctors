@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 
 class UpcomingAppointmentPage extends StatelessWidget {
   @override
@@ -21,6 +22,7 @@ class UpcomingAppointmentPage extends StatelessWidget {
             PendingAppointmentsTab(),
           ],
         ),
+        bottomNavigationBar: DoctorBottomNavBar(),
       ),
     );
   }
@@ -39,6 +41,7 @@ class UpcomingAppointmentsTab extends StatelessWidget {
         return AppointmentCard(
           patientName: 'John Doe',
           patientAge: 32,
+          appointmentDate: '09/09/2024',
           appointmentTime: '10:30 AM',
           imageUrl: 'assets/images/patient.png',
           isPending: false,
@@ -61,6 +64,7 @@ class PendingAppointmentsTab extends StatelessWidget {
         return AppointmentCard(
           patientName: 'Jane Smith',
           patientAge: 29,
+          appointmentDate: '09/09/2024',
           appointmentTime: '1:00 PM',
           imageUrl: 'assets/images/patient.png',
           isPending: true,
@@ -75,6 +79,7 @@ class AppointmentCard extends StatelessWidget {
   final String patientName;
   final int patientAge;
   final String appointmentTime;
+  final String appointmentDate;
   final String imageUrl;
   final bool isPending;
 
@@ -83,6 +88,7 @@ class AppointmentCard extends StatelessWidget {
     required this.patientName,
     required this.patientAge,
     required this.appointmentTime,
+    required this.appointmentDate,
     required this.imageUrl,
     required this.isPending,
   }) : super(key: key);
@@ -94,56 +100,84 @@ class AppointmentCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Patient Image
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage(imageUrl),
-            ),
-            const SizedBox(width: 16),
-            // Patient Info and Appointment Time
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    patientName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+            // First Row: Image and Patient Info
+            Row(
+              children: [
+                // Patient Image
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage(imageUrl),
+                ),
+                const SizedBox(width: 16),
+                // Patient Name and Age
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        patientName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text('Age: $patientAge years'),
+                    ],
                   ),
-                  Text('Age: $patientAge years'),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Appointment: $appointmentTime',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            // Buttons: Schedule/Proceed
-            Column(
+            const SizedBox(height: 20),
+
+            // Second Row: Date and Time
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.calendar_month),
+                Text(
+                  'Date: $appointmentDate',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                Icon(Icons.punch_clock_sharp),
+                Text(
+                  'Time: $appointmentTime',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // Third Row: Action Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: () {
                     // Handle Schedule Action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                  ),
-                  child: const Text('Schedule'),
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
+                  child: const Text('ReSchedule'),
                 ),
-                const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
                     // Handle Proceed Action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isPending ? Colors.orange : Colors.green,
-                  ),
-                  child: Text(isPending ? 'Proceed' : 'Start'),
+                      backgroundColor: isPending ? Colors.blueAccent : Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
+                  child: Text(isPending ? 'PrReScheduleoceed' : 'Proceed'),
                 ),
               ],
             ),

@@ -10,7 +10,7 @@ AppBar doctorAppBar() {
           children: [
             IconButton(
               icon: const Icon(Icons.person_2_rounded, color: Colors.black),
-              onPressed: () {}, // Clock action
+              onPressed: () {}, // Profile action
             ),
             const SizedBox(width: 8),
             const Text('@user',
