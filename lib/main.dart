@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color.fromARGB(255, 111, 136, 223),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            backgroundColor: const Color(0xFF617DEF),
+            backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
             shape: RoundedRectangleBorder(

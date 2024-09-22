@@ -169,10 +169,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
   String? _existingCondition;
   final TextEditingController _prescriptionController = TextEditingController();
 
-  void pushNewCase() {
-    print('going to push1');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
