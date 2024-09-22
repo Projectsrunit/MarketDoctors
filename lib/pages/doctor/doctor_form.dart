@@ -33,7 +33,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
-        _selectedTimeSlots.clear(); // Reset selected time slots for the new date
+        _selectedTimeSlots
+            .clear(); // Reset selected time slots for the new date
       });
     }
   }
@@ -101,7 +102,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     );
   }
 
-  // Build a labeled text field with the label on the left and the text input on the right
   Widget _buildLabeledTextField({
     required TextEditingController controller,
     required String labelText,
@@ -123,7 +123,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
             controller: controller,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             ),
           ),
         ),
@@ -132,71 +133,76 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   }
 
   // Build the calendar widget
- Widget _buildCalendar(BuildContext context) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Title on the left
-      SizedBox(
-        width: 150,  // Adjust the width as needed
-        child: Text(
-          'Select Date',
-          style: const TextStyle(
-            fontSize: 16, 
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,  // Added for emphasis
+  Widget _buildCalendar(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title on the left
+        SizedBox(
+          width: 100, // Adjust the width as needed
+          child: Text(
+            'Select Date',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+              fontWeight: FontWeight.bold, // Added for emphasis
+            ),
           ),
         ),
-      ),
-      const SizedBox(width: 16), // Space between title and calendar
+        const SizedBox(width: 10), // Space between title and calendar
 
-      // Calendar on the right
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TableCalendar(
-              focusedDay: _selectedDate ?? DateTime.now(),
-              firstDay: DateTime(2000),
-              lastDay: DateTime(2101),
-              calendarFormat: CalendarFormat.month,
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDate, day);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDate = selectedDay;
-                });
-              },
-              calendarStyle: const CalendarStyle(
-                selectedDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
+        // Calendar with grey background on the right
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(8.0), // Padding for better spacing
+            color: Colors.grey[100],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TableCalendar(
+                  focusedDay: _selectedDate ?? DateTime.now(),
+                  firstDay: DateTime(2000),
+                  lastDay: DateTime(2101),
+                  calendarFormat: CalendarFormat.month,
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDate, day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDate = selectedDay;
+                    });
+                  },
+                  calendarStyle: const CalendarStyle(
+                    selectedDecoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      shape: BoxShape.circle,
+                    ),
+                    todayDecoration: BoxDecoration(
+                      color: Colors.lightBlueAccent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                  ),
                 ),
-                todayDecoration: BoxDecoration(
-                  color: Colors.lightBlueAccent,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              headerStyle: const HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-              ),
+                if (_selectedDate != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Selected Date: ${DateFormat.yMMMd().format(_selectedDate!)}",
+                      style:
+                          const TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                  ),
+              ],
             ),
-            if (_selectedDate != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  "Selected Date: ${DateFormat.yMMMd().format(_selectedDate!)}",
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
-                ),
-              ),
-          ],
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   // Build the time slots widget
   Widget _buildTimeSlots() {
@@ -205,7 +211,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
       children: [
         const Text(
           'Available Time Slots',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         const SizedBox(height: 8),
         Wrap(
