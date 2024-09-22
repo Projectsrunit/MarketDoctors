@@ -1,77 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 
-class UpcomingAppointmentPage extends StatefulWidget {
-  const UpcomingAppointmentPage({Key? key}) : super(key: key);
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _UpcomingAppointmentPageState createState() =>
-      _UpcomingAppointmentPageState();
-}
-
-class _UpcomingAppointmentPageState extends State<UpcomingAppointmentPage> {
-  int _selectedIndex = 0; // Tracks which tab is selected
-
-  // Widget to show based on the selected tab
-  final List<Widget> _pages = [
-    UpcomingAppointmentsTab(),
-    PendingAppointmentsTab(),
-  ];
-
+class UpcomingAppointmentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: doctorAppBar(),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Upcoming Appointments Tab Button
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedIndex = 0; // Switch to the "Upcoming" tab
-                  });
-                },
-                child: Text(
-                  'Upcoming Appointments',
-                  style: TextStyle(
-                    color: _selectedIndex == 0 ? Colors.blue : Colors.black,
-                    fontWeight: _selectedIndex == 0
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 20),
-              // Pending Appointments Tab Button
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedIndex = 1; // Switch to the "Pending" tab
-                  });
-                },
-                child: Text(
-                  'Pending Appointments',
-                  style: TextStyle(
-                    color: _selectedIndex == 1 ? Colors.blue : Colors.black,
-                    fontWeight: _selectedIndex == 1
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Appointments'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Upcoming Appointments'),
+              Tab(text: 'Pending Appointments'),
             ],
           ),
-          const Divider(), // Add a line to separate the tabs from content
-
-          // Display the selected tab's content
-          Expanded(
-            child: _pages[_selectedIndex],
-          ),
-        ],
+        ),
+        body: const TabBarView(
+          children: [
+            UpcomingAppointmentsTab(),
+            PendingAppointmentsTab(),
+          ],
+        ),
       ),
     );
   }
@@ -79,7 +28,7 @@ class _UpcomingAppointmentPageState extends State<UpcomingAppointmentPage> {
 
 // Widget for Upcoming Appointments Tab
 class UpcomingAppointmentsTab extends StatelessWidget {
-  const UpcomingAppointmentsTab({super.key});
+  const UpcomingAppointmentsTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +50,7 @@ class UpcomingAppointmentsTab extends StatelessWidget {
 
 // Widget for Pending Appointments Tab
 class PendingAppointmentsTab extends StatelessWidget {
-  const PendingAppointmentsTab({super.key});
+  const PendingAppointmentsTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
