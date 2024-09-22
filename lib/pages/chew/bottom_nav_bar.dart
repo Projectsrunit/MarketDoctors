@@ -248,7 +248,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 height: 70,
                 width: 70,
                 decoration: BoxDecoration(
-                  color: Color(0xFF617DEF),
+                  color: Colors.blue,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
