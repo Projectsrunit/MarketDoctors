@@ -235,8 +235,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     final isSelected = _selectedTimeSlots.contains(time);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.green : Colors.blueAccent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isSelected ? Colors.green : Colors.grey[300],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       ),
       onPressed: () {
@@ -249,12 +249,13 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           }
         });
       },
-      child: Text(time, style: TextStyle(color: Colors.white)),
+      child: Text(time, style: TextStyle(color: Colors.black)),
     );
   }
 
   Widget _buildSaveButton() {
-    return Center(
+    return Align(
+      alignment: Alignment.centerRight, 
       child: ElevatedButton(
         onPressed: () {
           // Handle form submission logic
@@ -262,7 +263,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(10),
           ),
           backgroundColor: Colors.blueAccent,
         ),
