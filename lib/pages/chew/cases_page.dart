@@ -92,23 +92,26 @@ class CasesPageState extends State<CasesPage> {
                 Navigator.of(context).pop();
                 final String baseUrl = dotenv.env['API_URL']!;
                 final Uri url = Uri.parse('$baseUrl/api/cases/$caseId');
-                final response = await http.delete(url);
-
-                if (response.statusCode == 200) {
-                  Fluttertoast.showToast(
-                    msg: 'Deleted successfully',
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                    fontSize: 16.0,
-                  );
-                  setState(() {
-                    cases.removeAt(index);
-                  });
-                } else {
-                  print('this is the response ${response.body}');
+                try {
+                  final response = await http.delete(url);
+                  if (response.statusCode == 200) {
+                    Fluttertoast.showToast(
+                      msg: 'Deleted successfully',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                    setState(() {
+                      cases.removeAt(index);
+                    });
+                  } else {
+                    print('this is the response ${response.body}');
+                    throw Exception('Failed to delete');
+                  }
+                } catch (e) {
                   Fluttertoast.showToast(
                     msg: 'Failed. Please try again',
                     toastLength: Toast.LENGTH_SHORT,
@@ -227,7 +230,8 @@ class CasesPageState extends State<CasesPage> {
                                 editable: _activeCaseIndex == index &&
                                     _activeIconType == IconType.edit,
                                 saveId: caseData['id'],
-                                caseData: Map<String, dynamic>.from(caseData['attributes']),
+                                caseData: Map<String, dynamic>.from(
+                                    caseData['attributes']),
                                 index: index,
                                 updateCases: updateCases,
                               ),
