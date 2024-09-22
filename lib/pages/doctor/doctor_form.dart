@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class DoctorFormPage extends StatefulWidget {
   const DoctorFormPage({Key? key}) : super(key: key);
@@ -32,8 +33,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
-        _selectedTimeSlots
-            .clear(); // Reset selected time slots for the new date
+        _selectedTimeSlots.clear(); // Reset selected time slots for the new date
       });
     }
   }
@@ -53,8 +53,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                 child: Text(
                   'Doctor Form',
                   style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.black,
+                    fontSize: 24,
+                    color: Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -75,13 +75,13 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                 controller: _specializationController,
                 labelText: 'Specialization',
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               _buildCalendar(context),
               if (_selectedDate != null) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildTimeSlots(), // Show time slots after date selection
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               _buildLabeledTextField(
                 controller: _languageController,
                 labelText: 'Languages',
@@ -91,7 +91,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                 controller: _awardsAndRecognitionController,
                 labelText: 'Awards & Recognition',
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
               _buildSaveButton(),
             ],
           ),
@@ -114,7 +114,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           width: 150,
           child: Text(
             labelText,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
         ),
         // Input field on the right
@@ -123,6 +123,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
             controller: controller,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             ),
           ),
         ),
@@ -131,47 +132,85 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   }
 
   // Build the calendar widget
-  Widget _buildCalendar(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 150,
-          child: const Text(
-            "Select a Date",
-            style: TextStyle(fontSize: 16),
+ Widget _buildCalendar(BuildContext context) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Title on the left
+      SizedBox(
+        width: 150,  // Adjust the width as needed
+        child: Text(
+          'Select Date',
+          style: const TextStyle(
+            fontSize: 16, 
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,  // Added for emphasis
           ),
         ),
-        Expanded(
-          child: Row(
-            children: [
-              Text(
-                _selectedDate != null
-                    ? DateFormat.yMMMd().format(_selectedDate!)
-                    : "No date selected",
-                style: const TextStyle(fontSize: 16),
+      ),
+      const SizedBox(width: 16), // Space between title and calendar
+
+      // Calendar on the right
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TableCalendar(
+              focusedDay: _selectedDate ?? DateTime.now(),
+              firstDay: DateTime(2000),
+              lastDay: DateTime(2101),
+              calendarFormat: CalendarFormat.month,
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDate, day);
+              },
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDate = selectedDay;
+                });
+              },
+              calendarStyle: const CalendarStyle(
+                selectedDecoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  shape: BoxShape.circle,
+                ),
+                todayDecoration: BoxDecoration(
+                  color: Colors.lightBlueAccent,
+                  shape: BoxShape.circle,
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.calendar_today),
-                onPressed: () =>
-                    _selectDate(context), // Trigger the calendar picker
+              headerStyle: const HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
               ),
-            ],
-          ),
+            ),
+            if (_selectedDate != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "Selected Date: ${DateFormat.yMMMd().format(_selectedDate!)}",
+                  style: const TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              ),
+          ],
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   // Build the time slots widget
   Widget _buildTimeSlots() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Available Time Slots'),
+        const Text(
+          'Available Time Slots',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
         const SizedBox(height: 8),
         Wrap(
-          spacing: 8.0,
+          spacing: 10.0,
+          runSpacing: 8.0,
           children: [
             _buildTimeSlotButton(time: '09:30 AM'),
             _buildTimeSlotButton(time: '11:00 AM'),
@@ -179,10 +218,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
             _buildTimeSlotButton(time: '03:30 PM'),
             _buildTimeSlotButton(time: '05:00 PM'),
             _buildTimeSlotButton(time: '07:00 PM'),
-            _buildTimeSlotButton(time: '09:00 PM'),
-            _buildTimeSlotButton(time: '11:00 PM'),
-            _buildTimeSlotButton(time: '01:30 AM'),
-            _buildTimeSlotButton(time: '03:30 AM'),
           ],
         ),
       ],
@@ -193,8 +228,10 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     final isSelected = _selectedTimeSlots.contains(time);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          // primary: isSelected ? Colors.green : Colors.blue, // Highlight if selected
-          ),
+        backgroundColor: isSelected ? Colors.green : Colors.blueAccent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      ),
       onPressed: () {
         // Handle time slot selection logic
         setState(() {
@@ -205,16 +242,28 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           }
         });
       },
-      child: Text(time),
+      child: Text(time, style: TextStyle(color: Colors.white)),
     );
   }
 
   Widget _buildSaveButton() {
-    return TextButton(
-      onPressed: () {
-        // Handle form submission logic
-      },
-      child: const Text('Save'),
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          // Handle form submission logic
+        },
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: Colors.blueAccent,
+        ),
+        child: const Text(
+          'Save',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+      ),
     );
   }
 }
