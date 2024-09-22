@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
-import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
+import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 
 class DoctorBottomNavBar extends StatefulWidget {
@@ -92,7 +92,7 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ProfilePage()));
+                              builder: (context) => DoctorFormPage()));
                     },
                   ),
                   Text("Profile"),
