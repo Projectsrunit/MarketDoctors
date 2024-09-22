@@ -206,7 +206,7 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Note',
+          'Schedule',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
