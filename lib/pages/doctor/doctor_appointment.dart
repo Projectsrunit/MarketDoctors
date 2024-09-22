@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DoctorAppointmentPage extends StatefulWidget {
-  const DoctorAppointmentPage({Key? key}) : super(key: key);
+  const DoctorAppointmentPage({super.key});
 
   @override
   State<DoctorAppointmentPage> createState() => _DoctorAppointmentPageState();
@@ -227,13 +228,19 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
       width: double.infinity, // Full-width button
       child: ElevatedButton(
         onPressed: () {
-          if (_selectedDate != null) {
-            // Handle appointment scheduling logic here
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please select a date')),
-            );
-          }
+          // if (_selectedDate != null) {
+          //   // Handle appointment scheduling logic here
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(content: Text('Please select a date')),
+          //   );
+          // }
+
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>  UpcomingAppointmentPage(),
+            ),
+          );
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
