@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:market_doctor/pages/chew/doctor_card.dart';
+import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'dart:convert';
 
-import 'package:market_doctor/pages/chew/view_doc_profile.dart';
+import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 
 class DoctorView extends StatefulWidget {
   @override
@@ -21,9 +21,7 @@ class _DoctorViewState extends State<DoctorView> {
   @override
   void initState() {
     super.initState();
-    if (doctors.isEmpty) {
-      fetchDoctors();
-    }
+    fetchDoctors();
   }
 
   Future<void> fetchDoctors() async {
@@ -57,129 +55,122 @@ class _DoctorViewState extends State<DoctorView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(children: [
-          Row(
-            children: [
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: 48,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    'Popular Doctors',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 48),
+              ],
+            ),
+            if (isLoading) ...[
               SizedBox(
-                width: 48,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context);
+                height: 200,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ] else if (doctors.isNotEmpty) ...[
+              Expanded(
+                child: ListView.separated(
+                  itemCount: doctors.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 8.0),
+                  itemBuilder: (context, index) {
+                    final doc = doctors[index];
+                    final String baseUrl = dotenv.env['API_URL']!; // Get the base URL again
+
+                     String fullImageUrl = '$baseUrl/uploads/thumbnail_qq_f13aeead91.jpg';  // Default image
+
+                    // Check if profile_picture is not null and has a valid URL
+                    if (doc['profile_picture'] != null &&
+                        doc['profile_picture']['formats'] != null &&
+                        doc['profile_picture']['formats']['thumbnail'] != null &&
+                        doc['profile_picture']['formats']['thumbnail']['url'] != null) {
+                      fullImageUrl = '$baseUrl${doc['profile_picture']['formats']['thumbnail']['url']}';
+                    }
+
+                    return DoctorCard(
+                      imageUrl: fullImageUrl,
+                      name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
+                      profession: (doc['specialisation'] != null &&
+                              doc['specialisation'].isNotEmpty)
+                          ? doc['specialisation'][0]
+                          : 'General Practice',
+                      rating: 4.5,
+                      onChatPressed: () {},
+                      onViewProfilePressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewDocProfile(doctorCard: doc),
+                          ),
+                        );
+                      },
+                      onBookAppointmentPressed: () {},
+                    );
                   },
                 ),
               ),
-              Expanded(
-                child: Text(
-                  'Popular Doctors',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox( width: 48), 
-            ],
-          ),
-          if (isLoading) ...[
-            SizedBox(
-              height: 200,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          ] else if (doctors.isNotEmpty) ...[
-            Expanded(
-              child: ListView.separated(
-                itemCount: doctors.length,
-                separatorBuilder: (context, index) => SizedBox(height: 8.0),
-                itemBuilder: (context, index) {
-                  final doc = doctors[index];
-                  return DoctorCard(
-                    imageUrl:
-                        doc['picture_url'] ?? 'https://via.placeholder.com/120',
-                    name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
-                    profession: (doc['specialisation'] != null &&
-                            doc['specialisation'].isNotEmpty)
-                        ? doc['specialisation'][0]
-                        : 'General Practice_',
-                    rating: 4.5,
-                    onChatPressed: () {},
-                    onViewProfilePressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ViewDocProfile(doctorCard: doc)));
-                    },
-                    onBookAppointmentPressed: () {},
-                  );
-                },
-              ),
-            ),
-          ] else ...[
-            SizedBox(
-              height: 100,
-              child: Center(child: Text('No doctors available')),
-            )
-          ]
-        ]),
+            ] else ...[
+              SizedBox(
+                height: 100,
+                child: Center(child: Text('No doctors available')),
+              )
+            ]
+          ],
+        ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
 
-class AvailableDocs extends StatelessWidget {
-  final String name;
-  final int age;
-  final String location;
-
-  AvailableDocs(
-      {required this.name, required this.age, required this.location});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(name),
-        Text('Age: $age'),
-        Text('Location: $location'),
-      ],
-    );
-  }
-}
+// Removed the duplicate AvailableDocs class
 
 class AvailableDocsDetails extends StatelessWidget {
   final Map<String, dynamic> doctor;
 
   AvailableDocsDetails({required this.doctor});
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: Column(
         children: [
           Row(
             children: [
-              // Doctor's Image
-              Image.network('https://example.com/doctor_image.png', width: 50),
+              Image.network(doctor['profile_picture']['formats']['thumbnail']['url'], width: 50), // Use the correct image URL
               Column(
                 children: [
-                  Text(doctor['name']),
-                  Text('Specialty: ${doctor['specialty']}'),
+                  Text('Dr. ${doctor['firstName']} ${doctor['lastName']}'),
+                  Text('Specialty: ${doctor['specialisation'] ?? 'N/A'}'),
                   Row(
                     children: [
                       Icon(Icons.star),
                       Icon(Icons.star),
-                      Icon(Icons.star)
-                    ], // Star Rating
+                      Icon(Icons.star),
+                    ],
                   ),
-                  // Online indicator
                   Align(
                     alignment: Alignment.topRight,
                     child: Icon(Icons.circle, color: Colors.green),
@@ -188,52 +179,10 @@ class AvailableDocsDetails extends StatelessWidget {
               ),
             ],
           ),
-          // More details
-          Row(
-            children: [
-              Icon(Icons.people),
-              Text("1000+ patients"),
-              Icon(Icons.timer),
-              Text("10 years experience"),
-              Icon(Icons.local_hospital),
-              Text("Health Clinic"),
-            ],
-          ),
-          Text("About doctor"),
-          Text("Doctor's detailed description goes here."),
-          Text("Availability"),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text("Mon-Fri"), Text("9:00 AM - 5:00 PM")],
-          ),
-          Text("Specialisation"),
-          Text("Cardiology, Pediatrics, etc."),
-          Text("Languages"),
-          Text("English, Spanish"),
-          Row(
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RealDoctorView(
-                          doctor: doctor,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text('Send message')),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Back')),
-            ],
-          ),
+          // More details...
         ],
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
@@ -248,17 +197,17 @@ class RealDoctorView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Row(
           children: [
-            Text(doctor['name']),
+            Text('Dr. ${doctor['firstName']} ${doctor['lastName']}'),
             Icon(Icons.circle, color: Colors.green), // Online status
             CircleAvatar(
-                backgroundImage:
-                    NetworkImage('https://example.com/doctor_image.png')),
+              backgroundImage:
+                  NetworkImage(doctor['profile_picture']['formats']['thumbnail']['url']),
+            ),
           ],
         ),
         actions: [IconButton(icon: Icon(Icons.phone), onPressed: () {})],
@@ -269,7 +218,6 @@ class RealDoctorView extends StatelessWidget {
             child: ListView(
               children: [
                 // Chat messages UI similar to WhatsApp
-                // Messages from the doctor and user
               ],
             ),
           ),
@@ -277,14 +225,15 @@ class RealDoctorView extends StatelessWidget {
             children: [
               IconButton(icon: Icon(Icons.add), onPressed: () {}),
               Expanded(
-                  child: TextField(
-                      decoration: InputDecoration(hintText: "Enter message"))),
+                child: TextField(
+                  decoration: InputDecoration(hintText: "Enter message")),
+              ),
               IconButton(icon: Icon(Icons.send), onPressed: () {}),
             ],
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }

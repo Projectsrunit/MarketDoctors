@@ -264,7 +264,7 @@ class PopularsState extends State<Populars> {
 
       setState(() {
         doctors = data.map((doctor) {
-          String fullImageUrl = '$baseUrl/uploads/thumbnail_100_e5e679ec9a.jpeg'; // Default image with base URL
+          String fullImageUrl = '$baseUrl/uploads/thumbnail_qq_f13aeead91.jpg'; // Default image with base URL
 
           // Check if profile_picture is not null and has a valid URL
           if (doctor['profile_picture'] != null &&
