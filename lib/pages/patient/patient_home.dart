@@ -250,15 +250,33 @@ class PopularsState extends State<Populars> {
     fetchDoctors();
   }
 
+// ... (previous code)
+
   Future<void> fetchDoctors() async {
-    final String baseUrl = dotenv.env['API_URL']!;
+    final String baseUrl = dotenv.env['API_URL']!; // Ensure this is correctly set
     final Uri url = Uri.parse(
-        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=0start=0&limit=2');
+        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
+
     final response = await http.get(url);
+
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
+
       setState(() {
-        doctors = data;
+        doctors = data.map((doctor) {
+          String fullImageUrl = '$baseUrl/uploads/thumbnail_100_e5e679ec9a.jpeg'; // Default image with base URL
+
+          // Check if profile_picture is not null and has a valid URL
+          if (doctor['profile_picture'] != null &&
+              doctor['profile_picture']['formats'] != null &&
+              doctor['profile_picture']['formats']['thumbnail'] != null &&
+              doctor['profile_picture']['formats']['thumbnail']['url'] != null) {
+            fullImageUrl = '$baseUrl${doctor['profile_picture']['formats']['thumbnail']['url']}';
+          }
+
+          doctor['full_image_url'] = fullImageUrl;
+          return doctor;
+        }).toList();
         isLoading = false;
       });
     } else {
@@ -271,37 +289,36 @@ class PopularsState extends State<Populars> {
     return Column(
       children: [
         if (isLoading) ...[
-            SizedBox(
-              height: 100,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+          SizedBox(
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(),
             ),
+          ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
-            imageUrl: doctors[0]['picture_url'] ??
-                'https://via.placeholder.com/120',
+            imageUrl: doctors[0]['full_image_url'], // Use full_image_url
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
-            profession: (doctors[0]['specialisation'] != null &&
-                    doctors[0]['specialisation'].isNotEmpty)
-                ? doctors[0]['specialisation'][0]
-                : 'General Practice_',
-            rating: 4.5,
+            profession: doctors[0]['specialisation'] ?? 'General Practice',
+            rating: doctors[0]['total_overall_rating'] != null
+                ? doctors[0]['total_overall_rating'] / (doctors[0]['total_raters'] ?? 1)
+                : 0,
             onChatPressed: () {},
-              onViewProfilePressed: () {
+            onViewProfilePressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ViewDocProfile(doctorCard: doctors[0])));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewDocProfile(doctorCard: doctors[0]),
+                ),
+              );
             },
             onBookAppointmentPressed: () {},
           ),
+
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
-              imageUrl: doctors[1]['picture_url'] ??
-                  'https://via.placeholder.com/120',
+              imageUrl: doctors[1]['full_image_url'], // Use full_image_url
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
@@ -309,12 +326,14 @@ class PopularsState extends State<Populars> {
                   : 'General Practice_',
               rating: 4.0,
               onChatPressed: () {},
-               onViewProfilePressed: () {
+              onViewProfilePressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ViewDocProfile(doctorCard: doctors[1])));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ViewDocProfile(doctorCard: doctors[1]),
+                  ),
+                );
               },
               onBookAppointmentPressed: () {},
             ),
@@ -324,7 +343,7 @@ class PopularsState extends State<Populars> {
             height: 100,
             child: Center(
               child: Text('No doctors available')),
-          ) 
+          )
         ]
       ],
     );

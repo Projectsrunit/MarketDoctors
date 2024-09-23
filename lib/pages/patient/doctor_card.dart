@@ -17,9 +17,8 @@ class _DoctorCardScreenState extends State<DoctorCardScreen> {
   }
 
   Future<void> fetchDoctorData() async {
-    final response = await http.get(
-Uri.parse('{{BASE_URL}}/api/users?filters[id][\$eq]=35&filters[role][\$eq]=3&populate=*')
-    );
+    final response = await http.get(Uri.parse(
+        '{{BASE_URL}}/api/users?filters[id][\$eq]=35&filters[role][\$eq]=3&populate=*'));
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);
@@ -42,13 +41,30 @@ Uri.parse('{{BASE_URL}}/api/users?filters[id][\$eq]=35&filters[role][\$eq]=3&pop
               itemCount: doctorData.length,
               itemBuilder: (context, index) {
                 final doctor = doctorData[index];
-                final profilePictureUrl = doctor['profile_picture']?['url'] ?? '';
+
+                // Extract the profile picture URL
+                final profilePictureUrl = doctor['profile_picture']?['formats']
+                        ?['thumbnail']?['url'] ??
+                    '';
                 final fullName = '${doctor['firstName']} ${doctor['lastName']}';
-                final profession = doctor['role']['description'] ?? 'Doctor';
+
+
+                // Access the specialisation field
+                final profession = doctor['specialisation'] != null &&
+                        doctor['specialisation'].isNotEmpty
+                    ? doctor['specialisation']
+                    : 'Not available';
+// Fallback if specialisation is empty or null
+
+                print('Specialisation: $profession');
+
                 final rating = 4.5; // Assuming static rating for now
 
+                // Construct the full URL using {BASE_URL}
+                final imageUrl = '{{BASE_URL}}$profilePictureUrl';
+
                 return DoctorCard(
-                  imageUrl: 'https://yourdomain.com${profilePictureUrl}',
+                  imageUrl: imageUrl,
                   name: fullName,
                   profession: profession,
                   rating: rating,
@@ -117,7 +133,7 @@ class DoctorCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(profession),
+                Text(profession), // Display full specialisation here
                 GestureDetector(
                   onTap: onViewProfilePressed,
                   child: Container(
@@ -157,7 +173,8 @@ class DoctorCard extends StatelessWidget {
             SizedBox(width: 8.0),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
                 child: Flex(
                   direction: Axis.vertical,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -184,7 +201,8 @@ class DoctorCard extends StatelessWidget {
                     GestureDetector(
                       onTap: onBookAppointmentPressed,
                       child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 8.0),
                         decoration: BoxDecoration(
                             color: Colors.blue,
                             borderRadius: BorderRadius.circular(5)),
