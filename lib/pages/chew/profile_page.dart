@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
-import 'package:market_doctor/pages/choose_action.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -90,10 +90,8 @@ Widget _buildSystemList(BuildContext context) {
       _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNoArrowRow(context, Icons.logout, "Log out", () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ChooseActionPage()), // Replace with your login or welcome page
-        );
+        context.read<DataStore>().updateChewData(null);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> ChewHome()));
       }),
     ],
   );
@@ -254,7 +252,7 @@ class _ManagePaymentsChewState extends State<ManagePaymentsChew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -381,7 +379,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
