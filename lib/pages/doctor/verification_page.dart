@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/doctor/success_page.dart';
+import 'package:market_doctor/pages/doctor/upload_file.dart';
 
 class DoctorVerificationPage extends StatefulWidget {
   const DoctorVerificationPage({Key? key}) : super(key: key);
@@ -86,7 +87,7 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                   _verifyOtp();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const DoctorsSuccessPage(),
+                      builder: (context) => const DoctorsUploadCredentialsPage(),
                     ),
                   );
                 },

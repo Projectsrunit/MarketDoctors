@@ -6,7 +6,14 @@ import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DoctorFormPage extends StatefulWidget {
-  const DoctorFormPage({Key? key}) : super(key: key);
+  final String firstName;
+  final String lastName;
+
+  const DoctorFormPage({
+    Key? key,
+    required this.firstName,
+    required this.lastName,
+  }) : super(key: key);
 
   @override
   State<DoctorFormPage> createState() => _DoctorFormPageState();
@@ -43,7 +50,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: doctorAppBar(),
+      appBar:
+          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -99,7 +107,10 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           ),
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(
+        firstName: widget.firstName,
+        lastName: widget.lastName,
+      ),
     );
   }
 
@@ -261,12 +272,15 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const DoctorAppointmentPage(),
+              builder: (context) => DoctorAppointmentPage(
+                firstName: widget.firstName, // Access firstName here
+                lastName: widget.lastName, // Access lastName here
+              ),
             ),
           );
         },
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

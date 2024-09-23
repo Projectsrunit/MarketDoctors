@@ -7,7 +7,14 @@ import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  final String firstName;
+  final String lastName;
+
+  const DashboardPage({
+    super.key,
+    required this.firstName,
+    required this.lastName,
+  });
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -19,7 +26,8 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: doctorAppBar(),
+      appBar:
+          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -37,7 +45,10 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(
+        firstName: widget.firstName,
+        lastName: widget.lastName,
+      ),
     );
   }
 
@@ -128,7 +139,11 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DoctorCasesPage()),
+              MaterialPageRoute(
+                  builder: (context) => DoctorCasesPage(
+                        firstName: widget.firstName,
+                        lastName: widget.lastName,
+                      )),
             );
           },
         ),
@@ -143,7 +158,11 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DoctorAppointmentPage()),
+              MaterialPageRoute(
+                  builder: (context) => DoctorAppointmentPage(
+                        firstName: widget.firstName,
+                        lastName: widget.lastName,
+                      )),
             );
           },
         ),

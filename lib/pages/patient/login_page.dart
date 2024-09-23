@@ -47,12 +47,12 @@ Future<void> _loginUser() async {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
         _showMessage('Welcome Back!', isError: false);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardPage(),
-          ),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => DashboardPage(),
+        //   ),
+        // );
       } else {
        var errorResponse = jsonDecode(response.body);
          String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
