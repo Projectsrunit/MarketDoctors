@@ -4,7 +4,10 @@ import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/signup_page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../main.dart';
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
 
@@ -54,29 +57,34 @@ Future<void> _loginUser() async {
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
+             _showMessage('Welcome Back!', isError: false);
+          context.read<DataStore>().updatePatientData(responseBody);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PatientHome()));
         
-        // Extract patient details
-        String userId = responseBody['user']['id'].toString(); // Get the ID as a string
-        String firstName = responseBody['user']['firstName']; // Get the first name
-        String lastName = responseBody['user']['lastName']; // Get the last name
-        String fullName = '$firstName $lastName'; // Combine first and last names
+        // // Extract patient details
+        // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
+        // String firstName = responseBody['user']['firstName']; // Get the first name
+        // String lastName = responseBody['user']['lastName']; // Get the last name
+        // String fullName = '$firstName $lastName'; // Combine first and last names
         
-        // Store the user ID in SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('userId', userId);
+        // // Store the user ID in SharedPreferences
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('userId', userId);
 
-        _showMessage('Welcome Back!', isError: false);
+        // _showMessage('Welcome Back!', isError: false);
         
-        // Navigate to PatientHome and pass patientId and patientName
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PatientHome(
-              patientId: userId, // Pass the userId
-              patientName: fullName, // Pass the full name
-            ),
-          ),
-        );
+        // // Navigate to PatientHome and pass patientId and patientName
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => PatientHome(
+        //       patientId: userId, // Pass the userId
+        //       patientName: fullName, // Pass the full name
+        //     ),
+        //   ),
+        // );
+
       } else {
         var errorResponse = jsonDecode(response.body);
         String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';

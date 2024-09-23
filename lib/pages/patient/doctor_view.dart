@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/patient/patient_app_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:market_doctor/pages/patient/doctor_card.dart';
+import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'dart:convert';
+
+import 'package:market_doctor/pages/chew/view_doc_profile.dart';
 
 class DoctorView extends StatefulWidget {
   @override
@@ -27,44 +30,59 @@ class _DoctorViewState extends State<DoctorView> {
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url =
         Uri.parse('$baseUrl/api/users?filters[role][\$eq]=3&populate=*');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        doctors = data;
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load doctors');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          doctors = data;
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load doctors');
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Failed to load doctors',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(''),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(children: [
           Row(
             children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              SizedBox(
+                width: 48,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
               ),
               Expanded(
-                child: Center(
-                  child: Text(
-                    'Popular Doctors',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                child: Text(
+                  'Popular Doctors',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              SizedBox( width: 48), 
             ],
           ),
           if (isLoading) ...[
@@ -91,7 +109,13 @@ class _DoctorViewState extends State<DoctorView> {
                         : 'General Practice_',
                     rating: 4.5,
                     onChatPressed: () {},
-                    onViewProfilePressed: () {},
+                    onViewProfilePressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ViewDocProfile(doctorCard: doc)));
+                    },
                     onBookAppointmentPressed: () {},
                   );
                 },
@@ -105,7 +129,7 @@ class _DoctorViewState extends State<DoctorView> {
           ]
         ]),
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -137,7 +161,7 @@ class AvailableDocsDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(''),
+      appBar: ChewAppBar(),
       body: Column(
         children: [
           Row(
@@ -209,7 +233,7 @@ class AvailableDocsDetails extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -260,7 +284,7 @@ class RealDoctorView extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

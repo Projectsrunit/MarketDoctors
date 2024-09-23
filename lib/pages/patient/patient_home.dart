@@ -1,33 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/cases_page.dart';
 import 'package:market_doctor/pages/patient/doctor_view.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:market_doctor/pages/user_type.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 
 class PatientHome extends StatelessWidget {
   final int cases = 0;
   final int doctorsOnline = 0;
   final int users = 0;
 
-  // Add the required parameters
-  final String patientId;
-  final String patientName;
+  // // Add the required parameters
+  // final String patientId;
+  // final String patientName;
 
-  // Constructor to accept patientId and patientName
-  const PatientHome({Key? key, required this.patientId, required this.patientName}) : super(key: key);
+  // // Constructor to accept patientId and patientName
+  // const PatientHome({Key? key, required this.patientId, required this.patientName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: patientAppBar(patientName), // Pass the patient name to appBar
-      body: PatientHomeBody(),
-      bottomNavigationBar: PatientBottomNavBar(), 
-    );
+    Map? patientData = Provider.of<DataStore>(context).patientData;
+
+    if (patientData == null) {
+      return PopScope(
+        canPop: false,
+        child: ChooseUserTypePage()
+        );
+    } else {
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: PatientAppBar(),
+          body: PatientHomeBody(),
+          bottomNavigationBar: PatientBottomNavBar(),
+        ),
+      );
+    }
   }
 }
 
@@ -272,7 +288,13 @@ class PopularsState extends State<Populars> {
                 : 'General Practice_',
             rating: 4.5,
             onChatPressed: () {},
-            onViewProfilePressed: () {},
+              onViewProfilePressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewDocProfile(doctorCard: doctors[0])));
+            },
             onBookAppointmentPressed: () {},
           ),
           SizedBox(height: 16.0),
@@ -287,7 +309,13 @@ class PopularsState extends State<Populars> {
                   : 'General Practice_',
               rating: 4.0,
               onChatPressed: () {},
-              onViewProfilePressed: () {},
+               onViewProfilePressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewDocProfile(doctorCard: doctors[1])));
+              },
               onBookAppointmentPressed: () {},
             ),
           ],
