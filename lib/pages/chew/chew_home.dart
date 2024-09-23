@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
@@ -8,6 +10,9 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:market_doctor/pages/chew/view_doc_profile.dart';
+import 'package:market_doctor/pages/user_type.dart';
+import 'package:provider/provider.dart';
 
 class ChewHome extends StatelessWidget {
   final int cases = 0;
@@ -16,12 +21,23 @@ class ChewHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: chewAppBar(),
-      //detect a back button press and dont log out the person
-      body: ChewHomeBody(),
-      bottomNavigationBar: BottomNavBar(),
-    );
+    Map? chewData = Provider.of<DataStore>(context).chewData;
+
+    if (chewData == null) {
+      return PopScope(
+        canPop: false,
+        child: ChooseUserTypePage()
+        );
+    } else {
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: ChewAppBar(),
+          body: ChewHomeBody(),
+          bottomNavigationBar: BottomNavBar(),
+        ),
+      );
+    }
   }
 }
 
@@ -44,7 +60,6 @@ class ChewHomeBody extends StatelessWidget {
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        
                       ),
                     ),
                   ),
@@ -88,7 +103,8 @@ class ChewHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.briefcaseMedical, // Medical case with a +
+                          FontAwesomeIcons
+                              .briefcaseMedical, // Medical case with a +
                           size: 50,
                           color: Colors.blue, // Blue icon
                         ),
@@ -171,9 +187,7 @@ class ChewHomeBody extends StatelessWidget {
           Container(
             height: 130,
             decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(8)
-            ),
+                color: Colors.blue, borderRadius: BorderRadius.circular(8)),
             child: Center(
               child: Text(
                 'for advertisement',
@@ -191,7 +205,8 @@ class ChewHomeBody extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> DoctorView()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => DoctorView()));
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -219,7 +234,7 @@ class Populars extends StatefulWidget {
 
 class PopularsState extends State<Populars> {
   List<dynamic> doctors = [];
-  bool isLoading = true; 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -231,15 +246,28 @@ class PopularsState extends State<Populars> {
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse(
         '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=0start=0&limit=2');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        doctors = data;
-        isLoading = false;
-      });
-    } else {
-      print('Failed to load doctors');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          doctors = data;
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load doctors');
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to load doctors',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
@@ -248,16 +276,16 @@ class PopularsState extends State<Populars> {
     return Column(
       children: [
         if (isLoading) ...[
-            SizedBox(
-              height: 100,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+          SizedBox(
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(),
             ),
+          ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
-            imageUrl: doctors[0]['picture_url'] ??
-                'https://via.placeholder.com/120',
+            imageUrl:
+                doctors[0]['picture_url'] ?? 'https://via.placeholder.com/120',
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: (doctors[0]['specialisation'] != null &&
                     doctors[0]['specialisation'].isNotEmpty)
@@ -265,7 +293,13 @@ class PopularsState extends State<Populars> {
                 : 'General Practice_',
             rating: 4.5,
             onChatPressed: () {},
-            onViewProfilePressed: () {},
+            onViewProfilePressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewDocProfile(doctorCard: doctors[0])));
+            },
             onBookAppointmentPressed: () {},
           ),
           SizedBox(height: 16.0),
@@ -280,16 +314,21 @@ class PopularsState extends State<Populars> {
                   : 'General Practice_',
               rating: 4.0,
               onChatPressed: () {},
-              onViewProfilePressed: () {},
+              onViewProfilePressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewDocProfile(doctorCard: doctors[1])));
+              },
               onBookAppointmentPressed: () {},
             ),
           ],
         ] else ...[
           SizedBox(
             height: 100,
-            child: Center(
-              child: Text('No doctors available')),
-          ) 
+            child: Center(child: Text('No doctors available')),
+          )
         ]
       ],
     );

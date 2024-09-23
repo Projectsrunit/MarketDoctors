@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/patient/patient_app_bar.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,20 +28,33 @@ class CasesPageState extends State<CasesPage> {
   Future<void> fetchCases() async {
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=11');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      final List<dynamic> data = jsonData['data'];
-      setState(() {
-        cases = data;
-        isLoading = false;
-      });
-    } else {
-      print('Failed to load doctors');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<dynamic> data = jsonData['data'];
+        setState(() {
+          cases = data;
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load doctors');
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to load. Try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
-  void _onIconTapped(int caseIndex, IconType iconType) {
+  void _onIconTapped(int caseIndex, IconType iconType, [int? caseId]) {
     setState(() {
       if (_activeCaseIndex == caseIndex && _activeIconType == iconType) {
         _activeCaseIndex = null;
@@ -51,18 +64,18 @@ class CasesPageState extends State<CasesPage> {
         _activeIconType = iconType;
 
         if (iconType == IconType.delete) {
-          _showDeleteConfirmationDialog(caseIndex);
+          _showDeleteConfirmationDialog(caseIndex, caseId);
         }
       }
     });
   }
 
-  void _showDeleteConfirmationDialog(int index) {
+  void _showDeleteConfirmationDialog(int index, int? caseId) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete this file?'),
+          title: Text('Are you sure you want to delete this case?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -72,18 +85,49 @@ class CasesPageState extends State<CasesPage> {
                   _activeIconType = null;
                 });
               },
-              child: Text('No'),
+              child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                // Handle delete action (you can add specific logic here)
+                final String baseUrl = dotenv.env['API_URL']!;
+                final Uri url = Uri.parse('$baseUrl/api/cases/$caseId');
+                try {
+                  final response = await http.delete(url);
+                  if (response.statusCode == 200) {
+                    Fluttertoast.showToast(
+                      msg: 'Deleted successfully',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                    setState(() {
+                      cases.removeAt(index);
+                    });
+                  } else {
+                    print('this is the response ${response.body}');
+                    throw Exception('Failed to delete');
+                  }
+                } catch (e) {
+                  Fluttertoast.showToast(
+                    msg: 'Failed. Please try again',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 3,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                }
                 setState(() {
                   _activeCaseIndex = null;
                   _activeIconType = null;
                 });
               },
-              child: Text('Yes'),
+              child: Text('Delete'),
             ),
           ],
         );
@@ -91,10 +135,19 @@ class CasesPageState extends State<CasesPage> {
     );
   }
 
+  void updateCases(int index, Map<String, dynamic> updatedCase) {
+    setState(() {
+      cases[index] = {
+        ...cases[index],
+        'attributes': {...cases[index]['attributes'], ...updatedCase}
+      };
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: patientAppBar(''),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -167,15 +220,19 @@ class CasesPageState extends State<CasesPage> {
                               lastName: caseData['attributes']['last_name'],
                               isActive: _activeCaseIndex == index,
                               activeIconType: _activeIconType,
-                              onIconTapped: (iconType) =>
-                                  _onIconTapped(index, iconType),
+                              onIconTapped: (iconType) => _onIconTapped(
+                                  index, iconType, caseData['id']),
                             ),
                             if (_activeCaseIndex == index)
                               CaseInstanceDetails(
-                                  editable: _activeCaseIndex == index &&
-                                      _activeIconType == IconType.edit,
-                                  saveId: caseData['id'],
-                                  caseData: caseData['attributes']),
+                                editable: _activeCaseIndex == index &&
+                                    _activeIconType == IconType.edit,
+                                saveId: caseData['id'],
+                                caseData: Map<String, dynamic>.from(
+                                    caseData['attributes']),
+                                index: index,
+                                updateCases: updateCases,
+                              ),
                           ],
                         );
                       })
@@ -262,12 +319,16 @@ class CaseInstanceDetails extends StatefulWidget {
   final Map<String, dynamic> caseData;
   final bool editable;
   final int saveId;
+  final int index;
+  final Function(int, Map<String, dynamic>) updateCases;
 
   CaseInstanceDetails(
       {Key? key,
       required this.caseData,
       required this.editable,
-      required this.saveId})
+      required this.saveId,
+      required this.index,
+      required this.updateCases})
       : super(key: key);
 
   @override
@@ -290,24 +351,28 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   @override
   void initState() {
     super.initState();
-    _selectedGender = widget.caseData['gender']?.isEmpty ?? true ? null : widget.caseData['gender'];
-
+    _selectedGender = widget.caseData['gender']?.isEmpty ?? true
+        ? null
+        : widget.caseData['gender'];
   }
 
   @override
   Widget build(BuildContext context) {
-    _emailController.text = widget.caseData['email'] ?? '';
-    _phoneController.text = widget.caseData['phone_number'] ?? '';
-    _bloodPressureController.text = widget.caseData['blood_pressure'] ?? '';
-    _weightController.text = widget.caseData['weight'] ?? '';
-    _heightController.text = widget.caseData['height'] ?? '';
-    _bmiController.text = widget.caseData['bmi'] ?? '';
-    _bloodGlucoseController.text = widget.caseData['blood_glucose'] ?? '';
+    _emailController.text = widget.caseData['email']?.toString() ?? '';
+    _phoneController.text = widget.caseData['phone_number']?.toString() ?? '';
+    _bloodPressureController.text =
+        widget.caseData['blood_pressure']?.toString() ?? '';
+    _weightController.text = widget.caseData['weight']?.toString() ?? '';
+    _heightController.text = widget.caseData['height']?.toString() ?? '';
+    _bmiController.text = widget.caseData['bmi']?.toString() ?? '';
+    _bloodGlucoseController.text =
+        widget.caseData['blood_glucose']?.toString() ?? '';
     _existingConditionController.text =
-        widget.caseData['existing_condition'] ?? '';
+        widget.caseData['existing_condition']?.toString() ?? '';
     _currentPrescriptionController.text =
-        widget.caseData['current_prescription'] ?? '';
-    _chewsNotesController.text = widget.caseData['chews_notes'] ?? '';
+        widget.caseData['current_prescription']?.toString() ?? '';
+    _chewsNotesController.text =
+        widget.caseData['chews_notes']?.toString() ?? '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -376,7 +441,8 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               if (widget.editable)
                 ElevatedButton(
                   onPressed: () async {
-                    await _saveData();
+                    final updatedData = await _saveData();
+                    widget.updateCases(widget.index, updatedData);
                   },
                   child: Text('Save'),
                 ),
@@ -387,9 +453,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
   }
 
-  Future<void> _saveData() async {
-    print('going to save');
-      try {
+  Future<Map<String, Object?>> _saveData() async {
     Fluttertoast.showToast(
       msg: 'Saving...',
       toastLength: Toast.LENGTH_SHORT,
@@ -399,63 +463,61 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
       textColor: Colors.white,
       fontSize: 16.0,
     );
-  } catch (e) {
-    print('Error showing toast: $e');
-  }
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases/${widget.saveId}');
+    try {
+      final updatedData = {
+        'gender': _selectedGender,
+        'email': _emailController.text,
+        'phone_number': _phoneController.text,
+        if (_parseNumber(_bloodPressureController.text) != null)
+          'blood_pressure': _parseNumber(_bloodPressureController.text),
+        if (_parseNumber(_weightController.text) != null)
+          'weight': _parseNumber(_weightController.text),
+        if (_parseNumber(_heightController.text) != null)
+          'height': _parseNumber(_heightController.text),
+        if (_parseNumber(_bmiController.text) != null)
+          'bmi': _parseNumber(_bmiController.text),
+        if (_parseNumber(_bloodGlucoseController.text) != null)
+          'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+        'existing_condition': _existingConditionController.text,
+        'current_prescription': _currentPrescriptionController.text,
+        'chews_notes': _chewsNotesController.text,
+      };
 
-  print('this is the selected gender $_selectedGender');
-    final response = await http.put(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'data': {
-          'gender': _selectedGender,
-          if (_emailController.text.isNotEmpty) 'email': _emailController.text,
-          if (_phoneController.text.isNotEmpty)
-            'phone_number': _phoneController.text,
-          if (_parseNumber(_bloodPressureController.text) != null)
-            'blood_pressure': _parseNumber(_bloodPressureController.text),
-          if (_parseNumber(_weightController.text) != null)
-            'weight': _parseNumber(_weightController.text),
-          if (_parseNumber(_heightController.text) != null)
-            'height': _parseNumber(_heightController.text),
-          if (_parseNumber(_bmiController.text) != null)
-            'bmi': _parseNumber(_bmiController.text),
-          if (_parseNumber(_bloodGlucoseController.text) != null)
-            'blood_glucose': _parseNumber(_bloodGlucoseController.text),
-          if (_existingConditionController.text.isNotEmpty)
-            'existing_condition': _existingConditionController.text,
-          if (_currentPrescriptionController.text.isNotEmpty)
-            'current_prescription': _currentPrescriptionController.text,
-          if (_chewsNotesController.text.isNotEmpty)
-            'chews_notes': _chewsNotesController.text,
-          'chew': 11,
-        }
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('this is the response ${response.body}');
-      try{
-      Fluttertoast.showToast(
-        msg: 'Data successfully updated',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'data': updatedData}),
       );
-      } catch(e) {
-        print('error in fluttertoast $e');
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'Data successfully updated',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return updatedData;
+      } else {
+        print('this is the response ${response.body}');
+        Fluttertoast.showToast(
+          msg: 'Failed. Please try again',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       }
-    } else {
-      try{
-      print('this is the response ${response.body}');
+    } catch (e) {
+      print('this is the error: $e');
       Fluttertoast.showToast(
         msg: 'Failed. Please try again',
         toastLength: Toast.LENGTH_SHORT,
@@ -465,10 +527,8 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-       } catch(e) {
-        print('error in fluttertoast $e');
-      }
     }
+    return {};
   }
 
   double? _parseNumber(String text) {
@@ -492,29 +552,28 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
   }
 
-
-Widget _buildGenderDropdown() {
-  return DropdownButtonFormField<String?>(
-    value: _selectedGender,
-    onChanged: widget.editable
-        ? (String? value) {
-            setState(() {
-              _selectedGender = value;
-            });
-          }
-        : null,
-    items: [null, 'Male', 'Female']
-        .map((genderOption) => DropdownMenuItem<String?>(
-              value: genderOption,
-              child: Text(genderOption ?? 'Select Gender'),
-            ))
-        .toList(),
-    decoration: InputDecoration(
-      labelText: 'Gender',
-      border: OutlineInputBorder(),
-    ),
-  );
-}
+  Widget _buildGenderDropdown() {
+    return DropdownButtonFormField<String?>(
+      value: _selectedGender,
+      onChanged: widget.editable
+          ? (String? value) {
+              setState(() {
+                _selectedGender = value;
+              });
+            }
+          : null,
+      items: [null, 'Male', 'Female']
+          .map((genderOption) => DropdownMenuItem<String?>(
+                value: genderOption,
+                child: Text(genderOption ?? 'Select Gender'),
+              ))
+          .toList(),
+      decoration: InputDecoration(
+        labelText: 'Gender',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
 
   Widget _buildTextArea(String label, TextEditingController controller) {
     return TextField(

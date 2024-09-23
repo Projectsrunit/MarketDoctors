@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -127,9 +128,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      DoctorCasesPage()), // Replace with your CasesPage widget
+              MaterialPageRoute(builder: (context) => DoctorCasesPage()),
             );
           },
         ),
@@ -141,7 +140,12 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           icon: Icons.person_add_alt_1_outlined,
           label: 'Appointment',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DoctorAppointmentPage()),
+            );
+          },
         ),
       ],
     );
