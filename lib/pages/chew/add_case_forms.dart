@@ -10,7 +10,7 @@ class AddCaseForms extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: AddCaseForm1(),
       bottomNavigationBar: BottomNavBar(),
     );
@@ -182,14 +182,10 @@ class AddCaseForm2State extends State<AddCaseForm2> {
   final TextEditingController _existingConditionController =
       TextEditingController();
 
-  void pushNewCase() {
-    print('going to push1');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

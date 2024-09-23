@@ -18,7 +18,7 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: EdgeInsets.all(8),
         child: Flex(

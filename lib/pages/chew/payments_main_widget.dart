@@ -13,7 +13,7 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(

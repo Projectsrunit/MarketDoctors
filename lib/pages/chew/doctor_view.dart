@@ -57,7 +57,7 @@ class _DoctorViewState extends State<DoctorView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(children: [
@@ -161,7 +161,7 @@ class AvailableDocsDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Column(
         children: [
           Row(
