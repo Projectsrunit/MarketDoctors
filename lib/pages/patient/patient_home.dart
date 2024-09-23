@@ -218,7 +218,7 @@ class PatientHomeBody extends StatelessWidget {
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: const Color.fromARGB(0, 202, 23, 23),
                 ),
                 child: Text(
                   'See all',

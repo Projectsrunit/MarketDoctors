@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:market_doctor/pages/patient/contact_us_page.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:market_doctor/pages/patient/profile_page.dart';
 import 'package:market_doctor/pages/patient/cases_page.dart';
@@ -15,6 +14,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color iconColor = Colors.blue; // Use predefined Colors.blue
 
     return Stack(
       clipBehavior: Clip.none,
@@ -36,7 +36,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.home, size: 30, color: Color(0xFF617DEF)),
+                    icon: Icon(Icons.home, size: 30, color: iconColor),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -52,10 +52,12 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                 children: [
                   IconButton(
                     icon: FaIcon(FontAwesomeIcons.solidHeart,
-                        size: 30, color: Color(0xFF617DEF)),
+                        size: 30, color: iconColor),
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => PatientCasesPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PatientCasesPage()));
                     },
                   ),
                   Text("Health"),
@@ -66,7 +68,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.credit_card,
-                        size: 30, color: Color(0xFF617DEF)),
+                        size: 30, color: iconColor),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -82,23 +84,23 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.chat_bubble, size: 30, color: Color(0xFF617DEF)),
+                    icon: Icon(Icons.chat_bubble, size: 30, color: iconColor),
                     onPressed: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>  PatientProfilePage()));
+                              builder: (context) => PatientProfilePage()));
                     },
                   ),
                   Text("Contact"),
                 ],
               ),
 
-                Column(
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.person, size: 30, color: Color(0xFF617DEF)),
+                    icon: Icon(Icons.person, size: 30, color: iconColor),
                     onPressed: () {
                       Navigator.push(
                           context,
