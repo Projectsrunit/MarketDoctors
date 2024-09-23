@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
@@ -10,6 +11,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/view_doc_profile.dart';
+import 'package:market_doctor/pages/user_type.dart';
+import 'package:provider/provider.dart';
 
 class ChewHome extends StatelessWidget {
   final int cases = 0;
@@ -18,12 +21,23 @@ class ChewHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: chewAppBar(),
-      //detect a back button press and dont log out the person
-      body: ChewHomeBody(),
-      bottomNavigationBar: BottomNavBar(),
-    );
+    Map? chewData = Provider.of<DataStore>(context).chewData;
+
+    if (chewData == null) {
+      return PopScope(
+        canPop: false,
+        child: ChooseUserTypePage()
+        );
+    } else {
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: ChewAppBar(),
+          body: ChewHomeBody(),
+          bottomNavigationBar: BottomNavBar(),
+        ),
+      );
+    }
   }
 }
 
@@ -280,7 +294,11 @@ class PopularsState extends State<Populars> {
             rating: 4.5,
             onChatPressed: () {},
             onViewProfilePressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewDocProfile(doctorCard: doctors[0])));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewDocProfile(doctorCard: doctors[0])));
             },
             onBookAppointmentPressed: () {},
           ),
@@ -297,8 +315,12 @@ class PopularsState extends State<Populars> {
               rating: 4.0,
               onChatPressed: () {},
               onViewProfilePressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewDocProfile(doctorCard: doctors[1])));
-            },
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewDocProfile(doctorCard: doctors[1])));
+              },
               onBookAppointmentPressed: () {},
             ),
           ],

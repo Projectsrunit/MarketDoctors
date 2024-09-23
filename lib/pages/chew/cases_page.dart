@@ -136,20 +136,18 @@ class CasesPageState extends State<CasesPage> {
   }
 
   void updateCases(int index, Map<String, dynamic> updatedCase) {
-    print('the case before: ${cases[index]}');
     setState(() {
       cases[index] = {
         ...cases[index],
         'attributes': {...cases[index]['attributes'], ...updatedCase}
       };
     });
-    print('the updated case: ${cases[index]}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

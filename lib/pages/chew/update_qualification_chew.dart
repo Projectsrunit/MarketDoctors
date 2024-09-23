@@ -21,7 +21,7 @@ class UpdateQualificationChewState extends State<UpdateQualificationChew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chewAppBar(),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

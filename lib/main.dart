@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 // import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
-  runApp(ChangeNotifierProvider(
-    create: (_) => ThemeNotifier(),
-    child: const MyApp(),
-  ));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+      ChangeNotifierProvider(create: (_) => DataStore())
+    ],
+    child: const MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
@@ -62,7 +65,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      // home: ProfilePage(),
+      // home: ChooseUserTypePage(),
       home: const OnboardingScreen(),
     );
   }
@@ -75,6 +78,19 @@ class ThemeNotifier extends ChangeNotifier {
 
   void toggleTheme() {
     _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+  }
+}
+
+class DataStore with ChangeNotifier {
+  Map? userData;
+
+  DataStore({this.userData});
+
+  Map? get chewData => userData;
+
+  void updateChewData(Map? newValue) {
+    userData = newValue;
     notifyListeners();
   }
 }
