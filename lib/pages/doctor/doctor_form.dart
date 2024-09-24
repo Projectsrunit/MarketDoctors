@@ -59,6 +59,54 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData(); 
+  }
+
+  Future<void> _fetchUserData() async {
+    String? baseUrl = dotenv.env['API_URL'];
+    final uri = Uri.parse('$baseUrl/api/users/${widget.id}');
+
+    try {
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final userData = json.decode(response.body);
+        // Assuming the userData contains the fields we need
+        _yearsOfExperienceController.text = userData['yearsOfExperience'] ?? '';
+        _clinicHealthFacilityController.text =
+            userData['clinicHealthFacility'] ?? '';
+        _specializationController.text = userData['specialization'] ?? '';
+        _languageController.text = userData['languages'] ?? '';
+        _awardsAndRecognitionController.text =
+            userData['awardsAndRecognition'] ?? '';
+
+        // If the API provides a date, you can also set _selectedDate
+        if (userData['date'] != null) {
+          _selectedDate = DateTime.parse(userData['date']);
+        }
+
+        // If there are predefined time slots, you can set them here as well
+        // _selectedTimeSlots = List<String>.from(userData['timeSlots'] ?? []);
+
+        // Update UI
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Failed to fetch user data: ${response.reasonPhrase}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -228,35 +276,52 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     );
   }
 
-  Widget _buildLabeledTextField({
-    required TextEditingController controller,
-    required String labelText,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Label on the left
-        SizedBox(
-          width: 150,
-          child: Text(
-            labelText,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
-          ),
+Widget _buildLabeledTextField({
+  required TextEditingController controller,
+  required String labelText,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      // Label on the left
+      SizedBox(
+        width: 150,
+        child: Text(
+          labelText,
+          style: const TextStyle(fontSize: 16, color: Colors.black87),
         ),
-        // Input field on the right
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            ),
+      ),
+      // Input field on the right
+      Expanded(
+        child: TextFormField(
+          controller: controller,
+          keyboardType: labelText == 'Years of Experience' 
+              ? TextInputType.number // Set keyboard type to number
+              : TextInputType.text, // Default keyboard type
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           ),
+          validator: (value) {
+            if (labelText == 'Years of Experience') {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your years of experience';
+              }
+              // Additional validation to ensure it's a valid number
+              final int? years = int.tryParse(value);
+              if (years == null || years < 0) {
+                return 'Please enter a valid number';
+              }
+            }
+            return null; // No error
+          },
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
 
   // Build the calendar widget
   Widget _buildCalendar(BuildContext context) {
