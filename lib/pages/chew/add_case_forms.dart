@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/main.dart';
 import 'dart:convert';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:provider/provider.dart';
 
 class AddCaseForms extends StatelessWidget {
   @override
@@ -184,6 +186,8 @@ class AddCaseForm2State extends State<AddCaseForm2> {
 
   @override
   Widget build(BuildContext context) {
+    int chewId = context.watch<DataStore>().chewData?['user']['id'] ?? 2; //remove this after testing
+
     return Scaffold(
       appBar: ChewAppBar(),
       body: SingleChildScrollView(
@@ -416,7 +420,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _saveData();
+                          _saveData(chewId);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -450,7 +454,9 @@ class AddCaseForm2State extends State<AddCaseForm2> {
     );
   }
 
-  Future<void> _saveData() async {
+  Future<void> _saveData(chewId) async {
+    // int chewId;
+
     Fluttertoast.showToast(
       msg: 'Saving...',
       toastLength: Toast.LENGTH_SHORT,
@@ -483,6 +489,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
         'existing_condition': _existingConditionController.text,
         'current_prescription': _prescriptionController.text,
         'chews_notes': _chewsNotesController.text,
+        'chew': chewId
       };
 
       final response = await http.post(

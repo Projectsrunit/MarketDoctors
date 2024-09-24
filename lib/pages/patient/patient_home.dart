@@ -264,14 +264,15 @@ class PopularsState extends State<Populars> {
 
       setState(() {
         doctors = data.map((doctor) {
-          String fullImageUrl = '$baseUrl/uploads/thumbnail_qq_f13aeead91.jpg'; // Default image with base URL
+          String fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
 
           // Check if profile_picture is not null and has a valid URL
-          if (doctor['profile_picture'] != null &&
-              doctor['profile_picture']['formats'] != null &&
-              doctor['profile_picture']['formats']['thumbnail'] != null &&
-              doctor['profile_picture']['formats']['thumbnail']['url'] != null) {
-            fullImageUrl = '$baseUrl${doctor['profile_picture']['formats']['thumbnail']['url']}';
+          if (doctor['profile_picture'] != null 
+          // && doctor['profile_picture']['formats'] != null &&
+          //     doctor['profile_picture']['formats']['thumbnail'] != null &&
+          //     doctor['profile_picture']['formats']['thumbnail']['url'] != null
+              ) {
+            fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';
           }
 
           doctor['full_image_url'] = fullImageUrl;
@@ -314,7 +315,6 @@ class PopularsState extends State<Populars> {
             },
             onBookAppointmentPressed: () {},
           ),
-
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
@@ -322,7 +322,7 @@ class PopularsState extends State<Populars> {
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
-                  ? doctors[1]['specialisation'][0]
+                  ? doctors[1]['specialisation']
                   : 'General Practice_',
               rating: 4.0,
               onChatPressed: () {},

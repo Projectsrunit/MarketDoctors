@@ -25,13 +25,13 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
           direction: Axis.vertical,
           children: [
             DocLikeCard(
-              imageUrl: widget.doctorCard['picture_url'] ??
-                  'https://via.placeholder.com/120',
+              imageUrl: widget.doctorCard['profile_picture'] ??
+                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
               name:
                   'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
               profession: (widget.doctorCard['specialisation'] != null &&
                       widget.doctorCard['specialisation'].isNotEmpty)
-                  ? widget.doctorCard['specialisation'][0]
+                  ? widget.doctorCard['specialisation']
                   : 'General Practice_',
               rating: 4.5,
               onChatPressed: () {},
@@ -150,18 +150,8 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
-                      widget.doctorCard['specialisation'] != null &&
-                              widget.doctorCard['specialisation'].isNotEmpty
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(
-                                  widget.doctorCard['specialisation'].length,
-                                  (index) {
-                                return Text(
-                                    widget.doctorCard['specialisation'][index]);
-                              }),
-                            )
-                          : Text('Undeclared'),
+                      widget.doctorCard['specialisation'] != null  ? 
+                      Text(widget.doctorCard['specialisation']) : Text('Undeclared'),
                       SizedBox(height: 20),
                       Text(
                         'Languages',
