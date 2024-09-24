@@ -58,14 +58,7 @@ class PatientHomeBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Add a text label for the advertisement section
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              'For Advertisement',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
+
           // Advertisement carousel
           Container(
             margin: EdgeInsets.only(bottom: 16.0),
@@ -204,11 +197,12 @@ class PatientHomeBody extends StatelessWidget {
           ),
              SizedBox(height: 16.0),
           Container(
-              height: 130,
+              height: 170,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8)
             ),
+            
            child: Row(
               children: [
                 AdvertisementCarousel(),
@@ -244,193 +238,6 @@ class PatientHomeBody extends StatelessWidget {
     );
   }
 }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [  // Corrected: added children: [
-          AdvertisementCarousel(),  // Now correctly placed
-          Container(
-            margin: EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search doctor, field, drugs",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add search functionality here
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: Text('Search'),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // Cases icon
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(28.0),
-                        color: Colors.lightBlue[50], // Light blue background
-                        child: Icon(
-                          FontAwesomeIcons.hospital, // Medical case with a +
-                          size: 50,
-                          color: Colors.blue, // Blue icon
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text('Hospitals',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              SizedBox(width: 5.0),
-              // Doctors icon
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DoctorView()));
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(28.0),
-                        color: Colors.lightBlue[50], // Light blue background
-                        child: Icon(
-                          FontAwesomeIcons.stethoscope, // Stethoscope icon
-                          size: 50,
-                          color: Colors.blue, // Blue icon
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text('Doctors',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              SizedBox(width: 5.0),
-              // Patients icon
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(28.0),
-                        color: Colors.lightBlue[50], // Light blue background
-                        child: Icon(
-                          FontAwesomeIcons.pills, // Patients icon
-                          size: 50,
-                          color: Colors.blue, // Blue icon
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text('Pharmacy',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.0),
-          Container(
-            height: 130,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(8)
-            ),
-            child: Center(
-              child: Text(
-                'for advertisements',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ),
-          ),
-          SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Popular Doctors',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> DoctorView()));
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  backgroundColor: const Color.fromARGB(0, 202, 23, 23),
-                ),
-                child: Text(
-                  'See all',
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.0),
-          Populars(),
-        ],
-      ),
-    );
-  }
-
-
 
 class AdvertisementCarousel extends StatefulWidget {
   @override
@@ -475,7 +282,7 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
               itemBuilder: (context, index, realIndex) {
                 final advert = adverts[index]['attributes'];
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                  margin: EdgeInsets.symmetric(horizontal: 2.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
@@ -485,7 +292,7 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
                   ),
                   child: Center(
                     child: Container(
-                      padding: EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(36.0),
                       color: Colors.black54,
                       child: Text(
                         advert['text'],
