@@ -285,12 +285,12 @@ class PopularsState extends State<Populars> {
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
             imageUrl:
-                doctors[0]['profile_picture'] ?? 'https://via.placeholder.com/120',
+                doctors[0]['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: (doctors[0]['specialisation'] != null &&
                     doctors[0]['specialisation'].isNotEmpty)
                 ? doctors[0]['specialisation']
-                : 'General Practice_',
+                : 'General Practice',
             rating: 4.5,
             onChatPressed: () {},
             onViewProfilePressed: () {
@@ -305,13 +305,12 @@ class PopularsState extends State<Populars> {
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
-              imageUrl: doctors[1]['picture_url'] ??
-                  'https://via.placeholder.com/120',
+              imageUrl: doctors[1]['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
                   ? doctors[1]['specialisation']
-                  : 'General Practice_',
+                  : 'General Practice',
               rating: 4.0,
               onChatPressed: () {},
               onViewProfilePressed: () {

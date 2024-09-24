@@ -285,6 +285,27 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _currentPrescriptionController = TextEditingController();
   final _chewsNotesController = TextEditingController();
 
+  
+  @override
+  void initState() {
+    super.initState();
+    _heightController.addListener(_calcBmi);
+    _weightController.addListener(_calcBmi);
+  }
+
+  void _calcBmi() {
+    final input1 = double.tryParse(_heightController.text);
+    final input2 = double.tryParse(_weightController.text);
+
+    if (input1 != null && input2 != null) {
+      _bmiController.text = (((input2 * 10) / input1).round() / 10).toString();
+    } else {
+      setState(() {
+        _bmiController.text = '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _emailController.text = widget.caseData['email'] ?? '';
