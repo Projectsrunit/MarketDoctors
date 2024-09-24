@@ -88,8 +88,13 @@ class DataStore with ChangeNotifier {
   DataStore({this.userData});
 
   Map? get chewData => userData;
+   Map? get patientData => userData;
 
   void updateChewData(Map? newValue) {
+    userData = newValue;
+    notifyListeners();
+  }
+   void updatePatientData(Map? newValue) {
     userData = newValue;
     notifyListeners();
   }
