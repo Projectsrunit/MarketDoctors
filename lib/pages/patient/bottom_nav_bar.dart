@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:market_doctor/pages/patient/profile_page.dart';
-import 'package:market_doctor/pages/patient/cases_page.dart';
+import 'package:market_doctor/pages/patient/health_tips.dart';
 import 'package:market_doctor/pages/patient/patient_home.dart';
 
 class PatientBottomNavBar extends StatefulWidget {
@@ -57,7 +57,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => PatientCasesPage()));
+                              builder: (context) => HealthTipsPage()));
                     },
                   ),
                   Text("Health"),
