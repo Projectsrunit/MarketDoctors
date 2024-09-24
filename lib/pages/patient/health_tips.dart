@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+
 
 class HealthTipsPage extends StatefulWidget {
   @override
@@ -18,7 +21,11 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
   }
 
   fetchHealthTips() async {
-    final response = await http.get(Uri.parse('{{BASE_URL}}/api/health-tips'));
+     final String baseUrl = dotenv.env['API_URL']!; // Ensure this is correctly set
+    final Uri url = Uri.parse(
+        '$baseUrl/api/health-tips');
+          final response = await http.get(url);
+    // final respo = await http.get(Uri.parse('{{BASE_URL}}/api/health-tips'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -35,7 +42,7 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Health Tips'),
+        title: Text('Market Doctor Health Tips'),
         backgroundColor: Colors.green,
       ),
       body: isLoading
@@ -48,6 +55,7 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Card(
                     elevation: 5,
+                     color: const Color.fromARGB(255, 215, 244, 248),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -109,6 +117,7 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
                 );
               },
             ),
+             bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }

@@ -64,8 +64,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      home: ProfilePage(),
-      // home: const OnboardingScreen(),
+      // home: ProfilePage(),
+      home: const OnboardingScreen(),
     );
   }
 }
