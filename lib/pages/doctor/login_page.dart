@@ -4,6 +4,7 @@ import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/signup_page.dart';
+
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
 
@@ -18,62 +19,79 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final _role = 3;
   bool _isLoading = false;
 
-  // Function to handle login
- // Function to handle login
-Future<void> _loginUser() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    String? baseUrl = dotenv.env['API_URL'];
-
-    try {
-      var url = Uri.parse('$baseUrl/api/auth/login');
-      var response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'role': _role,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
-        _showMessage('Welcome Back!', isError: false);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardPage(),
-          ),
-        );
-      } else {
-       var errorResponse = jsonDecode(response.body);
-         String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
-
-        // Check if the error message is 'Role does not match'
-        if (errorMessage == 'Role does not match') {
-          _showMessage('Please log in with a different user type.');
-        } else {
-          _showMessage(errorMessage);
-        }
-      }
-    } catch (error) {
-      _showMessage('An error occurred. Please try again.');
-    } finally {
+  String? firstName;
+  String? lastName;
+  String? id;
+  Future<void> _loginUser() async {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      String? baseUrl = dotenv.env['API_URL'];
+
+      try {
+        var url = Uri.parse('$baseUrl/api/auth/login');
+        var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'email': email,
+            'password': password,
+            'role': _role,
+          }),
+        );
+        print("Status Code: ${response.statusCode}");
+        print("Response Body: ${response.body}");
+
+        if (response.statusCode == 200) {
+          var responseBody = jsonDecode(response.body);
+          if (responseBody.containsKey('user')) {
+            firstName = responseBody['user']['firstName'] ?? '';
+            lastName = responseBody['user']['lastName'] ?? '';
+            id = responseBody['user']['id'].toString();
+          } 
+          _showMessage('Welcome Back, $firstName $lastName!', isError: false);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardPage(
+                  firstName: firstName!,
+                  lastName: lastName!,
+                  id: id!,
+                ),
+              ),
+            );
+          
+          
+        } else {
+          var errorResponse = jsonDecode(response.body);
+
+          String errorMessage = errorResponse['error']?['message'] ??
+              'Login failed. Please try again.';
+          print("Response Error: $errorMessage");
+
+          // Check if the error message is 'Role does not match'
+          if (errorMessage == 'Role does not match') {
+            _showMessage('Please log in with a different user type.');
+          } else {
+            _showMessage(errorMessage);
+          }
+        }
+      } catch (error) {
+        _showMessage('An error occurred. Please try again.');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-}
-
 
   // Function to show success or error message
   void _showMessage(String message, {bool isError = true}) {
@@ -154,9 +172,10 @@ Future<void> _loginUser() async {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[850]
-                              : Colors.white,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[850]
+                                  : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
@@ -195,9 +214,10 @@ Future<void> _loginUser() async {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[850]
-                              : Colors.white,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[850]
+                                  : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none, // Remove border
@@ -217,7 +237,8 @@ Future<void> _loginUser() async {
                         },
                       ),
                     ),
-                    const SizedBox(height: 40), // Increased spacing before login button
+                    const SizedBox(
+                        height: 40), // Increased spacing before login button
                     _isLoading
                         ? const CircularProgressIndicator()
                         : TextButton(
@@ -228,7 +249,8 @@ Future<void> _loginUser() async {
                                 borderRadius: BorderRadius.circular(22),
                               ),
                               foregroundColor: Colors.white,
-                              backgroundColor: const Color.fromARGB(255, 111, 136, 223),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 111, 136, 223),
                             ),
                             child: const Text(
                               'Log In',

@@ -8,6 +8,13 @@ import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 enum IconType { information, edit, delete }
 
 class DoctorCasesPage extends StatefulWidget {
+  final String firstName;
+  final String lastName;
+  final String id;
+
+  DoctorCasesPage(
+      {required this.firstName, required this.lastName, required this.id});
+
   @override
   DoctorCasesPageState createState() => DoctorCasesPageState();
 }
@@ -93,7 +100,8 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: doctorAppBar(),
+      appBar:
+          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -188,7 +196,11 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(
+        firstName: widget.firstName,
+        lastName: widget.lastName,
+        id: widget.id,
+      ),
     );
   }
 }
@@ -334,7 +346,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-               _buildTextField('Email Address', _emailController),
+              _buildTextField('Email Address', _emailController),
               SizedBox(height: 20),
               Text(
                 'Medical History',
@@ -343,7 +355,6 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(height: 10),
               _buildTextField(
                   'Blood Pressure', _bloodGlucoseController, 'mmHg'),
-             
               SizedBox(
                 height: 4,
               ),

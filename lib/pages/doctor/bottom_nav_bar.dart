@@ -8,6 +8,16 @@ import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 
 class DoctorBottomNavBar extends StatefulWidget {
+  final String firstName;
+  final String lastName;
+  final String id;
+
+  DoctorBottomNavBar({
+    required this.firstName,
+    required this.lastName,
+    required this.id,
+  });
+
   @override
   State<DoctorBottomNavBar> createState() => _DoctorBottomNavBarState();
 }
@@ -44,7 +54,14 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => DashboardPage()),
+                        MaterialPageRoute(
+                          builder: (context) => DashboardPage(
+                            firstName: widget.firstName,
+                            lastName: widget.lastName,
+                            id: widget.id,
+
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -58,8 +75,17 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                     icon: Icon(Icons.business_center,
                         size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => DoctorCasesPage()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DoctorCasesPage(
+                            firstName: widget.firstName,
+                            lastName: widget.lastName,
+                            id: widget.id,
+
+                          ),
+                        ),
+                      );
                     },
                   ),
                   Text("Cases"),
@@ -74,9 +100,11 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                         size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PaymentsMainWidget()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentsMainWidget(),
+                        ),
+                      );
                     },
                   ),
                   Text("Payment"),
@@ -90,9 +118,16 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                         Icon(Icons.person, size: 36, color: Color(0xFF617DEF)),
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DoctorFormPage()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DoctorFormPage(
+                            firstName: widget.firstName,
+                            lastName: widget.lastName,
+                            id: widget.id,
+
+                          ),
+                        ),
+                      );
                     },
                   ),
                   Text("Profile"),
@@ -113,6 +148,7 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
               });
               Future.delayed(Duration.zero, () {
                 showMenu(
+                  // ignore: use_build_context_synchronously
                   context: context,
                   position: RelativeRect.fromLTRB(100, 600, 100, 100),
                   shape: RoundedRectangleBorder(
@@ -132,9 +168,11 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                       ),
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddCaseForms()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddCaseForms(),
+                          ),
+                        );
                       },
                     ),
                     PopupMenuItem(

@@ -6,7 +6,16 @@ import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DoctorAppointmentPage extends StatefulWidget {
-  const DoctorAppointmentPage({super.key});
+  final String firstName;
+  final String lastName;
+  final String id;
+
+  const DoctorAppointmentPage({
+    super.key,
+    required this.firstName,
+    required this.lastName,
+    required this.id,
+  });
 
   @override
   State<DoctorAppointmentPage> createState() => _DoctorAppointmentPageState();
@@ -238,7 +247,11 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
 
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>  UpcomingAppointmentPage(),
+              builder: (context) => UpcomingAppointmentPage(
+                firstName: widget.firstName,
+                lastName: widget.lastName,
+                id: widget.id,
+              ),
             ),
           );
         },
@@ -260,7 +273,8 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: doctorAppBar(),
+      appBar:
+          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -283,7 +297,11 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
           ),
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(
+        firstName: widget.firstName,
+        lastName: widget.lastName,
+        id: widget.id,
+      ),
     );
   }
 }
