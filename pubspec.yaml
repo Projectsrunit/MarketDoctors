@@ -22,6 +22,8 @@ dependencies:
   country_icons: ^3.0.0
   fluttertoast: ^8.2.1
   table_calendar: ^3.0.8
+  image_picker: ^0.8.7+3
+
 
 
 

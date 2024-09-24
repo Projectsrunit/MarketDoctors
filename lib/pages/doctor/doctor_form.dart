@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
@@ -7,6 +9,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http; // Import http package
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class DoctorFormPage extends StatefulWidget {
   final String firstName;
@@ -31,6 +35,9 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   final _specializationController = TextEditingController();
   final _awardsAndRecognitionController = TextEditingController();
   final _languageController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+
+  File? _profileImage; // Store the profile image
 
   DateTime? _selectedDate;
   List<String> _selectedTimeSlots = [];
@@ -52,37 +59,50 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path); // Convert to File for uploading
+      });
+    }
+  }
+
   Future<void> _updateUser() async {
     if (_formKey.currentState!.validate()) {
-      final Map<String, dynamic> updatedData = {
-        "yearsOfExperience": _yearsOfExperienceController.text,
-        "clinicHealthFacility": _clinicHealthFacilityController.text,
-        "specialization": _specializationController.text,
-        "languages": _languageController.text,
-        "awardsAndRecognition": _awardsAndRecognitionController.text,
-        "date": _selectedDate != null
-            ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-            : null,
-        "timeSlots": _selectedTimeSlots
-      };
       String? baseUrl = dotenv.env['API_URL'];
+      final uri = Uri.parse('$baseUrl/api/users/${widget.id}');
+      final request = http.MultipartRequest('PUT', uri);
+      request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
+      request.fields['clinicHealthFacility'] =
+          _clinicHealthFacilityController.text;
+      request.fields['specialization'] = _specializationController.text;
+      request.fields['languages'] = _languageController.text;
+      request.fields['awardsAndRecognition'] =
+          _awardsAndRecognitionController.text;
+      request.fields['date'] = _selectedDate != null
+          ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
+          : '';
+      request.fields['timeSlots'] = jsonEncode(_selectedTimeSlots);
 
-      final url = Uri.parse('$baseUrl/api/users/${widget.id}');
-      try {
-        final response = await http.put(
-          url,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: jsonEncode(updatedData), // Convert data to JSON format
+      // Add profile image if selected
+      if (_profileImage != null) {
+        final imageFile = await http.MultipartFile.fromPath(
+          'profile_picture',
+          _profileImage!.path,
         );
+        request.files.add(imageFile);
+      }
+
+      try {
+        final response = await request.send();
 
         if (response.statusCode == 200) {
-          // Handle success (show a message, navigate, etc.)
+          // Handle success
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('User updated successfully!')),
           );
-          // Navigate to another page, like the appointment page
+          // Navigate to another page
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => DoctorAppointmentPage(
@@ -107,6 +127,35 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         );
       }
     }
+  }
+
+  Widget _buildProfileImagePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Profile Image',
+            style: TextStyle(fontSize: 16, color: Colors.black87)),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: _pickImage,
+              child: const Text('Pick Image'),
+            ),
+            const SizedBox(width: 16),
+            _profileImage != null
+                ? Image.file(_profileImage!,
+                    width: 100, height: 100, fit: BoxFit.cover)
+                : Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.camera_alt, color: Colors.white),
+                  ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
@@ -163,6 +212,8 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                 controller: _awardsAndRecognitionController,
                 labelText: 'Awards & Recognition',
               ),
+              const SizedBox(height: 16),
+              _buildProfileImagePicker(),
               const SizedBox(height: 30),
               _buildSaveButton(),
             ],
