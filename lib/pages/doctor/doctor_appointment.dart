@@ -8,11 +8,13 @@ import 'package:table_calendar/table_calendar.dart';
 class DoctorAppointmentPage extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String id;
 
   const DoctorAppointmentPage({
     super.key,
     required this.firstName,
     required this.lastName,
+    required this.id,
   });
 
   @override
@@ -248,6 +250,7 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               builder: (context) => UpcomingAppointmentPage(
                 firstName: widget.firstName,
                 lastName: widget.lastName,
+                id: widget.id,
               ),
             ),
           );
@@ -297,6 +300,7 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
       bottomNavigationBar: DoctorBottomNavBar(
         firstName: widget.firstName,
         lastName: widget.lastName,
+        id: widget.id,
       ),
     );
   }

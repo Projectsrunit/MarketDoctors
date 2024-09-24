@@ -10,8 +10,10 @@ enum IconType { information, edit, delete }
 class DoctorCasesPage extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String id;
 
-  DoctorCasesPage({required this.firstName, required this.lastName});
+  DoctorCasesPage(
+      {required this.firstName, required this.lastName, required this.id});
 
   @override
   DoctorCasesPageState createState() => DoctorCasesPageState();
@@ -197,6 +199,7 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
       bottomNavigationBar: DoctorBottomNavBar(
         firstName: widget.firstName,
         lastName: widget.lastName,
+        id: widget.id,
       ),
     );
   }

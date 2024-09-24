@@ -4,15 +4,20 @@ import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http; // Import http package
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DoctorFormPage extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String id;
 
   const DoctorFormPage({
     Key? key,
     required this.firstName,
     required this.lastName,
+    required this.id,
   }) : super(key: key);
 
   @override
@@ -44,6 +49,63 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         _selectedTimeSlots
             .clear(); // Reset selected time slots for the new date
       });
+    }
+  }
+
+  Future<void> _updateUser() async {
+    if (_formKey.currentState!.validate()) {
+      final Map<String, dynamic> updatedData = {
+        "yearsOfExperience": _yearsOfExperienceController.text,
+        "clinicHealthFacility": _clinicHealthFacilityController.text,
+        "specialization": _specializationController.text,
+        "languages": _languageController.text,
+        "awardsAndRecognition": _awardsAndRecognitionController.text,
+        "date": _selectedDate != null
+            ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
+            : null,
+        "timeSlots": _selectedTimeSlots
+      };
+      String? baseUrl = dotenv.env['API_URL'];
+
+      final url = Uri.parse('$baseUrl/api/users/${widget.id}');
+      try {
+        final response = await http.put(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(updatedData), // Convert data to JSON format
+        );
+
+        if (response.statusCode == 200) {
+          // Handle success (show a message, navigate, etc.)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('User updated successfully!')),
+          );
+          // Navigate to another page, like the appointment page
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DoctorAppointmentPage(
+                firstName: widget.firstName,
+                lastName: widget.lastName,
+                id: widget.id,
+              ),
+            ),
+          );
+        } else {
+          // Handle failure
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Failed to update user: ${response.reasonPhrase}')),
+          );
+        }
+      } catch (e) {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
@@ -110,6 +172,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
       bottomNavigationBar: DoctorBottomNavBar(
         firstName: widget.firstName,
         lastName: widget.lastName,
+        id: widget.id,
       ),
     );
   }
@@ -269,16 +332,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     return Align(
       alignment: Alignment.centerRight,
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => DoctorAppointmentPage(
-                firstName: widget.firstName, // Access firstName here
-                lastName: widget.lastName, // Access lastName here
-              ),
-            ),
-          );
-        },
+        onPressed: _updateUser,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(

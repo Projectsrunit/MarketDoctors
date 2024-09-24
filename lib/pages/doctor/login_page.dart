@@ -21,6 +21,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
 
   String? firstName;
   String? lastName;
+  String? id;
   Future<void> _loginUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -44,27 +45,36 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
             'role': _role,
           }),
         );
+        print("Status Code: ${response.statusCode}");
+        print("Response Body: ${response.body}");
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
-          firstName = responseBody['user']['firstName'];
-          lastName = responseBody['user']['lastName'];
+          if (responseBody.containsKey('user')) {
+            firstName = responseBody['user']['firstName'] ?? '';
+            lastName = responseBody['user']['lastName'] ?? '';
+            id = responseBody['user']['id'].toString();
+          } 
           _showMessage('Welcome Back, $firstName $lastName!', isError: false);
 
-          Navigator.push(
-            // ignore: use_build_context_synchronously
-            context,
-            MaterialPageRoute(
-              builder: (context) => DashboardPage(
-                firstName: firstName!,
-                lastName: lastName!,
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardPage(
+                  firstName: firstName!,
+                  lastName: lastName!,
+                  id: id!,
+                ),
               ),
-            ),
-          );
+            );
+          
+          
         } else {
           var errorResponse = jsonDecode(response.body);
+
           String errorMessage = errorResponse['error']?['message'] ??
               'Login failed. Please try again.';
+          print("Response Error: $errorMessage");
 
           // Check if the error message is 'Role does not match'
           if (errorMessage == 'Role does not match') {

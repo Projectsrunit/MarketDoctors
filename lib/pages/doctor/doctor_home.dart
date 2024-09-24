@@ -9,11 +9,13 @@ import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 class DashboardPage extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String id;
 
   const DashboardPage({
     super.key,
     required this.firstName,
     required this.lastName,
+    required this.id,
   });
 
   @override
@@ -48,6 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
       bottomNavigationBar: DoctorBottomNavBar(
         firstName: widget.firstName,
         lastName: widget.lastName,
+        id: widget.id,
       ),
     );
   }
@@ -143,6 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   builder: (context) => DoctorCasesPage(
                         firstName: widget.firstName,
                         lastName: widget.lastName,
+                        id: widget.id,
                       )),
             );
           },
@@ -162,6 +166,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   builder: (context) => DoctorAppointmentPage(
                         firstName: widget.firstName,
                         lastName: widget.lastName,
+                        id: widget.id,
                       )),
             );
           },
