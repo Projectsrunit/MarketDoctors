@@ -96,16 +96,17 @@ class _DoctorViewState extends State<DoctorView> {
                   separatorBuilder: (context, index) => SizedBox(height: 8.0),
                   itemBuilder: (context, index) {
                     final doc = doctors[index];
-                    final String baseUrl = dotenv.env['API_URL']!; // Get the base URL again
+                    // final String baseUrl = dotenv.env['API_URL']!; // Get the base URL again
 
-                     String fullImageUrl = '$baseUrl/uploads/thumbnail_qq_f13aeead91.jpg';  // Default image
+                     String fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';  // Default image
 
                     // Check if profile_picture is not null and has a valid URL
-                    if (doc['profile_picture'] != null &&
-                        doc['profile_picture']['formats'] != null &&
-                        doc['profile_picture']['formats']['thumbnail'] != null &&
-                        doc['profile_picture']['formats']['thumbnail']['url'] != null) {
-                      fullImageUrl = '$baseUrl${doc['profile_picture']['formats']['thumbnail']['url']}';
+                    if (doc['profile_picture'] == null 
+                    // && doc['profile_picture']['formats'] != null &&
+                    //     doc['profile_picture']['formats']['thumbnail'] != null &&
+                    //     doc['profile_picture']['formats']['thumbnail']['url'] != null
+                        ) {
+                      fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';
                     }
 
                     return DoctorCard(
@@ -113,7 +114,7 @@ class _DoctorViewState extends State<DoctorView> {
                       name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
                       profession: (doc['specialisation'] != null &&
                               doc['specialisation'].isNotEmpty)
-                          ? doc['specialisation'][0]
+                          ? doc['specialisation']
                           : 'General Practice',
                       rating: 4.5,
                       onChatPressed: () {},
@@ -159,7 +160,8 @@ class AvailableDocsDetails extends StatelessWidget {
         children: [
           Row(
             children: [
-              Image.network(doctor['profile_picture']['formats']['thumbnail']['url'], width: 50), // Use the correct image URL
+              // Image.network(doctor['profile_picture']['formats']['thumbnail']['url'], width: 50), // Use the correct image URL
+              Image.network('https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'),
               Column(
                 children: [
                   Text('Dr. ${doctor['firstName']} ${doctor['lastName']}'),

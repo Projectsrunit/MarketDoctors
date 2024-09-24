@@ -17,6 +17,7 @@ class DocLikeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('the image url: $imageUrl');
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         color: Colors.blue,

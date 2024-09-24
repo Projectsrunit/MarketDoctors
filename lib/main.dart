@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:market_doctor/pages/chew/profile_page.dart';
+import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -65,8 +64,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      // home: ChooseUserTypePage(),
-      home: const OnboardingScreen(),
+      home: ProfilePage(),
+      // home: const OnboardingScreen(),
     );
   }
 }

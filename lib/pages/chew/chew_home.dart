@@ -285,11 +285,11 @@ class PopularsState extends State<Populars> {
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
             imageUrl:
-                doctors[0]['picture_url'] ?? 'https://via.placeholder.com/120',
+                doctors[0]['profile_picture'] ?? 'https://via.placeholder.com/120',
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: (doctors[0]['specialisation'] != null &&
                     doctors[0]['specialisation'].isNotEmpty)
-                ? doctors[0]['specialisation'][0]
+                ? doctors[0]['specialisation']
                 : 'General Practice_',
             rating: 4.5,
             onChatPressed: () {},
@@ -310,7 +310,7 @@ class PopularsState extends State<Populars> {
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
-                  ? doctors[1]['specialisation'][0]
+                  ? doctors[1]['specialisation']
                   : 'General Practice_',
               rating: 4.0,
               onChatPressed: () {},

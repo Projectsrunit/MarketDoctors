@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 enum IconType { information, edit, delete }
 
@@ -22,12 +24,20 @@ class CasesPageState extends State<CasesPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     fetchCases();
   }
 
   Future<void> fetchCases() async {
+    int chewId = context.watch<DataStore>().chewData?['user']['id'] ??
+        11; //remove the 11 after testing
+
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=11');
+    final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=$chewId');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
