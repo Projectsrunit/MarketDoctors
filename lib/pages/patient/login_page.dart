@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/signup_page.dart';
+import 'package:provider/provider.dart';
+
+import '../../main.dart';
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
 
@@ -18,8 +21,15 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
   final _role = 5;
   bool _isLoading = false;
 
-  // Function to handle login
- // Function to handle login
+  void _showMessage(String message, {bool isError = true}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: isError ? Colors.red : Colors.green,
+    ),
+  );
+}
+
 Future<void> _loginUser() async {
   if (_formKey.currentState!.validate()) {
     setState(() {
@@ -46,18 +56,38 @@ Future<void> _loginUser() async {
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
-        _showMessage('Welcome Back!', isError: false);
+             _showMessage('Welcome Back!', isError: false);
+          context.read<DataStore>().updatePatientData(responseBody);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PatientHome()));
+        
+        // // Extract patient details
+        // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
+        // String firstName = responseBody['user']['firstName']; // Get the first name
+        // String lastName = responseBody['user']['lastName']; // Get the last name
+        // String fullName = '$firstName $lastName'; // Combine first and last names
+        
+        // // Store the user ID in SharedPreferences
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('userId', userId);
+
+        // _showMessage('Welcome Back!', isError: false);
+        
+        // // Navigate to PatientHome and pass patientId and patientName
         // Navigator.pushReplacement(
         //   context,
         //   MaterialPageRoute(
-        //     builder: (context) => DashboardPage(),
+        //     builder: (context) => PatientHome(
+        //       patientId: userId, // Pass the userId
+        //       patientName: fullName, // Pass the full name
+        //     ),
         //   ),
         // );
-      } else {
-       var errorResponse = jsonDecode(response.body);
-         String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
 
-        // Check if the error message is 'Role does not match'
+      } else {
+        var errorResponse = jsonDecode(response.body);
+        String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
+
         if (errorMessage == 'Role does not match') {
           _showMessage('Please log in with a different user type.');
         } else {
@@ -75,15 +105,6 @@ Future<void> _loginUser() async {
 }
 
 
-  // Function to show success or error message
-  void _showMessage(String message, {bool isError = true}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

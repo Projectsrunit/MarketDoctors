@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:market_doctor/pages/chew/doctor_like_card.dart';
 
 class ViewDocProfile extends StatefulWidget {
@@ -18,7 +18,7 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: Padding(
         padding: EdgeInsets.all(8),
         child: Flex(

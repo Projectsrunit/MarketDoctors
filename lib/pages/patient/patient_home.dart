@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/cases_page.dart';
-import 'package:market_doctor/pages/chew/doctor_view.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/cases_page.dart';
+import 'package:market_doctor/pages/patient/doctor_view.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/chew/doctor_card.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:market_doctor/pages/chew/view_doc_profile.dart';
-import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
+import 'package:market_doctor/pages/user_type.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/patient/doctor_card.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 
-class ChewHome extends StatelessWidget {
+class PatientHome extends StatelessWidget {
   final int cases = 0;
   final int doctorsOnline = 0;
   final int users = 0;
 
+  // // Add the required parameters
+  // final String patientId;
+  // final String patientName;
+
+  // // Constructor to accept patientId and patientName
+  // const PatientHome({Key? key, required this.patientId, required this.patientName}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    Map? chewData = Provider.of<DataStore>(context).chewData;
+    Map? patientData = Provider.of<DataStore>(context).patientData;
 
-    if (chewData == null) {
+    if (patientData == null) {
       return PopScope(
         canPop: false,
         child: ChooseUserTypePage()
@@ -32,16 +38,17 @@ class ChewHome extends StatelessWidget {
       return PopScope(
         canPop: false,
         child: Scaffold(
-          appBar: ChewAppBar(),
-          body: ChewHomeBody(),
-          bottomNavigationBar: BottomNavBar(),
+          appBar: PatientAppBar(),
+          body: PatientHomeBody(),
+          bottomNavigationBar: PatientBottomNavBar(),
         ),
       );
     }
   }
 }
 
-class ChewHomeBody extends StatelessWidget {
+
+class PatientHomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -60,6 +67,7 @@ class ChewHomeBody extends StatelessWidget {
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
+                        
                       ),
                     ),
                   ),
@@ -89,7 +97,7 @@ class ChewHomeBody extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CasesPage()));
+                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -103,15 +111,14 @@ class ChewHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons
-                              .briefcaseMedical, // Medical case with a +
+                          FontAwesomeIcons.hospital, // Medical case with a +
                           size: 50,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Cases',
+                    Text('Hospitals',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
@@ -154,7 +161,7 @@ class ChewHomeBody extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CasesPage()));
+                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -168,14 +175,14 @@ class ChewHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.userFriends, // Patients icon
+                          FontAwesomeIcons.pills, // Patients icon
                           size: 50,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Patients',
+                    Text('Pharmacy',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
@@ -187,7 +194,9 @@ class ChewHomeBody extends StatelessWidget {
           Container(
             height: 130,
             decoration: BoxDecoration(
-                color: Colors.blue, borderRadius: BorderRadius.circular(8)),
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(8)
+            ),
             child: Center(
               child: Text(
                 'for advertisement',
@@ -205,12 +214,11 @@ class ChewHomeBody extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DoctorView()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> DoctorView()));
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: const Color.fromARGB(0, 202, 23, 23),
                 ),
                 child: Text(
                   'See all',
@@ -234,7 +242,7 @@ class Populars extends StatefulWidget {
 
 class PopularsState extends State<Populars> {
   List<dynamic> doctors = [];
-  bool isLoading = true;
+  bool isLoading = true; 
 
   @override
   void initState() {
@@ -242,32 +250,38 @@ class PopularsState extends State<Populars> {
     fetchDoctors();
   }
 
+// ... (previous code)
+
   Future<void> fetchDoctors() async {
-    final String baseUrl = dotenv.env['API_URL']!;
+    final String baseUrl = dotenv.env['API_URL']!; // Ensure this is correctly set
     final Uri url = Uri.parse(
-        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=0start=0&limit=2');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          doctors = data;
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load doctors');
-      }
-    } catch (e) {
-      print('this is the error: $e');
-      Fluttertoast.showToast(
-        msg: 'Failed to load doctors',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        doctors = data.map((doctor) {
+          String fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
+
+          // Check if profile_picture is not null and has a valid URL
+          if (doctor['profile_picture'] != null 
+          // && doctor['profile_picture']['formats'] != null &&
+          //     doctor['profile_picture']['formats']['thumbnail'] != null &&
+          //     doctor['profile_picture']['formats']['thumbnail']['url'] != null
+              ) {
+            fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';
+          }
+
+          doctor['full_image_url'] = fullImageUrl;
+          return doctor;
+        }).toList();
+        isLoading = false;
+      });
+    } else {
+      print('Failed to load doctors');
     }
   }
 
@@ -284,29 +298,27 @@ class PopularsState extends State<Populars> {
           ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
-            imageUrl:
-                doctors[0]['profile_picture'] ?? 'https://via.placeholder.com/120',
+            imageUrl: doctors[0]['full_image_url'], // Use full_image_url
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
-            profession: (doctors[0]['specialisation'] != null &&
-                    doctors[0]['specialisation'].isNotEmpty)
-                ? doctors[0]['specialisation']
-                : 'General Practice_',
-            rating: 4.5,
+            profession: doctors[0]['specialisation'] ?? 'General Practice',
+            rating: doctors[0]['total_overall_rating'] != null
+                ? doctors[0]['total_overall_rating'] / (doctors[0]['total_raters'] ?? 1)
+                : 0,
             onChatPressed: () {},
             onViewProfilePressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ViewDocProfile(doctorCard: doctors[0])));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewDocProfile(doctorCard: doctors[0]),
+                ),
+              );
             },
             onBookAppointmentPressed: () {},
           ),
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
-              imageUrl: doctors[1]['picture_url'] ??
-                  'https://via.placeholder.com/120',
+              imageUrl: doctors[1]['full_image_url'], // Use full_image_url
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
@@ -316,10 +328,12 @@ class PopularsState extends State<Populars> {
               onChatPressed: () {},
               onViewProfilePressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ViewDocProfile(doctorCard: doctors[1])));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ViewDocProfile(doctorCard: doctors[1]),
+                  ),
+                );
               },
               onBookAppointmentPressed: () {},
             ),
@@ -327,7 +341,8 @@ class PopularsState extends State<Populars> {
         ] else ...[
           SizedBox(
             height: 100,
-            child: Center(child: Text('No doctors available')),
+            child: Center(
+              child: Text('No doctors available')),
           )
         ]
       ],

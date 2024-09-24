@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'package:market_doctor/main.dart';
-import 'dart:convert';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:provider/provider.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 
-class AddCaseForms extends StatelessWidget {
+class AddCaseFormsPatient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: AddCaseForm1(),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
@@ -25,11 +19,8 @@ class AddCaseForm1 extends StatefulWidget {
 }
 
 class AddCaseForm1State extends State<AddCaseForm1> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _choosePartnerController =
-      TextEditingController();
-  final TextEditingController _outreachLocationController =
-      TextEditingController();
+  String? _selectedDropDown1;
+  String? _selectedDropDown2;
 
   @override
   Widget build(BuildContext context) {
@@ -38,96 +29,107 @@ class AddCaseForm1State extends State<AddCaseForm1> {
       child: Column(
         children: [
           Expanded(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 60),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0),
-                          child: Text(
-                            'Choose a partner',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        TextFormField(
-                          controller: _choosePartnerController,
-                          maxLines: 1,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'This field is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0),
-                          child: Text(
-                            'Outreach location',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        TextFormField(
-                          controller: _outreachLocationController,
-                          // maxLines: 1,
-                          decoration: InputDecoration(
-                            // labelText: 'Location',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'This field is required';
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
-                    ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 60),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
                   ),
-                ],
-              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Choose a partner',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[700]
+                              : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: _selectedDropDown1,
+                            isExpanded: true,
+                            items:
+                                ['String1', 'String2', 'String3'].map((item) {
+                              return DropdownMenuItem(
+                                value: item,
+                                child: Text(item),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDropDown1 = value as String?;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Outreach location',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[700]
+                              : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: _selectedDropDown2,
+                            isExpanded: true,
+                            items:
+                                ['String4', 'String5', 'String6'].map((item) {
+                              return DropdownMenuItem(
+                                value: item,
+                                child: Text(item),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDropDown2 = value as String?;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           FractionallySizedBox(
             widthFactor: 0.8,
             child: ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddCaseForm2(
-                            outreach: _outreachLocationController.text,
-                            partner: _choosePartnerController.text),
-                      ));
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddCaseForm2()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context)
@@ -135,7 +137,7 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                         .style
                         ?.backgroundColor
                         ?.resolve({}) ??
-                    Colors.blue,
+                    Color(0xFF617DEF),
                 foregroundColor: Theme.of(context)
                         .textButtonTheme
                         .style
@@ -157,39 +159,24 @@ class AddCaseForm1State extends State<AddCaseForm1> {
 }
 
 class AddCaseForm2 extends StatefulWidget {
-  final String outreach;
-  final String partner;
-
-  AddCaseForm2({required this.outreach, required this.partner});
-
   @override
   AddCaseForm2State createState() => AddCaseForm2State();
 }
 
 class AddCaseForm2State extends State<AddCaseForm2> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedGender;
+  String? _selectedSex;
+  String? _existingCondition;
   final TextEditingController _prescriptionController = TextEditingController();
-  final TextEditingController _chewsNotesController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _bloodGlucoseController = TextEditingController();
-  final TextEditingController _bloodPressureController =
-      TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _bmiController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _existingConditionController =
-      TextEditingController();
+
+  void pushNewCase() {
+    print('going to push1');
+  }
 
   @override
   Widget build(BuildContext context) {
-    int chewId = context.watch<DataStore>().chewData?['user']['id'] ?? 2; //remove this after testing
-
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -208,31 +195,17 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _firstNameController,
                         decoration: InputDecoration(
                           labelText: 'First Name',
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
                       ),
                     ),
                     SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        controller: _lastNameController,
                         decoration: InputDecoration(
                           labelText: 'Last Name',
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
                       ),
                     ),
                   ],
@@ -243,18 +216,18 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
+                          hintText: 'example@example.com',
                         ),
                       ),
                     ),
                     SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        controller: _phoneController,
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
+                          hintText: '123-456-7890',
                         ),
                         keyboardType: TextInputType.phone,
                       ),
@@ -271,7 +244,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _bloodPressureController,
                         decoration: InputDecoration(
                           labelText: 'Blood Pressure',
                           suffixText: 'mmHg',
@@ -282,7 +254,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                     SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        controller: _heightController,
                         decoration: InputDecoration(
                           labelText: 'Height',
                           suffixText: 'cm',
@@ -296,7 +267,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _weightController,
                         decoration: InputDecoration(
                           labelText: 'Weight',
                           suffixText: 'kg',
@@ -307,7 +277,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                     SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        controller: _bmiController,
                         decoration: InputDecoration(
                           labelText: 'BMI',
                         ),
@@ -321,7 +290,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _bloodGlucoseController,
                         decoration: InputDecoration(
                           labelText: 'Blood Glucose',
                           suffixText: 'mg/dL',
@@ -341,7 +309,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                         padding: EdgeInsets.symmetric(horizontal: 12),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            value: _selectedGender,
+                            value: _selectedSex,
                             isExpanded: true,
                             items: ['Male', 'Female'].map((String value) {
                               return DropdownMenuItem<String>(
@@ -351,10 +319,10 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                             }).toList(),
                             onChanged: (String? newValue) {
                               setState(() {
-                                _selectedGender = newValue;
+                                _selectedSex = newValue;
                               });
                             },
-                            hint: Text('Gender'),
+                            hint: Text('Sex'),
                           ),
                         ),
                       ),
@@ -367,13 +335,22 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
-                TextFormField(
-                  controller: _existingConditionController,
-                  maxLines: 5,
+                DropdownButtonFormField<String>(
+                  value: _existingCondition,
                   decoration: InputDecoration(
-                    labelText: 'Enter existing condition',
-                    border: OutlineInputBorder(),
+                    labelText: 'Select an option',
                   ),
+                  items: ['Yes', 'No', 'Another'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _existingCondition = value;
+                    });
+                  },
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -396,7 +373,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                 ),
                 SizedBox(height: 10),
                 TextFormField(
-                  controller: _chewsNotesController,
+                  controller: _prescriptionController,
                   maxLines: 5,
                   decoration: InputDecoration(
                     labelText: 'Enter note of a patient\'s health challenge',
@@ -419,9 +396,11 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                     widthFactor: 0.8,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _saveData(chewId);
-                        }
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => AddCaseForm2()),
+                        // );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context)
@@ -450,98 +429,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
-  }
-
-  Future<void> _saveData(chewId) async {
-    // int chewId;
-
-    Fluttertoast.showToast(
-      msg: 'Saving...',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-    final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/cases');
-    try {
-      final caseData = {
-        'first_name': _firstNameController.text,
-        'last_name': _lastNameController.text,
-        'gender': _selectedGender,
-        'email': _emailController.text,
-        if (_parseNumber(_phoneController.text) != null)
-          'phone_number': _phoneController.text,
-        if (_parseNumber(_bloodPressureController.text) != null)
-          'blood_pressure': _parseNumber(_bloodPressureController.text),
-        if (_parseNumber(_weightController.text) != null)
-          'weight': _parseNumber(_weightController.text),
-        if (_parseNumber(_heightController.text) != null)
-          'height': _parseNumber(_heightController.text),
-        if (_parseNumber(_bmiController.text) != null)
-          'bmi': _parseNumber(_bmiController.text),
-        if (_parseNumber(_bloodGlucoseController.text) != null)
-          'blood_glucose': _parseNumber(_bloodGlucoseController.text),
-        'existing_condition': _existingConditionController.text,
-        'current_prescription': _prescriptionController.text,
-        'chews_notes': _chewsNotesController.text,
-        'chew': chewId
-      };
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'data': caseData}),
-      );
-
-      if (response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: 'Case added successfully',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddCaseForms()),
-        );
-      } else {
-        print('this is the response ${response.body}');
-        Fluttertoast.showToast(
-          msg: 'Failed. Please try again',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
-    } catch (e) {
-      print('this is the error: $e');
-      Fluttertoast.showToast(
-        msg: 'Failed. Please try again',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
-  }
-
-  double? _parseNumber(String text) {
-    final value = double.tryParse(text);
-    return value != null ? value : null;
   }
 }
