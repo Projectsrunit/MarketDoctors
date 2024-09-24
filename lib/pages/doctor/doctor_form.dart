@@ -1,12 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:http/http.dart' as http; // Import http package
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
@@ -37,12 +35,9 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   final _languageController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
-  File? _profileImage; // Store the profile image
-
+  File? _profileImage;
   DateTime? _selectedDate;
   List<String> _selectedTimeSlots = [];
-
-  // Function to open the date picker
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -62,7 +57,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserData(); 
+    _fetchUserData();
   }
 
   Future<void> _fetchUserData() async {
@@ -71,11 +66,11 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
 
     try {
       final response = await http.get(uri);
-
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
-        // Assuming the userData contains the fields we need
-        _yearsOfExperienceController.text = userData['yearsOfExperience'] ?? '';
+        _yearsOfExperienceController.text =
+            userData['yearsOfExperience']?.toString() ??
+                ''; // Ensure this is a string
         _clinicHealthFacilityController.text =
             userData['clinicHealthFacility'] ?? '';
         _specializationController.text = userData['specialization'] ?? '';
@@ -83,35 +78,29 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         _awardsAndRecognitionController.text =
             userData['awardsAndRecognition'] ?? '';
 
-        // If the API provides a date, you can also set _selectedDate
         if (userData['date'] != null) {
           _selectedDate = DateTime.parse(userData['date']);
         }
-
-        // If there are predefined time slots, you can set them here as well
-        // _selectedTimeSlots = List<String>.from(userData['timeSlots'] ?? []);
-
         // Update UI
         setState(() {});
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Failed to fetch user data: ${response.reasonPhrase}')),
-        );
+        _showSnackBar('Failed to fetch user data: ${response.reasonPhrase}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showSnackBar('Error: $e');
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _profileImage = File(pickedFile.path); // Convert to File for uploading
+        _profileImage = File(pickedFile.path);
       });
     }
   }
@@ -133,24 +122,16 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           : '';
       request.fields['timeSlots'] = jsonEncode(_selectedTimeSlots);
 
-      // Add profile image if selected
       if (_profileImage != null) {
         final imageFile = await http.MultipartFile.fromPath(
-          'profile_picture',
-          _profileImage!.path,
-        );
+            'profile_picture', _profileImage!.path);
         request.files.add(imageFile);
       }
 
       try {
         final response = await request.send();
-
         if (response.statusCode == 200) {
-          // Handle success
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User updated successfully!')),
-          );
-          // Navigate to another page
+          _showSnackBar('User updated successfully!');
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => DoctorAppointmentPage(
@@ -161,18 +142,10 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
             ),
           );
         } else {
-          // Handle failure
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content:
-                    Text('Failed to update user: ${response.reasonPhrase}')),
-          );
+          _showSnackBar('Failed to update user: ${response.reasonPhrase}');
         }
       } catch (e) {
-        // Handle error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        _showSnackBar('Error: $e');
       }
     }
   }
@@ -259,6 +232,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
               _buildLabeledTextField(
                 controller: _awardsAndRecognitionController,
                 labelText: 'Awards & Recognition',
+                
               ),
               const SizedBox(height: 16),
               _buildProfileImagePicker(),
@@ -276,12 +250,12 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     );
   }
 
-Widget _buildLabeledTextField({
+ Widget _buildLabeledTextField({
   required TextEditingController controller,
   required String labelText,
 }) {
   return Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.start, // Align to the top
     children: [
       // Label on the left
       SizedBox(
@@ -295,26 +269,33 @@ Widget _buildLabeledTextField({
       Expanded(
         child: TextFormField(
           controller: controller,
-          keyboardType: labelText == 'Years of Experience' 
+          keyboardType: labelText == 'Years of Experience'
               ? TextInputType.number // Set keyboard type to number
               : TextInputType.text, // Default keyboard type
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            hintText: labelText == 'Awards & Recognition' 
+                ? 'Enter your awards and recognitions' 
+                : null, // No hint for other fields
           ),
+          maxLines: labelText == 'Awards & Recognition' ? 4 : 1, // Allow multi-line for awards
           validator: (value) {
             if (labelText == 'Years of Experience') {
               if (value == null || value.isEmpty) {
                 return 'Please enter your years of experience';
               }
-              // Additional validation to ensure it's a valid number
+              // Ensure it's a valid number
               final int? years = int.tryParse(value);
               if (years == null || years < 0) {
                 return 'Please enter a valid number';
               }
+            } else if (labelText == 'Awards & Recognition') {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your awards and recognitions';
+              }
             }
-            return null; // No error
+            return null;
           },
         ),
       ),
@@ -323,7 +304,6 @@ Widget _buildLabeledTextField({
 }
 
 
-  // Build the calendar widget
   Widget _buildCalendar(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,7 +375,6 @@ Widget _buildLabeledTextField({
     );
   }
 
-  // Build the time slots widget
   Widget _buildTimeSlots() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
