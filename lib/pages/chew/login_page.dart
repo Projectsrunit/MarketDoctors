@@ -253,22 +253,5 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
     );
   }
 }
-// class LoginSuccess extends StatelessWidget {
-//   final Map? respBody;
 
-//   LoginSuccess({required this.respBody});
-
-//   // @override
-//   @override
-//   Widget build(BuildContext context) {
-//     Map? chewData = context.watch<DataStore>().chewData;
-//     print('this is the chewData: $chewData');
-
-//     if (chewData != null) {
-//       return ChewHome();
-//     } else {
-//       return ChooseUserTypePage();
-//     }
-//   }
-// }
 

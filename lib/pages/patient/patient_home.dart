@@ -323,7 +323,7 @@ class PopularsState extends State<Populars> {
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
                   ? doctors[1]['specialisation']
-                  : 'General Practice_',
+                  : 'General Practice',
               rating: 4.0,
               onChatPressed: () {},
               onViewProfilePressed: () {

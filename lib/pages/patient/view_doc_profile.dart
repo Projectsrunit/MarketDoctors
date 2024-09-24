@@ -32,7 +32,7 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
               profession: (widget.doctorCard['specialisation'] != null &&
                       widget.doctorCard['specialisation'].isNotEmpty)
                   ? widget.doctorCard['specialisation']
-                  : 'General Practice_',
+                  : 'General Practice',
               rating: 4.5,
               onChatPressed: () {},
             ),

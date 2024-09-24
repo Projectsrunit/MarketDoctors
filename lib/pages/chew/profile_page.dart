@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
@@ -7,6 +11,7 @@ import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -75,28 +80,30 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-Widget _buildSystemList(BuildContext context) {
-  final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+  Widget _buildSystemList(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
 
-  return Column(
-    children: [
-      _buildModeToggleRow(
-          context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(context, Icons.lock, "Change password", _showPasswordPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(context, Icons.pin, "Change transaction pin", _showPinPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(context, Icons.logout, "Log out", () {
-        context.read<DataStore>().updateChewData(null);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> ChewHome()));
-      }),
-    ],
-  );
-}
-
+    return Column(
+      children: [
+        _buildModeToggleRow(
+            context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(
+            context, Icons.lock, "Change password", _showPasswordPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(
+            context, Icons.pin, "Change transaction pin", _showPinPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(context, Icons.logout, "Log out", () {
+          context.read<DataStore>().updateChewData(null);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ChewHome()));
+        }),
+      ],
+    );
+  }
 
   Widget _buildModeToggleRow(BuildContext context, IconData icon, String label,
       VoidCallback onToggle) {
@@ -172,8 +179,9 @@ Widget _buildSystemList(BuildContext context) {
     );
   }
 
- // Update this function to use pushReplacement and ensure the user cannot go back
-  Widget _buildNoArrowRow(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  // Update this function to use pushReplacement and ensure the user cannot go back
+  Widget _buildNoArrowRow(
+      BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap, // Pass the onTap function
       child: Padding(
@@ -188,8 +196,6 @@ Widget _buildSystemList(BuildContext context) {
       ),
     );
   }
-
-
 
   void _showPasswordPopup() {
     // Show dialog for changing password
@@ -376,8 +382,73 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
     );
   }
 
+  Future<int> _updateChewProfile(chewId) async {
+    Fluttertoast.showToast(
+      msg: 'Updating...',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url = Uri.parse('$baseUrl/api/users/$chewId');
+
+    try {
+      Map body = {
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'email': emailController.text,
+        'phone': phoneNumberController.text
+      };
+
+      print('this is the request body: $body');
+      final response = await http.put(url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(body));
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'Updated successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return 200;
+      } else {
+        throw Exception('Failed to update');
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to update data. Try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+    return 400;
+  }
+
   @override
   Widget build(BuildContext context) {
+    Map? chewData = context.read<DataStore>().chewData!;
+
+    firstNameController.text = chewData['user']['firstName'] ?? '';
+    lastNameController.text = chewData['user']['lastName'] ?? '';
+    emailController.text = chewData['user']['email'] ?? '';
+    phoneNumberController.text = chewData['user']['phone'] ?? '';
+
     return Scaffold(
       appBar: ChewAppBar(),
       body: Padding(
@@ -394,82 +465,96 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(8)
-              ),
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8)),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Flex(
                   direction: Axis.vertical,
                   children: [
-                            TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(labelText: 'First Name'),
-                            ),
-                            SizedBox(height: 10),
-                            TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: phoneNumberController,
-                      decoration: InputDecoration(labelText: 'Phone Number'),
+                    TextField(
+                      controller: firstNameController,
+                      decoration: InputDecoration(labelText: 'First Name'),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('number'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: lastNameController,
+                      decoration: InputDecoration(labelText: 'Last Name'),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('email'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 20),
-                            Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // update action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 32,
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: phoneNumberController,
+                            decoration:
+                                InputDecoration(labelText: 'Phone Number'),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () => _sendOTP('number'),
+                          child: Text('Verify'),
+                        ),
+                      ],
                     ),
-                    backgroundColor: const Color(0xFF617DEF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(labelText: 'Email'),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () => _sendOTP('email'),
+                          child: Text('Verify'),
+                        ),
+                      ],
                     ),
-                  ),
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
+                    SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final updated = await _updateChewProfile(chewData['user']['id']);
+                          if (updated == 200) {
+                            context.read<DataStore>().updateChewData({
+                              ...chewData,
+                              'user': {
+                                ...chewData['user'],
+                                'firstName': firstNameController.text,
+                                'lastName': lastNameController.text,
+                                'email': emailController.text,
+                                'phone': phoneNumberController.text
+                              }
+                            });
+
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 32,
+                          ),
+                          backgroundColor: const Color(0xFF617DEF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Update',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                            ),
-                            ],
-                  ),
               ),
             ),
           ],
