@@ -403,70 +403,82 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
 
     if (response.statusCode == 200) {
       print('Profile updated successfully');
+       Fluttertoast.showToast(
+        msg: "Record Updated successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     } else {
       print('Failed to update profile: ${response.statusCode}');
     }
   }
 
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PatientAppBar(),
-      body: Center(
-        child: Container(
-          width: double.infinity,
-          margin: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1.0),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: firstNameController,
-                  decoration: InputDecoration(labelText: 'First Name'),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: lastNameController,
-                  decoration: InputDecoration(labelText: 'Last Name'),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: phoneNumberController,
-                  decoration: InputDecoration(labelText: 'Phone Number'),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: busStopController,
-                  decoration: InputDecoration(labelText: 'Nearest Bus Stop'),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: homeAddressController,
-                  decoration: InputDecoration(labelText: 'Home Address'),
-                ),
-                SizedBox(height: 32), // Space before the button
-                Center(
-                  child: ElevatedButton(
-                    onPressed: updateProfile,
-                    child: Text('Update Profile'),
+      appBar: AppBar(title: Text('Update Profile')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildTextField(firstNameController, 'First Name'),
+              SizedBox(height: 10),
+              _buildTextField(lastNameController, 'Last Name'),
+              SizedBox(height: 10),
+              _buildTextField(phoneNumberController, 'Phone Number'),
+              SizedBox(height: 10),
+              _buildTextField(emailController, 'Email'),
+              SizedBox(height: 10),
+              _buildTextField(busStopController, 'Nearest Bus Stop'),
+              SizedBox(height: 10),
+              _buildTextField(homeAddressController, 'Home Address'),
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: updateProfile,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.blue,
                   ),
+                  child: Text('Update Profile'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
+
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white, // Background color of the text field
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+        border: Border.all(color: Colors.blueAccent), // Blue border
+        boxShadow: [
+          BoxShadow(
+            color: Colors.lightBlue.withOpacity(0.2), // Light blue shadow
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3), // Changes position of shadow
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none, // No inner border
+          contentPadding: EdgeInsets.all(16), // Padding for text
+        ),
+      ),
+    );
+  }
+
 }
