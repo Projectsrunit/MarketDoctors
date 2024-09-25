@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
+      
     Map? patientData = Provider.of<DataStore>(context).patientData;
+ 
 
     return AppBar(
       automaticallyImplyLeading: false,
