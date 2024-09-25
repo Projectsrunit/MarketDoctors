@@ -19,6 +19,7 @@ class PatientHome extends StatelessWidget {
   final int cases = 0;
   final int doctorsOnline = 0;
   final int users = 0;
+  
 
   // // Add the required parameters
   // final String patientId;
