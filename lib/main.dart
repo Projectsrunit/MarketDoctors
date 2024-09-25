@@ -3,6 +3,7 @@ import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts package
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
@@ -11,7 +12,8 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ChangeNotifierProvider(create: (_) => DataStore())
     ],
-    child: const MyApp(),));
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -25,8 +27,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.white, // Background color for light theme
+        scaffoldBackgroundColor: Colors.white,
         primaryColor: const Color.fromARGB(255, 111, 136, 223),
+        textTheme: GoogleFonts.nunitoTextTheme( // Apply Nunito font globally
+          Theme.of(context).textTheme.copyWith(
+                bodyLarge: const TextStyle(fontSize: 18), // Default font size for body text
+                bodyMedium: const TextStyle(fontSize: 16),
+                headlineLarge: const TextStyle(fontSize: 32),
+                headlineMedium: const TextStyle(fontSize: 28),
+                headlineSmall: const TextStyle(fontSize: 24),
+                bodySmall: const TextStyle(fontSize: 12),
+              ),
+        ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             backgroundColor: Colors.blue,
@@ -45,8 +57,15 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.black, // Background color for dark theme
+        scaffoldBackgroundColor: Colors.black,
         primaryColor: const Color.fromARGB(255, 111, 136, 223),
+        textTheme: GoogleFonts.nunitoTextTheme( // Apply Nunito font in dark theme too
+          Theme.of(context).textTheme.copyWith(
+                bodyLarge: const TextStyle(fontSize: 18, color: Colors.white),
+                bodyMedium: const TextStyle(fontSize: 16, color: Colors.white),
+                headlineLarge: const TextStyle(fontSize: 32, color: Colors.white),
+              ),
+        ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             backgroundColor: const Color.fromARGB(255, 111, 136, 223),
@@ -64,8 +83,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      home: ProfilePage(),
-      // home: const OnboardingScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }
@@ -87,13 +105,14 @@ class DataStore with ChangeNotifier {
   DataStore({this.userData});
 
   Map? get chewData => userData;
-   Map? get patientData => userData;
+  Map? get patientData => userData;
 
   void updateChewData(Map? newValue) {
     userData = newValue;
     notifyListeners();
   }
-   void updatePatientData(Map? newValue) {
+
+  void updatePatientData(Map? newValue) {
     userData = newValue;
     notifyListeners();
   }

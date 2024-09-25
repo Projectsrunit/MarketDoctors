@@ -8,10 +8,22 @@ import 'package:market_doctor/pages/patient/update_qualification_patient.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+
+
+
+
 
 class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+     int? patientId; 
+    Map? patientData = Provider.of<DataStore>(context).patientData;
+     patientId = patientData?['user']['id']; 
     return Scaffold(
       appBar: PatientAppBar(),
       body: Padding(
@@ -60,17 +72,11 @@ class PatientProfilePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => UpdateProfilePatient()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.payment, "Manage payments", () {
+        _buildArrowRow(Icons.payment, "Payments History", () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => ManagePaymentsPatient()));
         }),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.school, "Update qualifications", () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => UpdateQualificationPatient()));
-        }),
+       
       ],
     );
   }
@@ -84,8 +90,6 @@ Widget _buildSystemList(BuildContext context) {
           context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNoArrowRow(context, Icons.lock, "Change password", _showPasswordPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(context, Icons.pin, "Change transaction pin", _showPinPopup),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
       Divider(color: Colors.grey[300], thickness: 1),
@@ -333,151 +337,145 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController busStopController = TextEditingController();
+  final TextEditingController homeAddressController = TextEditingController();
 
-  void _sendOTP(String type) {
-    int otp = _generateOTP();
-    // Call API to send OTP (Simulated here)
-    print("Sending OTP $otp to $type");
+  int? patientId;
 
-    _showOTPPopup(type);
+  @override
+  void initState() {
+    super.initState();
+
+    // Get the patient ID from the context
+    Map? patientData = Provider.of<DataStore>(context, listen: false).patientData;
+    patientId = patientData?['user']['id'];
+
+    // Check if patient ID is retrieved
+    print("Retrieved patient ID: $patientId");
+
+    if (patientId != null) {
+      final baseUrl = dotenv.env['API_URL'];
+      final url = '$baseUrl/api/users/$patientId?populate=*';
+      fetchPatientData(url);
+    } else {
+      print("Patient ID is null, cannot fetch data.");
+    }
   }
 
-  int _generateOTP() {
-    var random = Random();
-    return random.nextInt(900000) + 100000; // Generates a 6-digit OTP
+  Future<void> fetchPatientData(String url) async {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        firstNameController.text = data['firstName'] ?? '';
+        lastNameController.text = data['lastName'] ?? '';
+        phoneNumberController.text = data['phone'] ?? '';
+        emailController.text = data['email'] ?? '';
+        busStopController.text = data['nearest_bus_stop'] ?? '';
+        homeAddressController.text = data['home_address'] ?? '';
+      });
+    } else {
+      print('Failed to load patient data: ${response.statusCode}');
+    }
   }
 
-  void _showOTPPopup(String type) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter the OTP sent to your $type'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Enter OTP'),
-              ),
-              SizedBox(height: 10),
-              Text("Did not receive code? Ask for resend"),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text('Submit'),
-            ),
-          ],
-        );
-      },
+  void updateProfile() async {
+    final url = '${dotenv.env['API_URL']}/api/users/$patientId';
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'phone': phoneNumberController.text,
+        'email': emailController.text,
+        'nearest_bus_stop': busStopController.text,
+        'home_address': homeAddressController.text,
+      }),
     );
+
+    if (response.statusCode == 200) {
+      print('Profile updated successfully');
+       Fluttertoast.showToast(
+        msg: "Record Updated successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      print('Failed to update profile: ${response.statusCode}');
+    }
   }
 
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PatientAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Update Profile',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(8)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: [
-                            TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(labelText: 'First Name'),
-                            ),
-                            SizedBox(height: 10),
-                            TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: phoneNumberController,
-                      decoration: InputDecoration(labelText: 'Phone Number'),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('number'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('email'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 20),
-                            Center(
+       appBar: PatientAppBar(),
+  
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildTextField(firstNameController, 'First Name'),
+              SizedBox(height: 10),
+              _buildTextField(lastNameController, 'Last Name'),
+              SizedBox(height: 10),
+              _buildTextField(phoneNumberController, 'Phone Number'),
+              SizedBox(height: 10),
+              _buildTextField(emailController, 'Email'),
+              SizedBox(height: 10),
+              _buildTextField(busStopController, 'Nearest Bus Stop'),
+              SizedBox(height: 10),
+              _buildTextField(homeAddressController, 'Home Address'),
+              SizedBox(height: 20),
+              Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // update action
-                  },
+                  onPressed: updateProfile,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 32,
-                    ),
-                    backgroundColor: const Color(0xFF617DEF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    foregroundColor: Colors.white, backgroundColor: Colors.blue,
                   ),
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: Text('Update Profile'),
                 ),
-                            ),
-                            ],
-                  ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
+
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white, // Background color of the text field
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+        border: Border.all(color: Colors.blueAccent), // Blue border
+        boxShadow: [
+          BoxShadow(
+            color: Colors.lightBlue.withOpacity(0.2), // Light blue shadow
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3), // Changes position of shadow
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none, // No inner border
+          contentPadding: EdgeInsets.all(16), // Padding for text
+        ),
+      ),
+    );
+    
+  }
+  
+
 }

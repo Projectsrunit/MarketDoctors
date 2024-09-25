@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:google_fonts/google_fonts.dart';
 
 class DoctorCardScreen extends StatefulWidget {
   @override
@@ -106,9 +107,27 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      // margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
+      decoration: BoxDecoration(
+        color: Colors.white, // Card background color
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+        border: Border.all(
+          color: Colors.grey.shade300, // Border color
+          width: 1, // Border thickness
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3), // Shadow color
+            spreadRadius: 2, // Spread of shadow
+            blurRadius: 5, // Blur radius for smooth shadow
+            offset: Offset(0, 3), // Shadow position (x, y)
+          ),
+        ],
+      ),
       child: Container(
-        height: 135,
+        height: 145,
         padding: const EdgeInsets.all(2.0),
         child: Row(
           children: [
@@ -116,7 +135,7 @@ class DoctorCard extends StatelessWidget {
               padding: const EdgeInsets.all(2.0),
               child: Image.network(
                 imageUrl,
-                width: 120,
+                width: 112,
                 height: 120,
                 fit: BoxFit.cover,
               ),
@@ -128,21 +147,32 @@ class DoctorCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.nunito(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                Text(profession), // Display full specialisation here
+                Text(profession),
                 GestureDetector(
                   onTap: onViewProfilePressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(5)),
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                    child: Text('View Profile',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                    child: Text(
+                      'View Profile',
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Padding(
@@ -151,8 +181,16 @@ class DoctorCard extends StatelessWidget {
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 16),
                       SizedBox(width: 4.0),
-                      Text('$rating',
-                          style: TextStyle(color: Colors.amber, fontSize: 14)),
+                      Text(
+                        '$rating',
+                        style: GoogleFonts.nunito(
+                          textStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -161,11 +199,20 @@ class DoctorCard extends StatelessWidget {
                   onTap: onChatPressed,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(5)),
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                    child: Text('Chat with doctor',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                    child: Text(
+                      'Chat with doctor',
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -193,7 +240,11 @@ class DoctorCard extends StatelessWidget {
                         SizedBox(width: 4.0),
                         Text(
                           'available',
-                          style: TextStyle(fontSize: 14),
+                          style: GoogleFonts.nunito(
+                            textStyle: TextStyle(
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -204,8 +255,9 @@ class DoctorCard extends StatelessWidget {
                         padding: EdgeInsets.symmetric(
                             vertical: 4.0, horizontal: 8.0),
                         decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(5)),
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                         child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
