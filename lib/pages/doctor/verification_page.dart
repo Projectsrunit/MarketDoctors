@@ -3,7 +3,7 @@ import 'package:market_doctor/pages/doctor/success_page.dart';
 import 'package:market_doctor/pages/doctor/upload_file.dart';
 
 class DoctorVerificationPage extends StatefulWidget {
-  const DoctorVerificationPage({Key? key}) : super(key: key);
+  const DoctorVerificationPage({super.key});
 
   @override
   State<DoctorVerificationPage> createState() => _DoctorVerificationPageState();
@@ -91,7 +91,6 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                     ),
                   );
                 },
-                child: const Text('Continue'),
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -100,6 +99,7 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text('Continue'),
               ),
               const SizedBox(height: 20),
               GestureDetector(

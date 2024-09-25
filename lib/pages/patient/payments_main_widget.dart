@@ -327,8 +327,8 @@ class EarningsInstance extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${randomMonth}/${randomYear}'),
-              Text('₦${randomAmount}'),
+              Text('$randomMonth/$randomYear'),
+              Text('₦$randomAmount'),
             ],
           ),
         ),

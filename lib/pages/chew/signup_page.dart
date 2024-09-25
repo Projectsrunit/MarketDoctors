@@ -9,7 +9,7 @@ import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
 
 class ChewSignUpPage extends StatefulWidget {
-  const ChewSignUpPage({Key? key}) : super(key: key);
+  const ChewSignUpPage({super.key});
 
   @override
   State<ChewSignUpPage> createState() => _ChewSignUpPageState();

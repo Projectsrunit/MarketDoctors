@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/success_page.dart';
 
 class ChewVerificationPage extends StatefulWidget {
-  const ChewVerificationPage({Key? key}) : super(key: key);
+  const ChewVerificationPage({super.key});
 
   @override
   State<ChewVerificationPage> createState() => _ChewVerificationPageState();
@@ -90,7 +90,6 @@ class _ChewVerificationPageState extends State<ChewVerificationPage> {
                     ),
                   );
                 },
-                child: const Text('Continue'),
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -99,6 +98,7 @@ class _ChewVerificationPageState extends State<ChewVerificationPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text('Continue'),
               ),
               const SizedBox(height: 20),
               GestureDetector(

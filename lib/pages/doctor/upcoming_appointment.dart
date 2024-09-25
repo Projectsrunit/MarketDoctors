@@ -46,7 +46,7 @@ class UpcomingAppointmentPage extends StatelessWidget {
 
 // Widget for Upcoming Appointments Tab
 class UpcomingAppointmentsTab extends StatelessWidget {
-  const UpcomingAppointmentsTab({Key? key}) : super(key: key);
+  const UpcomingAppointmentsTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,7 @@ class UpcomingAppointmentsTab extends StatelessWidget {
 
 // Widget for Pending Appointments Tab
 class PendingAppointmentsTab extends StatelessWidget {
-  const PendingAppointmentsTab({Key? key}) : super(key: key);
+  const PendingAppointmentsTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -100,14 +100,14 @@ class AppointmentCard extends StatelessWidget {
   final bool isPending;
 
   const AppointmentCard({
-    Key? key,
+    super.key,
     required this.patientName,
     required this.patientAge,
     required this.appointmentTime,
     required this.appointmentDate,
     required this.imageUrl,
     required this.isPending,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

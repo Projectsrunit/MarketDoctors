@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/verification_page.dart';
 
 class ChewCheckInboxPage extends StatelessWidget {
-  const ChewCheckInboxPage({Key? key}) : super(key: key);
+  const ChewCheckInboxPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +37,13 @@ class ChewCheckInboxPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Next'),
               style: TextButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
+              child: const Text('Next'),
             ),
           ],
         ),

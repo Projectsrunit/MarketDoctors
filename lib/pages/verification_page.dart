@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/upload_file.dart';
 
 class VerificationPage extends StatefulWidget {
-  const VerificationPage({Key? key}) : super(key: key);
+  const VerificationPage({super.key});
 
   @override
   State<VerificationPage> createState() => _VerificationPageState();
@@ -72,7 +72,6 @@ class _VerificationPageState extends State<VerificationPage> {
                     ),
                   );
                 },
-                child: const Text('Continue'),
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -81,6 +80,7 @@ class _VerificationPageState extends State<VerificationPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text('Continue'),
               ),
               const SizedBox(height: 20),
               GestureDetector(

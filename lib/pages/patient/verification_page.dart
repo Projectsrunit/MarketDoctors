@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/patient/success_page.dart';
 
 class PatientVerificationPage extends StatefulWidget {
-  const PatientVerificationPage({Key? key}) : super(key: key);
+  const PatientVerificationPage({super.key});
 
   @override
   State<PatientVerificationPage> createState() => _PatientVerificationPageState();
@@ -90,7 +90,6 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                     ),
                   );
                 },
-                child: const Text('Continue'),
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -99,6 +98,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text('Continue'),
               ),
               const SizedBox(height: 20),
               GestureDetector(

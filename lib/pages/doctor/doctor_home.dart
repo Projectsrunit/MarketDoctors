@@ -1,10 +1,12 @@
 // ignore_for_file: unnecessary_string_interpolations, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
+import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 
 class DashboardPage extends StatefulWidget {
   final String firstName;
@@ -154,7 +156,18 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           image: AssetImage('assets/images/pills-image.png'),
           label: 'Pharmacy',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AvailabilityCalendar(
+                        firstName: widget.firstName,
+                        lastName: widget.lastName,
+                        id: widget.id,
+                        
+                      )),
+            );
+          },
         ),
         _buildDashboardCardWithLabel(
           icon: Icons.person_add_alt_1_outlined,
@@ -224,41 +237,9 @@ class _DashboardPageState extends State<DashboardPage> {
         borderRadius: BorderRadius.circular(10),
         color: Color(0xFF617DEF).withOpacity(0.5),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: const Text(
-                'Thought about secret \n to having the perfect \n smile..... “Whitegate”',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ),
-          // Image section on the right
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                // borderRadius: BorderRadius.circular(10),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/advert-image.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Row(children: [
+        AdvertisementCarousel(),
+      ]),
     );
   }
 

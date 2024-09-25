@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-AppBar doctorAppBar({required String firstName, required String lastName}) {
+AppBar doctorAppBar({required String firstName, required String lastName  }) {
   return AppBar(
     automaticallyImplyLeading: false,
     backgroundColor: Colors.white,
@@ -37,6 +37,7 @@ AppBar doctorAppBar({required String firstName, required String lastName}) {
         ),
 
         // Action Buttons on the Right (Notifications, Time, and More options)
+        // Action Buttons on the Right (Notifications, Time, and More options)
         Row(
           children: [
             // Time/Clock Icon
@@ -58,9 +59,12 @@ AppBar doctorAppBar({required String firstName, required String lastName}) {
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, color: Colors.black),
               onSelected: (value) {
-                // Add desired action based on menu selection
                 if (value == 'Settings') {
-                  // Navigate to Settings
+                  // Navigate to the Profile Page when 'Settings' is selected
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => ProfilePage()),
+                  // );
                 } else if (value == 'Logout') {
                   // Log out user
                 }

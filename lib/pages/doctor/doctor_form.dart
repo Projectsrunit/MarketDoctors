@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
@@ -16,11 +19,11 @@ class DoctorFormPage extends StatefulWidget {
   final String id;
 
   const DoctorFormPage({
-    Key? key,
+    super.key,
     required this.firstName,
     required this.lastName,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
   State<DoctorFormPage> createState() => _DoctorFormPageState();
@@ -36,23 +39,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   final ImagePicker _picker = ImagePicker();
 
   File? _profileImage;
-  DateTime? _selectedDate;
-  List<String> _selectedTimeSlots = [];
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      setState(() {
-        _selectedDate = pickedDate;
-        _selectedTimeSlots
-            .clear(); // Reset selected time slots for the new date
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -78,9 +64,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         _awardsAndRecognitionController.text =
             userData['awardsAndRecognition'] ?? '';
 
-        if (userData['date'] != null) {
-          _selectedDate = DateTime.parse(userData['date']);
-        }
         // Update UI
         setState(() {});
       } else {
@@ -117,10 +100,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
       request.fields['languages'] = _languageController.text;
       request.fields['awardsAndRecognition'] =
           _awardsAndRecognitionController.text;
-      request.fields['date'] = _selectedDate != null
-          ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-          : '';
-      request.fields['timeSlots'] = jsonEncode(_selectedTimeSlots);
 
       if (_profileImage != null) {
         final imageFile = await http.MultipartFile.fromPath(
@@ -134,7 +113,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           _showSnackBar('User updated successfully!');
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => DoctorAppointmentPage(
+              builder: (context) => AvailabilityCalendar(
                 firstName: widget.firstName,
                 lastName: widget.lastName,
                 id: widget.id,
@@ -191,7 +170,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
+              Align(
                 child: Text(
                   'Doctor Form',
                   style: TextStyle(
@@ -200,6 +179,28 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft, // Aligns the text to the left
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey, // Border color
+                      width: 1.0, // Border width
+                    ),
+                  ),
+                  padding: EdgeInsets.all(
+                      10.0), // Optional padding for better spacing
+                  child: Text(
+                    'Doctor ${widget.firstName} ${widget.lastName}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -218,12 +219,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                 labelText: 'Specialization',
               ),
               const SizedBox(height: 20),
-              _buildCalendar(context),
-              if (_selectedDate != null) ...[
-                const SizedBox(height: 20),
-                _buildTimeSlots(), // Show time slots after date selection
-              ],
-              const SizedBox(height: 20),
               _buildLabeledTextField(
                 controller: _languageController,
                 labelText: 'Languages',
@@ -232,7 +227,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
               _buildLabeledTextField(
                 controller: _awardsAndRecognitionController,
                 labelText: 'Awards & Recognition',
-                
               ),
               const SizedBox(height: 16),
               _buildProfileImagePicker(),
@@ -250,176 +244,59 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     );
   }
 
- Widget _buildLabeledTextField({
-  required TextEditingController controller,
-  required String labelText,
-}) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start, // Align to the top
-    children: [
-      // Label on the left
-      SizedBox(
-        width: 150,
-        child: Text(
-          labelText,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
-        ),
-      ),
-      // Input field on the right
-      Expanded(
-        child: TextFormField(
-          controller: controller,
-          keyboardType: labelText == 'Years of Experience'
-              ? TextInputType.number // Set keyboard type to number
-              : TextInputType.text, // Default keyboard type
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            hintText: labelText == 'Awards & Recognition' 
-                ? 'Enter your awards and recognitions' 
-                : null, // No hint for other fields
-          ),
-          maxLines: labelText == 'Awards & Recognition' ? 4 : 1, // Allow multi-line for awards
-          validator: (value) {
-            if (labelText == 'Years of Experience') {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your years of experience';
-              }
-              // Ensure it's a valid number
-              final int? years = int.tryParse(value);
-              if (years == null || years < 0) {
-                return 'Please enter a valid number';
-              }
-            } else if (labelText == 'Awards & Recognition') {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your awards and recognitions';
-              }
-            }
-            return null;
-          },
-        ),
-      ),
-    ],
-  );
-}
-
-
-  Widget _buildCalendar(BuildContext context) {
+  Widget _buildLabeledTextField({
+    required TextEditingController controller,
+    required String labelText,
+  }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start, // Align to the top
       children: [
-        // Title on the left
+        // Label on the left
         SizedBox(
-          width: 100, // Adjust the width as needed
+          width: 150,
           child: Text(
-            'Select Date',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-              fontWeight: FontWeight.bold, // Added for emphasis
-            ),
+            labelText,
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
         ),
-        const SizedBox(width: 10), // Space between title and calendar
-
-        // Calendar with grey background on the right
+        // Input field on the right
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(8.0), // Padding for better spacing
-            color: Colors.grey[100],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TableCalendar(
-                  focusedDay: _selectedDate ?? DateTime.now(),
-                  firstDay: DateTime(2000),
-                  lastDay: DateTime(2101),
-                  calendarFormat: CalendarFormat.month,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDate, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDate = selectedDay;
-                    });
-                  },
-                  calendarStyle: const CalendarStyle(
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      shape: BoxShape.circle,
-                    ),
-                    todayDecoration: BoxDecoration(
-                      color: Colors.lightBlueAccent,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  headerStyle: const HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: true,
-                  ),
-                ),
-                if (_selectedDate != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      "Selected Date: ${DateFormat.yMMMd().format(_selectedDate!)}",
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                  ),
-              ],
+          child: TextFormField(
+            controller: controller,
+            keyboardType: labelText == 'Years of Experience'
+                ? TextInputType.number // Set keyboard type to number
+                : TextInputType.text, // Default keyboard type
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              hintText: labelText == 'Awards & Recognition'
+                  ? 'Enter your awards and recognitions'
+                  : null, // No hint for other fields
             ),
+            maxLines: labelText == 'Awards & Recognition'
+                ? 4
+                : 1, // Allow multi-line for awards
+            validator: (value) {
+              if (labelText == 'Years of Experience') {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your years of experience';
+                }
+                // Ensure it's a valid number
+                final int? years = int.tryParse(value);
+                if (years == null || years < 0) {
+                  return 'Please enter a valid number';
+                }
+              } else if (labelText == 'Awards & Recognition') {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your awards and recognitions';
+                }
+              }
+              return null;
+            },
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTimeSlots() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Available Time Slots',
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 10.0,
-          runSpacing: 8.0,
-          children: [
-            _buildTimeSlotButton(time: '09:30 AM'),
-            _buildTimeSlotButton(time: '11:00 AM'),
-            _buildTimeSlotButton(time: '01:00 PM'),
-            _buildTimeSlotButton(time: '03:30 PM'),
-            _buildTimeSlotButton(time: '05:00 PM'),
-            _buildTimeSlotButton(time: '07:00 PM'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimeSlotButton({required String time}) {
-    final isSelected = _selectedTimeSlots.contains(time);
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.green : Colors.grey[300],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      ),
-      onPressed: () {
-        // Handle time slot selection logic
-        setState(() {
-          if (isSelected) {
-            _selectedTimeSlots.remove(time);
-          } else {
-            _selectedTimeSlots.add(time);
-          }
-        });
-      },
-      child: Text(time, style: TextStyle(color: Colors.black)),
     );
   }
 

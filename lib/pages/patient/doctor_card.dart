@@ -59,7 +59,7 @@ class _DoctorCardScreenState extends State<DoctorCardScreen> {
 
                 print('Specialisation: $profession');
 
-                final rating = 4.5; // Assuming static rating for now
+                const rating = 4.5; // Assuming static rating for now
 
                 // Construct the full URL using {BASE_URL}
                 final imageUrl = '{{BASE_URL}}$profilePictureUrl';
