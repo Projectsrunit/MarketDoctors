@@ -12,6 +12,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+
 
 
 
@@ -70,17 +72,11 @@ class PatientProfilePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => UpdateProfilePatient()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.payment, "Manage payments", () {
+        _buildArrowRow(Icons.payment, "Payments History", () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => ManagePaymentsPatient()));
         }),
-        Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.school, "Update qualifications", () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => UpdateQualificationPatient()));
-        }),
+       
       ],
     );
   }
@@ -94,8 +90,6 @@ Widget _buildSystemList(BuildContext context) {
           context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNoArrowRow(context, Icons.lock, "Change password", _showPasswordPopup),
-      Divider(color: Colors.grey[300], thickness: 1),
-      _buildNoArrowRow(context, Icons.pin, "Change transaction pin", _showPinPopup),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
       Divider(color: Colors.grey[300], thickness: 1),
@@ -421,7 +415,8 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update Profile')),
+       appBar: PatientAppBar(),
+  
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -479,6 +474,8 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
         ),
       ),
     );
+    
   }
+  
 
 }
