@@ -21,7 +21,9 @@ class _DoctorViewState extends State<DoctorView> {
   @override
   void initState() {
     super.initState();
-    fetchDoctors();
+    if (doctors.isEmpty) {
+      fetchDoctors();
+    }
   }
 
   Future<void> fetchDoctors() async {
@@ -58,184 +60,96 @@ class _DoctorViewState extends State<DoctorView> {
       appBar: PatientAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 48,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    'Popular Doctors',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 48),
-              ],
-            ),
-            if (isLoading) ...[
+        child: Column(children: [
+          Row(
+            children: [
               SizedBox(
-                height: 200,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            ] else if (doctors.isNotEmpty) ...[
-              Expanded(
-                child: ListView.separated(
-                  itemCount: doctors.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final doc = doctors[index];
-                    // final String baseUrl = dotenv.env['API_URL']!; // Get the base URL again
-
-                     String fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';  // Default image
-
-                    // Check if profile_picture is not null and has a valid URL
-                    if (doc['profile_picture'] == null 
-                    // && doc['profile_picture']['formats'] != null &&
-                    //     doc['profile_picture']['formats']['thumbnail'] != null &&
-                    //     doc['profile_picture']['formats']['thumbnail']['url'] != null
-                        ) {
-                      fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg';
-                    }
-
-                    return DoctorCard(
-                      imageUrl: fullImageUrl,
-                      name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
-                      profession: (doc['specialisation'] != null &&
-                              doc['specialisation'].isNotEmpty)
-                          ? doc['specialisation']
-                          : 'General Practice',
-                      rating: 4.5,
-                      onChatPressed: () {},
-                      onViewProfilePressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewDocProfile(doctorCard: doc),
-                          ),
-                        );
-                      },
-                      onBookAppointmentPressed: () {},
-                    );
+                width: 48,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
                   },
                 ),
               ),
-            ] else ...[
-              SizedBox(
-                height: 100,
-                child: Center(child: Text('No doctors available')),
-              )
-            ]
-          ],
-        ),
-      ),
-      bottomNavigationBar: PatientBottomNavBar(),
-    );
-  }
-}
-
-// Removed the duplicate AvailableDocs class
-
-class AvailableDocsDetails extends StatelessWidget {
-  final Map<String, dynamic> doctor;
-
-  AvailableDocsDetails({required this.doctor});
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PatientAppBar(),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              // Image.network(doctor['profile_picture']['formats']['thumbnail']['url'], width: 50), // Use the correct image URL
-              Image.network('https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'),
-              Column(
-                children: [
-                  Text('Dr. ${doctor['firstName']} ${doctor['lastName']}'),
-                  Text('Specialty: ${doctor['specialisation'] ?? 'N/A'}'),
-                  Row(
-                    children: [
-                      Icon(Icons.star),
-                      Icon(Icons.star),
-                      Icon(Icons.star),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Icon(Icons.circle, color: Colors.green),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // More details...
-        ],
-      ),
-      bottomNavigationBar: PatientBottomNavBar(),
-    );
-  }
-}
-
-class RealDoctorView extends StatelessWidget {
-  final Map<String, dynamic> doctor;
-
-  RealDoctorView({required this.doctor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            Text('Dr. ${doctor['firstName']} ${doctor['lastName']}'),
-            Icon(Icons.circle, color: Colors.green), // Online status
-            CircleAvatar(
-              backgroundImage:
-                  NetworkImage(doctor['profile_picture']['formats']['thumbnail']['url']),
-            ),
-          ],
-        ),
-        actions: [IconButton(icon: Icon(Icons.phone), onPressed: () {})],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: [
-                // Chat messages UI similar to WhatsApp
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(icon: Icon(Icons.add), onPressed: () {}),
               Expanded(
-                child: TextField(
-                  decoration: InputDecoration(hintText: "Enter message")),
+                child: Text(
+                  'Popular Doctors',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              IconButton(icon: Icon(Icons.send), onPressed: () {}),
+              SizedBox( width: 48), 
             ],
           ),
-        ],
+          if (isLoading) ...[
+            SizedBox(
+              height: 200,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ] else if (doctors.isNotEmpty) ...[
+            Expanded(
+              child: ListView.separated(
+                itemCount: doctors.length,
+                separatorBuilder: (context, index) => SizedBox(height: 8.0),
+                itemBuilder: (context, index) {
+                  final doc = doctors[index];
+                  return DoctorCard(
+                    imageUrl:
+                        doc['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                    name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
+                    profession: (doc['specialisation'] != null &&
+                            doc['specialisation'].isNotEmpty)
+                        ? doc['specialisation']
+                        : 'General Practice',
+                    rating: 4.5,
+                    onChatPressed: () {},
+                    onViewProfilePressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ViewDocProfile(doctorCard: doc)));
+                    },
+                    onBookAppointmentPressed: () {},
+                  );
+                },
+              ),
+            ),
+          ] else ...[
+            SizedBox(
+              height: 100,
+              child: Center(child: Text('No doctors available')),
+            )
+          ]
+        ]),
       ),
       bottomNavigationBar: PatientBottomNavBar(),
+    );
+  }
+}
+
+class AvailableDocs extends StatelessWidget {
+  final String name;
+  final int age;
+  final String location;
+
+  AvailableDocs(
+      {required this.name, required this.age, required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(name),
+        Text('Age: $age'),
+        Text('Location: $location'),
+      ],
     );
   }
 }
