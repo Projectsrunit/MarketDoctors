@@ -391,7 +391,7 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   }
 
   void updateProfile() async {
-    final url = '${dotenv.env['BASE_URL']}/api/users/$patientId';
+    final url = '${dotenv.env['API_URL']}/api/users/$patientId';
     final response = await http.put(
       Uri.parse(url),
       headers: {"Content-Type": "application/json"},
