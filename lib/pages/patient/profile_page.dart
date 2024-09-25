@@ -381,8 +381,8 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
         lastNameController.text = data['lastName'] ?? '';
         phoneNumberController.text = data['phone'] ?? '';
         emailController.text = data['email'] ?? '';
-        busStopController.text = data['nearestBusStop'] ?? '';
-        homeAddressController.text = data['homeAddress'] ?? '';
+        busStopController.text = data['nearest_bus_stop'] ?? '';
+        homeAddressController.text = data['home_address'] ?? '';
       });
     } else {
       // Handle the error
@@ -400,8 +400,8 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
         'lastName': lastNameController.text,
         'phone': phoneNumberController.text,
         'email': emailController.text,
-        'nearestBusStop': busStopController.text,
-        'homeAddress': homeAddressController.text,
+        'nearest_bus_stop': busStopController.text,
+        'home_address': homeAddressController.text,
       }),
     );
 
