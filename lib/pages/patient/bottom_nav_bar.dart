@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:market_doctor/pages/patient/profile_page.dart';
 import 'package:market_doctor/pages/patient/health_tips.dart';
@@ -32,84 +33,135 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.home, size: 30, color: iconColor),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PatientHome()),
-                      );
-                    },
-                  ),
-                  Text("Home"),
-                ],
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: FaIcon(FontAwesomeIcons.solidHeart,
-                        size: 30, color: iconColor),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HealthTipsPage()));
-                    },
-                  ),
-                  Text("Health"),
-                ],
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.credit_card,
-                        size: 30, color: iconColor),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PaymentsMainWidget()));
-                    },
-                  ),
-                  Text("Payment"),
-                ],
-              ),
-            
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.chat_bubble, size: 30, color: iconColor),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PatientProfilePage()));
-                    },
-                  ),
-                  Text("Contact"),
-                ],
+              // Home Icon and Label
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PatientHome()),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.home, size: 30, color: iconColor),
+                    SizedBox(height: 2), // Reduced height for less spacing
+                    Text(
+                      "Home",
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.person, size: 30, color: iconColor),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PatientProfilePage()));
-                    },
-                  ),
-                  Text("Profile"),
-                ],
+              // Health Icon and Label
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HealthTipsPage()),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FaIcon(FontAwesomeIcons.solidHeart,
+                        size: 30, color: iconColor),
+                    SizedBox(height: 2), // Reduced height
+                    Text(
+                      "Health",
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Payment Icon and Label
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PaymentsMainWidget()),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.credit_card, size: 30, color: iconColor),
+                    SizedBox(height: 2), // Reduced height
+                    Text(
+                      "Payment",
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Contact Icon and Label
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PatientProfilePage(),
+                    ),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.chat_bubble, size: 30, color: iconColor),
+                    SizedBox(height: 3), // Reduced height for less spacing
+                    Text(
+                      "Contact",
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Profile Icon and Label
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PatientProfilePage(),
+                    ),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person, size: 30, color: iconColor),
+                    SizedBox(height: 2), // Reduced height
+                    Text(
+                      "Profile",
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

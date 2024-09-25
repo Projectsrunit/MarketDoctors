@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -22,7 +23,7 @@ class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Text(
                 'Hi, ${patientData?['user']['firstName']} ${patientData?['user']['lastName']}!',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 19, // Reduces the size of the text
                   fontWeight: FontWeight.bold,
                   color: const Color.fromARGB(255, 22, 91, 148), // Customize color if needed

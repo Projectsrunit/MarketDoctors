@@ -13,7 +13,7 @@ import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class PatientHome extends StatelessWidget {
   final int cases = 0;
@@ -32,10 +32,7 @@ class PatientHome extends StatelessWidget {
     Map? patientData = Provider.of<DataStore>(context).patientData;
 
     if (patientData == null) {
-      return PopScope(
-        canPop: false,
-        child: ChooseUserTypePage()
-        );
+      return PopScope(canPop: false, child: ChooseUserTypePage());
     } else {
       return PopScope(
         canPop: false,
@@ -49,7 +46,6 @@ class PatientHome extends StatelessWidget {
   }
 }
 
-
 class PatientHomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -58,40 +54,61 @@ class PatientHomeBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // Advertisement carousel
           Container(
             margin: EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search doctor, field, drugs",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Add search functionality here
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: Text('Search'),
-                ),
-              ],
+  child: Row(
+  children: [
+    Expanded(
+      child: SizedBox(
+        height: 40,  // Adjust the height as needed
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: "Search doctor, field, drugs",
+            hintStyle: GoogleFonts.nunito(
+              textStyle: TextStyle(
+                fontSize: 14,  // Adjust the font size as needed
+                fontWeight: FontWeight.normal,  // Change the weight if necessary
+                color: Colors.grey,  // Change the color if you want a different hint color
+              ),
             ),
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 10), // Reduce vertical padding
+          ),
+        ),
+      ),
+    ),
+    SizedBox(width: 8.0),
+    ElevatedButton(
+      onPressed: () {
+        // Add search functionality here
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      child: Text(
+        'Search',
+        style: GoogleFonts.nunito(
+          textStyle: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ),
+  ],
+),
+
+
           ),
           // Remaining widgets...
           Row(
@@ -100,8 +117,10 @@ class PatientHomeBody extends StatelessWidget {
               // Cases icon
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PatientCasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -116,15 +135,21 @@ class PatientHomeBody extends StatelessWidget {
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
                           FontAwesomeIcons.hospital,
-                          size: 50,
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Hospitals',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Hospitals',
+                      style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -148,15 +173,18 @@ class PatientHomeBody extends StatelessWidget {
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
                           FontAwesomeIcons.stethoscope,
-                          size: 50,
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Doctors',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('Doctors', style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),),
                   ],
                 ),
               ),
@@ -164,8 +192,10 @@ class PatientHomeBody extends StatelessWidget {
               // Patients icon
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PatientCasesPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PatientCasesPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -180,45 +210,51 @@ class PatientHomeBody extends StatelessWidget {
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
                           FontAwesomeIcons.pills,
-                          size: 50,
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
                     ),
                     SizedBox(height: 4.0),
                     Text('Pharmacy',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      ),
                   ],
                 ),
-                
               ),
             ],
           ),
-             SizedBox(height: 16.0),
+          SizedBox(height: 16.0),
           Container(
               height: 170,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8)
-            ),
-            
-           child: Row(
-              children: [
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(8)),
+              child: Row(children: [
                 AdvertisementCarousel(),
-              ])
-          ),
+              ])),
           SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Popular Doctors',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                 style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
+              
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorView()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => DoctorView()));
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -226,7 +262,14 @@ class PatientHomeBody extends StatelessWidget {
                 ),
                 child: Text(
                   'See all',
-                  style: TextStyle(color: Colors.blue),
+                   style: GoogleFonts.nunito(
+                        textStyle: TextStyle(
+                          fontSize: 16,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                 
                 ),
               ),
             ],
@@ -254,8 +297,9 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
     fetchAdverts();
   }
 
-    Future<void> fetchAdverts() async {
-    final String baseUrl = dotenv.env['API_URL']!; // Ensure this is correctly set
+  Future<void> fetchAdverts() async {
+    final String baseUrl =
+        dotenv.env['API_URL']!; // Ensure this is correctly set
     final Uri url = Uri.parse('$baseUrl/api/adverts');
 
     final response = await http.get(url);
@@ -271,10 +315,10 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
     }
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 130,
+      height: 160,
       child: isLoading
           ? Center(child: CircularProgressIndicator())
           : CarouselSlider.builder(
@@ -296,7 +340,7 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
                       color: Colors.black54,
                       child: Text(
                         advert['text'],
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                         style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -306,7 +350,7 @@ class _AdvertisementCarouselState extends State<AdvertisementCarousel> {
               options: CarouselOptions(
                 autoPlay: true,
                 enlargeCenterPage: true,
-                aspectRatio: 2.0,
+                aspectRatio: 2.2,
                 viewportFraction: 0.8,
               ),
             ),
@@ -321,7 +365,7 @@ class Populars extends StatefulWidget {
 
 class PopularsState extends State<Populars> {
   List<dynamic> doctors = [];
-  bool isLoading = true; 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -329,10 +373,9 @@ class PopularsState extends State<Populars> {
     fetchDoctors();
   }
 
-
-
   Future<void> fetchDoctors() async {
-    final String baseUrl = dotenv.env['API_URL']!; // Ensure this is correctly set
+    final String baseUrl =
+        dotenv.env['API_URL']!; // Ensure this is correctly set
     final Uri url = Uri.parse(
         '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
 
@@ -343,13 +386,14 @@ class PopularsState extends State<Populars> {
 
       setState(() {
         doctors = data.map((doctor) {
-          String fullImageUrl = 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
+          String fullImageUrl =
+              'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
 
           // Check if profile_picture is not null and has a valid URL
-          if (doctor['profile_picture'] != null 
-          // && doctor['profile_picture']['formats'] != null &&
-          //     doctor['profile_picture']['formats']['thumbnail'] != null &&
-          //     doctor['profile_picture']['formats']['thumbnail']['url'] != null
+          if (doctor['profile_picture'] != null
+              // && doctor['profile_picture']['formats'] != null &&
+              //     doctor['profile_picture']['formats']['thumbnail'] != null &&
+              //     doctor['profile_picture']['formats']['thumbnail']['url'] != null
               ) {
             fullImageUrl = '${doctor['profile_picture']}';
           }
@@ -381,7 +425,8 @@ class PopularsState extends State<Populars> {
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: doctors[0]['specialisation'] ?? 'General Practice',
             rating: doctors[0]['total_overall_rating'] != null
-                ? doctors[0]['total_overall_rating'] / (doctors[0]['total_raters'] ?? 1)
+                ? doctors[0]['total_overall_rating'] /
+                    (doctors[0]['total_raters'] ?? 1)
                 : 0,
             onChatPressed: () {},
             onViewProfilePressed: () {
@@ -420,8 +465,7 @@ class PopularsState extends State<Populars> {
         ] else ...[
           SizedBox(
             height: 100,
-            child: Center(
-              child: Text('No doctors available')),
+            child: Center(child: Text('No doctors available')),
           )
         ]
       ],
