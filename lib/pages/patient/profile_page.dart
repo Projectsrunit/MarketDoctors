@@ -8,10 +8,15 @@ import 'package:market_doctor/pages/patient/update_qualification_patient.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Map? patientData = Provider.of<DataStore>(context).patientData;
     return Scaffold(
       appBar: PatientAppBar(),
       body: Padding(
@@ -333,6 +338,63 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController nearestBusStopController = TextEditingController();
+  final TextEditingController homeAddressController = TextEditingController();
+  
+  late String patientId;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatientData();
+  }
+
+  Future<void> _fetchPatientData() async {
+    // Get patient ID from context or provider
+    Map? patientData = Provider.of<DataStore>(context, listen: false).patientData;
+    patientId = patientData!['id'].toString();
+    
+    final response = await http.get(Uri.parse('${dotenv.env['BASE_URL']}/api/users/$patientId?populate=*'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Assuming the API returns a 'data' object with the needed fields
+      var userData = data['data'];
+      // Populate the fields
+      firstNameController.text = userData['firstName'] ?? '';
+      lastNameController.text = userData['lastName'] ?? '';
+      phoneNumberController.text = userData['phone'] ?? '';
+      emailController.text = userData['email'] ?? '';
+      nearestBusStopController.text = userData['nearestBusStop'] ?? '';
+      homeAddressController.text = userData['homeAddress'] ?? '';
+    } else {
+      // Handle error
+      print('Failed to load patient data');
+    }
+  }
+
+  Future<void> _updatePatientData() async {
+    final response = await http.put(
+      Uri.parse('${dotenv.env['BASE_URL']}/api/users/$patientId'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'phone': phoneNumberController.text,
+        'email': emailController.text,
+        'nearestBusStop': nearestBusStopController.text,
+        'homeAddress': homeAddressController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Handle successful update
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
+    } else {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile')));
+    }}
+    
 
   void _sendOTP(String type) {
     int otp = _generateOTP();
@@ -381,103 +443,51 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PatientAppBar(),
+      appBar: AppBar(title: Text('Update Profile')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Update Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
-            Text(
-              'Update Profile',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            TextField(
+              controller: firstNameController,
+              decoration: InputDecoration(labelText: 'First Name'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: lastNameController,
+              decoration: InputDecoration(labelText: 'Last Name'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: phoneNumberController,
+              decoration: InputDecoration(labelText: 'Phone Number'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: nearestBusStopController,
+              decoration: InputDecoration(labelText: 'Nearest Bus Stop'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: homeAddressController,
+              decoration: InputDecoration(labelText: 'Home Address'),
             ),
             SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(8)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: [
-                            TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(labelText: 'First Name'),
-                            ),
-                            SizedBox(height: 10),
-                            TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: phoneNumberController,
-                      decoration: InputDecoration(labelText: 'Phone Number'),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('number'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _sendOTP('email'),
-                    child: Text('Verify'),
-                  ),
-                ],
-                            ),
-                            SizedBox(height: 20),
-                            Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // update action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 32,
-                    ),
-                    backgroundColor: const Color(0xFF617DEF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                            ),
-                            ],
-                  ),
-              ),
+            ElevatedButton(
+              onPressed: _updatePatientData,
+              child: Text('Update Profile'),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
