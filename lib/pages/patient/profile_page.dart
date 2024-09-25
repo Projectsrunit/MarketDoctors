@@ -11,6 +11,8 @@ import 'package:market_doctor/pages/choose_action.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 
 
@@ -339,11 +341,9 @@ class UpdateProfilePatient extends StatefulWidget {
 class UpdateProfilePatientState extends State<UpdateProfilePatient> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController
- phoneNumberController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController
- busStopController = TextEditingController();
+  final TextEditingController busStopController = TextEditingController();
   final TextEditingController homeAddressController = TextEditingController();
 
   int? patientId;
@@ -373,9 +373,6 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
-      print("Retrieved patient data: $data"); // Log retrieved data
-      // Autofill the text fields with the retrieved data
       setState(() {
         firstNameController.text = data['firstName'] ?? '';
         lastNameController.text = data['lastName'] ?? '';
@@ -385,7 +382,6 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
         homeAddressController.text = data['home_address'] ?? '';
       });
     } else {
-      // Handle the error
       print('Failed to load patient data: ${response.statusCode}');
     }
   }
@@ -406,127 +402,71 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
     );
 
     if (response.statusCode == 200) {
-      // Handle successful update
       print('Profile updated successfully');
     } else {
-      // Handle update error
       print('Failed to update profile: ${response.statusCode}');
     }
-  }
-    
-
-  void _sendOTP(String type) {
-    int otp = _generateOTP();
-    // Call API to send OTP (Simulated here)
-    print("Sending OTP $otp to $type");
-
-    _showOTPPopup(type);
-  }
-
-  int _generateOTP() {
-    var random = Random();
-    return random.nextInt(900000) + 100000; // Generates a 6-digit OTP
-  }
-
-  void _showOTPPopup(String type) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter the OTP sent to your $type'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Enter OTP'),
-              ),
-              SizedBox(height: 10),
-              Text("Did not receive code? Ask for resend"),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Update Profile'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Update Profile',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: [
-                    TextField(
-                      controller: firstNameController,
-                      decoration: InputDecoration(labelText: 'First Name'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: lastNameController,
-                      decoration: InputDecoration(labelText: 'Last Name'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: phoneNumberController,
-                      decoration: InputDecoration(labelText: 'Phone Number'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: busStopController,
-                      decoration: InputDecoration(labelText: 'Nearest Bus Stop'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: homeAddressController,
-                      decoration: InputDecoration(labelText: 'Home Address'),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: updateProfile,
-                      child: Text('Update Profile'),
-                    ),
-                  ],
+      appBar: PatientAppBar(),
+      body: Center(
+        child: Container(
+          width: double.infinity,
+          margin: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 1.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: firstNameController,
+                  decoration: InputDecoration(labelText: 'First Name'),
                 ),
-              ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: lastNameController,
+                  decoration: InputDecoration(labelText: 'Last Name'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: phoneNumberController,
+                  decoration: InputDecoration(labelText: 'Phone Number'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(labelText: 'Email'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: busStopController,
+                  decoration: InputDecoration(labelText: 'Nearest Bus Stop'),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: homeAddressController,
+                  decoration: InputDecoration(labelText: 'Home Address'),
+                ),
+                SizedBox(height: 32), // Space before the button
+                Center(
+                  child: ElevatedButton(
+                    onPressed: updateProfile,
+                    child: Text('Update Profile'),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }
