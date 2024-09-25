@@ -361,9 +361,22 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   @override
   void initState() {
     super.initState();
-    _selectedGender = widget.caseData['gender']?.isEmpty ?? true
-        ? null
-        : widget.caseData['gender'];
+    _selectedGender = widget.caseData['gender']?.isEmpty ?? true ? null : widget.caseData['gender'];
+    _heightController.addListener(_calcBmi);
+    _weightController.addListener(_calcBmi);
+  }
+
+  void _calcBmi() {
+    final input1 = double.tryParse(_heightController.text);
+    final input2 = double.tryParse(_weightController.text);
+
+    if (input1 != null && input2 != null) {
+      _bmiController.text = (((input2 * 10) / input1).round() / 10).toString();
+    } else {
+      setState(() {
+        _bmiController.text = '';
+      });
+    }
   }
 
   @override

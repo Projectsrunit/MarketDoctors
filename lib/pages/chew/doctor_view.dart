@@ -101,12 +101,12 @@ class _DoctorViewState extends State<DoctorView> {
                   final doc = doctors[index];
                   return DoctorCard(
                     imageUrl:
-                        doc['picture_url'] ?? 'https://via.placeholder.com/120',
+                        doc['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
                     profession: (doc['specialisation'] != null &&
                             doc['specialisation'].isNotEmpty)
                         ? doc['specialisation']
-                        : 'General Practice_',
+                        : 'General Practice',
                     rating: 4.5,
                     onChatPressed: () {},
                     onViewProfilePressed: () {

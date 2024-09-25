@@ -256,7 +256,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                       child: TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Height',
-                          suffixText: 'cm',
+                          suffixText: 'meters',
                         ),
                         keyboardType: TextInputType.number,
                       ),
