@@ -87,7 +87,7 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
                               SizedBox(height: 8),
                               Text(
                                 tip['description'],
-                                style: TextStyle(fontSize: 14),
+                                style: TextStyle(fontSize: 16),
                               ),
                               SizedBox(height: 16),
                               Row(
