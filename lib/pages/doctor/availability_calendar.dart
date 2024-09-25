@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // For date formatting
@@ -35,7 +36,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     return Scaffold(
       appBar:
           doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -50,6 +51,11 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
             ],
           ),
         ),
+      ),
+       bottomNavigationBar: DoctorBottomNavBar(
+        firstName: widget.firstName,
+        lastName: widget.lastName,
+        id: widget.id,
       ),
     );
   }
