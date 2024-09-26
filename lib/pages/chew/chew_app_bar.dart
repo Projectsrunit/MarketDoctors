@@ -6,9 +6,6 @@ class ChewAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     Map? chewData = Provider.of<DataStore>(context).chewData;
-  // if (chewData == null) {
-  //   print('chewdata is null');
-  // }
 
     return AppBar(
       automaticallyImplyLeading: false,
@@ -18,7 +15,7 @@ class ChewAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.ac_unit),
+              child: chewData?['picture_url'] != null ? Image.network(chewData?['picture_url'], width: 112, height: 120, fit: BoxFit.cover,) : Icon(Icons.person),
             ),
             SizedBox(width: 8),
             Flexible(
