@@ -21,17 +21,34 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3)
+          ),
+        ],
+      ),
         child: Container(
-      height: 135,
+      height: 145,
       padding: const EdgeInsets.all(2.0),
       child: Row(
         children: [
           Padding(
             padding: const EdgeInsets.all(2.0),
-            child: Image.network(imageUrl, width: 120, height: 120, fit: BoxFit.cover,),
+            child: Image.network(imageUrl, width: 112, height: 120, fit: BoxFit.cover,),
           ),
-          SizedBox(width: 4),
+          SizedBox(width: 4), 
           Flex(
               crossAxisAlignment: CrossAxisAlignment.start,
               direction: Axis.vertical,
@@ -49,13 +66,9 @@ class DoctorCard extends StatelessWidget {
                         color: Colors.blue,
                         borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                    constraints: BoxConstraints(
-                      minHeight: 20,
-                      maxHeight: 25,
-                      maxWidth: double.infinity,
-                    ),
                     child: Text('View Profile',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                        style: TextStyle(fontSize: 13,
+                        fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 Padding(
@@ -65,11 +78,13 @@ class DoctorCard extends StatelessWidget {
                       Icon(Icons.star, color: Colors.amber, size: 16),
                       SizedBox(width: 4.0),
                       Text('$rating',
-                          style: TextStyle(color: Colors.amber, fontSize: 14)),
+                          style: TextStyle(color: Colors.amber, 
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14)),
                     ],
                   ),
                 ),
-                SizedBox(height: 8,),
+                SizedBox(height: 8),
                 GestureDetector(
                   onTap: onChatPressed,
                   child: Container(
@@ -81,10 +96,11 @@ class DoctorCard extends StatelessWidget {
                       minHeight: 24,
                     ),
                     child: Text('Chat with doctor',
-                        style: TextStyle(fontSize: 14, color: Colors.white)),
+                        style: TextStyle(fontSize: 13,
+                        fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
-                SizedBox(height: 4,)
+                // SizedBox(height: 4,)
               ]),
           SizedBox(width: 8.0),
           Expanded(
@@ -108,7 +124,7 @@ class DoctorCard extends StatelessWidget {
                       SizedBox(width: 4.0),
                       Text(
                         'available',
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 13),
                       ),
                     ],
                   ),
