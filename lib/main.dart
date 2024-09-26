@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/profile_page.dart';
+// import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -83,8 +83,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      home: ProfilePage(),
-      // home: OnboardingScreen()
+      // home: ProfilePage(),
+      home: OnboardingScreen()
     );
   }
 }
