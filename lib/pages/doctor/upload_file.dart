@@ -62,7 +62,7 @@ class DoctorsUploadCredentialsPage extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     const Text(
-                      'Regulation requires you to upload a certificate as a community health worker. Your data will stay safe and private with us.',
+                      'Regulation requires you to upload a certificating document as a doctor. Your data will stay safe and private with us.',
                       style: TextStyle(
                         fontSize: 16,
                       ),
