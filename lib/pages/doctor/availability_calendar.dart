@@ -2,24 +2,17 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // For environment variables
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:provider/provider.dart';
 
 class AvailabilityCalendar extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-  const AvailabilityCalendar({
-    super.key,
-    required this.firstName,
-    required this.lastName,
-    required this.id,
-  });
+  const AvailabilityCalendar({super.key});
 
   @override
   State<AvailabilityCalendar> createState() => _AvailabilityCalendarState();
@@ -34,8 +27,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
+      appBar: DoctorApp(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -52,11 +44,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           ),
         ),
       ),
-       bottomNavigationBar: DoctorBottomNavBar(
-        firstName: widget.firstName,
-        lastName: widget.lastName,
-        id: widget.id,
-      ),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 
@@ -65,7 +53,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Select Date',
+          'Select Date Available',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
@@ -110,6 +98,15 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
       '01:00 PM',
       '02:00 PM',
       '03:00 PM',
+      '04:00 PM',
+      '05:00 PM',
+      '06:00 PM',
+      '07:00 PM',
+      '08:00 PM',
+      '09:00 PM',
+      '10:00 PM',
+      '11:00 PM',
+      '00:00 AM',
     ];
 
     return Column(
@@ -151,13 +148,34 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     );
   }
 
+  String formatTime(String time) {
+    final DateFormat inputFormat = DateFormat('hh:mm a'); // '09:00 AM'
+    final DateFormat outputFormat = DateFormat('HH:mm:ss'); // '09:00:00'
+    DateTime dateTime = inputFormat.parse(time);
+    return outputFormat.format(dateTime);
+  }
+
+// List of time slots with start and end times
+  List<Map<String, String>> generateTimeSlotPairs(
+      List<String> selectedTimeSlots) {
+    List<Map<String, String>> timePairs = [];
+
+    for (int i = 0; i < selectedTimeSlots.length - 1; i++) {
+      timePairs.add({
+        'start_time': formatTime(selectedTimeSlots[i]),
+        'end_time': formatTime(selectedTimeSlots[i + 1]),
+      });
+    }
+
+    return timePairs;
+  }
+
   Future<void> _saveAvailability() async {
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
+
     if (_selectedDate == null || _selectedTimeSlots.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a date and at least one time slot.'),
-        ),
-      );
+      _showSnackBar('Please select a date and at least one time slot.');
       return;
     }
 
@@ -168,28 +186,17 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     String? baseUrl = dotenv.env['API_URL'];
     final uri = Uri.parse('$baseUrl/api/availabilities');
 
-    // Function to format time to HH:mm:ss
-    String formatTime(String time) {
-      final DateFormat inputFormat = DateFormat('hh:mm a'); // '09:00 AM'
-      final DateFormat outputFormat = DateFormat('HH:mm:ss'); // '09:00:00'
-      DateTime dateTime = inputFormat.parse(time);
-      return outputFormat.format(dateTime);
-    }
-
-    // Map over selected time slots and format them
-    List<String> formattedTimeSlots =
-        _selectedTimeSlots.map(formatTime).toList();
+    // Generate time slot pairs with start and end times
+    List<Map<String, String>> timeSlotPairs =
+        generateTimeSlotPairs(_selectedTimeSlots);
 
     final body = jsonEncode({
       "data": {
         "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
-        "time": formattedTimeSlots.join(','), // Join time slots if multiple
-        "users_permissions_user": {"id": int.parse(widget.id)},
+        "users_permissions_user": doctorData?['id'],
+        "available_time": timeSlotPairs, // Provide the array of time slots
       },
     });
-
-    // Log the request body
-    print('Request body: $body');
 
     final headers = {
       'Content-Type': 'application/json',
@@ -198,28 +205,27 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     try {
       final response = await http.post(uri, body: body, headers: headers);
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Availability saved successfully!')),
-        );
+        _showSnackBar('Availability saved successfully!');
         setState(() {
           _selectedDate = null;
           _selectedTimeSlots.clear();
         });
       } else {
-        print('Response body: ${response.body}'); // Log the response body
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save: ${response.reasonPhrase}')),
-        );
+        print('Response body: ${response.body}');
+        _showSnackBar('Failed to save: ${response.reasonPhrase}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showSnackBar('Error: $e');
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildSaveButton() {

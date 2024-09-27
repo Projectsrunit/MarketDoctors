@@ -1,12 +1,18 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
+import 'package:market_doctor/pages/doctor/upload_file.dart';
+import 'package:market_doctor/pages/upload_file.dart';
+import 'package:provider/provider.dart';
 
 class DoctorSignUpPage extends StatefulWidget {
   const DoctorSignUpPage({super.key});
@@ -71,13 +77,19 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             body: json.encode(signUpData),
           );
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            _showSnackBar('Sign up successful');
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => const DoctorCheckInboxPage()),
-            );
-          } else {
+          if (response.statusCode == 200) {
+          var responseBody = jsonDecode(response.body);
+          //to get full user record with profile picture etc
+          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          final fullRecord = await http.get(url);
+          if (fullRecord.statusCode == 200) {
+            var recordBody = jsonDecode(fullRecord.body);
+            
+            context.read<DataStore>().updateDoctorData(recordBody);
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => DoctorsUploadCredentialsPage()));
+          }
+        } else {
             _showSnackBar('Sign up failed: ${response.body}');
           }
         } catch (e) {

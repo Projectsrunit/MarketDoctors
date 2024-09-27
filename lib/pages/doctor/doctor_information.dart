@@ -10,19 +10,19 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:market_doctor/pages/doctor/check_inbox.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:provider/provider.dart';
 
-class DoctorFormPage extends StatefulWidget {
-  const DoctorFormPage({
+class DoctorInformation extends StatefulWidget {
+  const DoctorInformation({
     super.key,
   });
 
   @override
-  State<DoctorFormPage> createState() => _DoctorFormPageState();
+  State<DoctorInformation> createState() => _DoctorInformationPageState();
 }
 
-class _DoctorFormPageState extends State<DoctorFormPage> {
+class _DoctorInformationPageState extends State<DoctorInformation> {
   final _formKey = GlobalKey<FormState>();
   final _yearsOfExperienceController = TextEditingController();
   final _clinicHealthFacilityController = TextEditingController();
@@ -97,7 +97,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           _showSnackBar('User updated successfully!');
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => DoctorCheckInboxPage(),
+              builder: (context) => AvailabilityCalendar(),
             ),
           );
         } else {
@@ -170,9 +170,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     final doctorData = Provider.of<DataStore>(context).doctorData;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Doctor KYC'),
-      ),
+      appBar: DoctorApp(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Form(
