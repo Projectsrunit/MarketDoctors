@@ -5,21 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:market_doctor/pages/chew/chew_home.dart';
-import 'package:market_doctor/pages/chew/payments_main_widget.dart';
-import 'package:market_doctor/pages/chew/update_qualification_chew.dart';
+import 'package:market_doctor/pages/doctor/payments_main_widget.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_form.dart';
+import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:provider/provider.dart';
 
 class DoctorProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorApp(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -54,7 +53,7 @@ class DoctorProfilePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 
@@ -68,7 +67,7 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.payment, "Manage payments", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ManagePaymentsChew()));
+              MaterialPageRoute(builder: (context) => ManagePaymentsDoctor()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.school, "Update qualifications", () {
@@ -98,9 +97,9 @@ class DoctorProfilePage extends StatelessWidget {
         _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
-          context.read<DataStore>().updateChewData(null);
+          context.read<DataStore>().updateDoctorData(null);
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ChewHome()));
+              context, MaterialPageRoute(builder: (context) => DashboardPage()));
         }),
       ],
     );
@@ -207,15 +206,15 @@ class DoctorProfilePage extends StatelessWidget {
   }
 }
 
-class ManagePaymentsChew extends StatefulWidget {
+class ManagePaymentsDoctor extends StatefulWidget {
   @override
-  ManagePaymentsChewState createState() => ManagePaymentsChewState();
+  ManagePaymentsDoctorState createState() => ManagePaymentsDoctorState();
 }
 
-class ManagePaymentsChewState extends State<ManagePaymentsChew> {
+class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
   String backendUrl = dotenv.env['API_URL']!;
 
-  void _showAddBankAccountPopup(int chewId) {
+  void _showAddBankAccountPopup(int doctorId) {
     final TextEditingController bankNameController = TextEditingController();
     final TextEditingController accountNumberController =
         TextEditingController();
@@ -271,7 +270,7 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                   'accountHolder': accountHolderController.text,
                   'bankName': bankNameController.text,
                   'accountNumber': accountNumberController.text,
-                  'user': chewId
+                  'user': doctorId
                 };
                 try {
                   final response = await http.post(
@@ -410,9 +409,9 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
 
   @override
   Widget build(BuildContext context) {
-    Map? chewData = context.watch<DataStore>().chewData;
+    Map? doctorData = context.watch<DataStore>().doctorData;
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorApp(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -426,12 +425,12 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
             ImportantRemindersWidget(),
             Divider(thickness: 2),
             Expanded(
-              child: chewData?['payments'] != null &&
-                      chewData?['payments'].isNotEmpty
+              child: doctorData?['payments'] != null &&
+                      doctorData?['payments'].isNotEmpty
                   ? ListView.builder(
-                      itemCount: chewData?['payments'].length,
+                      itemCount: doctorData?['payments'].length,
                       itemBuilder: (context, index) {
-                        var payment = chewData?['payments'][index];
+                        var payment = doctorData?['payments'][index];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: DottedBorder(
@@ -514,24 +513,24 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () => _showAddBankAccountPopup(chewData?['id']),
+                onPressed: () => _showAddBankAccountPopup(doctorData?['id']),
                 child: Text('Add a new bank account'),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }
 
-class UpdateProfileChew extends StatefulWidget {
+class UpdateProfileDoctor extends StatefulWidget {
   @override
-  UpdateProfileChewState createState() => UpdateProfileChewState();
+  UpdateProfileDoctorState createState() => UpdateProfileDoctorState();
 }
 
-class UpdateProfileChewState extends State<UpdateProfileChew> {
+class UpdateProfileDoctorState extends State<UpdateProfileDoctor> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -581,7 +580,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
     );
   }
 
-  Future<int> _updateChewProfile(chewId) async {
+  Future<int> _updateDoctorProfile(doctorId) async {
     Fluttertoast.showToast(
       msg: 'Updating...',
       toastLength: Toast.LENGTH_SHORT,
@@ -593,7 +592,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
     );
 
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/users/$chewId');
+    final Uri url = Uri.parse('$baseUrl/api/users/$doctorId');
 
     try {
       Map body = {
@@ -640,15 +639,15 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
 
   @override
   Widget build(BuildContext context) {
-    Map? chewData = context.read<DataStore>().chewData!;
+    Map? doctorData = context.read<DataStore>().doctorData!;
 
-    firstNameController.text = chewData['firstName'] ?? '';
-    lastNameController.text = chewData['lastName'] ?? '';
-    emailController.text = chewData['email'] ?? '';
-    phoneNumberController.text = chewData['phone'] ?? '';
+    firstNameController.text = doctorData['firstName'] ?? '';
+    lastNameController.text = doctorData['lastName'] ?? '';
+    emailController.text = doctorData['email'] ?? '';
+    phoneNumberController.text = doctorData['phone'] ?? '';
 
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorApp(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
@@ -718,10 +717,10 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
                         child: ElevatedButton(
                           onPressed: () async {
                             final updated =
-                                await _updateChewProfile(chewData['id']);
+                                await _updateDoctorProfile(doctorData['id']);
                             if (updated == 200) {
-                              context.read<DataStore>().updateChewData({
-                                ...chewData,
+                              context.read<DataStore>().updateDoctorData({
+                                ...doctorData,
                                 'firstName': firstNameController.text,
                                 'lastName': lastNameController.text,
                                 'email': emailController.text,
@@ -758,7 +757,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }
