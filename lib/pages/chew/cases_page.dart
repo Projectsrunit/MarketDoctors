@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
@@ -170,21 +171,26 @@ class CasesPageState extends State<CasesPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search cases...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            height: 40,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Search cases",
+                                  hintStyle: GoogleFonts.nunito(
+                                    textStyle: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 8), // Reduce vertical padding
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue),
-                              ),
-                            ),
                           ),
                         ),
                         IconButton(
@@ -361,7 +367,9 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   @override
   void initState() {
     super.initState();
-    _selectedGender = widget.caseData['gender']?.isEmpty ?? true ? null : widget.caseData['gender'];
+    _selectedGender = widget.caseData['gender']?.isEmpty ?? true
+        ? null
+        : widget.caseData['gender'];
     _heightController.addListener(_calcBmi);
     _weightController.addListener(_calcBmi);
   }
