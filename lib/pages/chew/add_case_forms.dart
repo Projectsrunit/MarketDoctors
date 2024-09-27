@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/main.dart';
 import 'dart:convert';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:market_doctor/pages/show_custom_toast.dart';
 import 'package:provider/provider.dart';
 
 class AddCaseForms extends StatelessWidget {
@@ -487,7 +487,15 @@ class AddCaseForm2State extends State<AddCaseForm2> {
   }
 
   Future<void> _saveData(chewId) async {
-    showCustomToast(context, 'Saving...');
+    Fluttertoast.showToast(
+          msg: 'Saving...',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases');
     try {
@@ -523,7 +531,15 @@ class AddCaseForm2State extends State<AddCaseForm2> {
       );
 
       if (response.statusCode == 200) {
-        showCustomToast(context, 'Case added successfully');
+        Fluttertoast.showToast(
+          msg: 'Case added successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -536,7 +552,15 @@ class AddCaseForm2State extends State<AddCaseForm2> {
       }
     } catch (e) {
       print('this is the error: $e');
-      showCustomToast(context, 'Failed. Please try again');
+      Fluttertoast.showToast(
+        msg: 'Failed. Please try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
