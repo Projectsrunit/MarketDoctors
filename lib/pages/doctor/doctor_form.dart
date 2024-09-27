@@ -109,171 +109,211 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     }
   }
 
-  Widget _buildProfileImagePicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Profile Image',
-            style: TextStyle(fontSize: 16, color: Colors.black87)),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Pick Image'),
+Widget _buildProfileImagePicker() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Profile Image',
+        style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+      Row(
+        children: [
+          ElevatedButton.icon(
+            onPressed: _pickImage,
+            icon: const Icon(Icons.image),
+            label: const Text('Pick Image'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            const SizedBox(width: 16),
-            _profileImage != null
-                ? Image.file(_profileImage!,
-                    width: 100, height: 100, fit: BoxFit.cover)
-                : Container(
+          ),
+          const SizedBox(width: 16),
+          _profileImage != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    _profileImage!,
                     width: 100,
                     height: 100,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.camera_alt, color: Colors.white),
+                    fit: BoxFit.cover,
                   ),
-          ],
-        ),
-      ],
-    );
-  }
+                )
+              : Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 40),
+                ),
+        ],
+      ),
+    ],
+  );
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final doctorData = Provider.of<DataStore>(context).doctorData;
+@override
+Widget build(BuildContext context) {
+  final doctorData = Provider.of<DataStore>(context).doctorData;
 
-    return Scaffold(
-      appBar: DoctorApp(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
+  return Scaffold(
+    appBar: DoctorApp(),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(20.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Doctor Form',
+                style: TextStyle(
+                  fontSize: 26,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[400]!, width: 1.0),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(12.0),
                 child: Text(
-                  'Doctor Form',
+                  'Doctor ${doctorData?['firstName'] ?? ''} ${doctorData?['lastName'] ?? ''}',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     color: Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1.0),
-                  ),
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Doctor ${doctorData?['firstName'] ?? ''} ${doctorData?['lastName'] ?? ''}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildLabeledTextField(
-                controller: _yearsOfExperienceController,
-                labelText: 'Years of Experience',
-              ),
-              const SizedBox(height: 16),
-              _buildLabeledTextField(
-                controller: _clinicHealthFacilityController,
-                labelText: 'Clinic / Health Facility',
-              ),
-              const SizedBox(height: 16),
-              _buildLabeledTextField(
-                controller: _specializationController,
-                labelText: 'Specialization',
-              ),
-              const SizedBox(height: 20),
-              _buildLabeledTextField(
-                controller: _languageController,
-                labelText: 'Languages',
-              ),
-              const SizedBox(height: 16),
-              _buildLabeledTextField(
-                controller: _awardsAndRecognitionController,
-                labelText: 'Awards & Recognition',
-              ),
-              const SizedBox(height: 16),
-              _buildProfileImagePicker(),
-              const SizedBox(height: 30),
-              _buildSaveButton(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 30),
+            _buildLabeledTextField(
+              controller: _yearsOfExperienceController,
+              labelText: 'Years of Experience',
+            ),
+            const SizedBox(height: 20),
+            _buildLabeledTextField(
+              controller: _clinicHealthFacilityController,
+              labelText: 'Clinic / Health Facility',
+            ),
+            const SizedBox(height: 20),
+            _buildLabeledTextField(
+              controller: _specializationController,
+              labelText: 'Specialization',
+            ),
+            const SizedBox(height: 20),
+            _buildLabeledTextField(
+              controller: _languageController,
+              labelText: 'Languages',
+            ),
+            const SizedBox(height: 20),
+            _buildLabeledTextField(
+              controller: _awardsAndRecognitionController,
+              labelText: 'Awards & Recognition',
+            ),
+            const SizedBox(height: 20),
+            _buildProfileImagePicker(),
+            const SizedBox(height: 30),
+            _buildSaveButton(),
+          ],
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
-    );
-  }
+    ),
+    bottomNavigationBar: DoctorBottomNavBar(),
+  );
+}
 
-  Widget _buildLabeledTextField({
-    required TextEditingController controller,
-    required String labelText,
-  }) {
-    return Row(
+Widget _buildLabeledTextField({
+  required TextEditingController controller,
+  required String labelText,
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 150,
-          child: Text(
-            labelText,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+        Text(
+          labelText,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            keyboardType: labelText == 'Years of Experience'
-                ? TextInputType.number
-                : TextInputType.text,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-              hintText: labelText == 'Awards & Recognition'
-                  ? 'Enter your awards and recognitions'
-                  : null,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: labelText == 'Years of Experience'
+              ? TextInputType.number
+              : TextInputType.text,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
-            maxLines: labelText == 'Awards & Recognition' ? 4 : 1,
-            validator: (value) {
-              if (labelText == 'Years of Experience') {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your years of experience';
-                }
-                final int? years = int.tryParse(value);
-                if (years == null || years < 0) {
-                  return 'Please enter a valid number';
-                }
-              } else if (labelText == 'Awards & Recognition') {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your awards and recognitions';
-                }
-              }
-              return null;
-            },
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
+            hintText: labelText == 'Awards & Recognition'
+                ? 'Enter your awards and recognitions'
+                : null,
           ),
+          maxLines: labelText == 'Awards & Recognition' ? 4 : 1,
+          validator: (value) {
+            if (labelText == 'Years of Experience') {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your years of experience';
+              }
+              final int? years = int.tryParse(value);
+              if (years == null || years < 0) {
+                return 'Please enter a valid number';
+              }
+            } else if (labelText == 'Awards & Recognition') {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your awards and recognitions';
+              }
+            }
+            return null;
+          },
         ),
       ],
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
+    return Align(
+      alignment: Alignment.centerRight,
       child: ElevatedButton(
-        onPressed: _updateUser,
-        child: const Text('Save'),
+        onPressed: _updateUser, // Disable button when loading
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.blueAccent,
+        ),
+        child: const Text(
+          'Save',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
       ),
     );
   }

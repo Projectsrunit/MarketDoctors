@@ -37,7 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 16),
             _buildDashboardCards(userId),
             const SizedBox(height: 16),
-            _buildBanner(),
+            AdvertisementCarousel(),
             const SizedBox(height: 16),
             _buildNextAppointmentSection(),
           ],
@@ -191,19 +191,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      height: 120,
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color(0xFF617DEF).withOpacity(0.5),
-      ),
-      child: Row(children:  [
-        AdvertisementCarousel(),
-      ]),
-    );
-  }
+
 
   Widget _buildNextAppointmentSection() {
     return Column(
