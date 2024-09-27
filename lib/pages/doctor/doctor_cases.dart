@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:provider/provider.dart';
 
 enum IconType { information, edit, delete }
@@ -154,10 +155,10 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
   @override
   Widget build(BuildContext context) {
 
-    List? cases = context.watch<DataStore>().chewData?['cases'];
+    List? cases = context.watch<DataStore>().doctorData?['cases'];
 
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorApp(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -257,7 +258,7 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }

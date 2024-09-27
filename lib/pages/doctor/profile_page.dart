@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
+import 'package:market_doctor/pages/doctor/doctor_information.dart';
 import 'package:market_doctor/pages/doctor/payments_main_widget.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -20,7 +22,7 @@ class DoctorProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DoctorApp(),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
@@ -30,7 +32,7 @@ class DoctorProfilePage extends StatelessWidget {
                 children: [
                   Icon(Icons.person_outline),
                   SizedBox(width: 8),
-                  Text('General',
+                  Text('Doctor',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
@@ -63,20 +65,25 @@ class DoctorProfilePage extends StatelessWidget {
       children: [
         _buildArrowRow(Icons.account_circle, "Profile information", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DoctorFormPage()));
+              MaterialPageRoute(builder: (context) => DoctorInformation()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.payment, "Manage payments", () {
+        _buildArrowRow(Icons.medical_services, "Patient Overview", () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => ManagePaymentsDoctor()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.school, "Update qualifications", () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DoctorFormPage()));
+        _buildArrowRow(Icons.task_alt_outlined, "Task Management", () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AvailabilityCalendar()));
         }),
+        Divider(color: Colors.grey[300], thickness: 1),
+        _buildArrowRow(Icons.medical_information_outlined, "Medical Profile",
+            () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AvailabilityCalendar()));
+        }),
+        Divider(color: Colors.grey[300], thickness: 2),
       ],
     );
   }
@@ -89,18 +96,21 @@ class DoctorProfilePage extends StatelessWidget {
         _buildModeToggleRow(
             context, Icons.dark_mode, "Dark mode", themeNotifier.toggleTheme),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildNoArrowRow(
-            context, Icons.lock, "Change password", _showPasswordPopup),
+        _buildNoArrowRow(context, Icons.chat_rounded, "Communication Type",
+            _showPasswordPopup),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(
-            context, Icons.pin, "Change transaction pin", _showPinPopup),
+            context, Icons.notifications, "Emergency Alert", _showPinPopup),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
         Divider(color: Colors.grey[300], thickness: 1),
+        _buildNoArrowRow(context, Icons.person_2,
+            "Upload / Update Profile", _showPinPopup),
+        Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateDoctorData(null);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ChooseUserTypePage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ChooseUserTypePage()));
         }),
       ],
     );
@@ -479,9 +489,11 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
                                                     Brightness.dark
                                                 ? Colors.white
                                                 : Colors.black,
-                                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                       ),
                                       onPressed: () =>
@@ -727,7 +739,7 @@ class UpdateProfileDoctorState extends State<UpdateProfileDoctor> {
                                 'email': emailController.text,
                                 'phone': phoneNumberController.text
                               });
-        
+
                               Navigator.pop(context);
                             }
                           },
