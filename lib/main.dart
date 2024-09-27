@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:market_doctor/pages/chew/profile_page.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,6 +19,16 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  TextStyle _buildTextStyle(double fontSize, {Color? color}) {
+    return TextStyle(
+      fontSize: fontSize,
+      backgroundColor: Colors.transparent,
+      wordSpacing: 0,
+      decorationThickness: 0,
+      color: color,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
@@ -29,14 +39,14 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         primaryColor: const Color.fromARGB(255, 111, 136, 223),
-        textTheme: GoogleFonts.nunitoTextTheme( // Apply Nunito font globally
+        textTheme: GoogleFonts.nunitoTextTheme(
           Theme.of(context).textTheme.copyWith(
-                bodyLarge: const TextStyle(fontSize: 18), // Default font size for body text
-                bodyMedium: const TextStyle(fontSize: 16),
-                headlineLarge: const TextStyle(fontSize: 32),
-                headlineMedium: const TextStyle(fontSize: 28),
-                headlineSmall: const TextStyle(fontSize: 24),
-                bodySmall: const TextStyle(fontSize: 12),
+                bodyLarge: _buildTextStyle(18),
+                bodyMedium: _buildTextStyle(16),
+                headlineLarge: _buildTextStyle(32),
+                headlineMedium: _buildTextStyle(28),
+                headlineSmall: _buildTextStyle(24),
+                bodySmall: _buildTextStyle(12),
               ),
         ),
         textButtonTheme: TextButtonThemeData(
@@ -59,11 +69,12 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
         primaryColor: const Color.fromARGB(255, 111, 136, 223),
-        textTheme: GoogleFonts.nunitoTextTheme( // Apply Nunito font in dark theme too
+        textTheme: GoogleFonts.nunitoTextTheme(
           Theme.of(context).textTheme.copyWith(
-                bodyLarge: const TextStyle(fontSize: 18, color: Colors.white),
-                bodyMedium: const TextStyle(fontSize: 16, color: Colors.white),
-                headlineLarge: const TextStyle(fontSize: 32, color: Colors.white),
+                bodyLarge: _buildTextStyle(18, color: Colors.white),
+                bodyMedium: _buildTextStyle(16, color: Colors.white),
+                headlineLarge: _buildTextStyle(32, color: Colors.white),
+                headlineMedium: _buildTextStyle(28, color: Colors.white),
               ),
         ),
         textButtonTheme: TextButtonThemeData(
@@ -83,8 +94,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      // home: ProfilePage(),
-      home: OnboardingScreen()
+      home: ChooseUserTypePage(),
+      // home: OnboardingScreen()
     );
   }
 }
@@ -95,7 +106,8 @@ class ThemeNotifier extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
 
   void toggleTheme() {
-    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    _themeMode =
+        _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     notifyListeners();
   }
 }
@@ -111,6 +123,23 @@ class DataStore with ChangeNotifier {
   void updateChewData(Map? newValue) {
     userData = newValue;
     notifyListeners();
+  }
+
+  void removePayment(int index) {
+    if (userData != null && userData?['payments'] != null) {
+      userData?['payments'].removeAt(index);
+      notifyListeners();
+    }
+  }
+
+  void addPayment(Map payment) {
+    if (userData != null) {
+      if (userData!['payments'] == null) {
+        userData!['payments'] = [];
+      }
+      userData!['payments'].add(payment);
+      notifyListeners();
+    }
   }
 
   void updatePatientData(Map? newValue) {
@@ -138,7 +167,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPageData(
       title: 'Healthcare Provision Just for You',
-      description: 'Explore opportunities you deserve. Discover care that safeguards you.',
+      description:
+          'Explore opportunities you deserve. Discover care that safeguards you.',
       imageUrl: 'assets/images/medical-care.png',
     ),
     OnboardingPageData(
