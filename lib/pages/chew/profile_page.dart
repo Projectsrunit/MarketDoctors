@@ -417,17 +417,17 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bank accounts',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(
+              'Bank accounts',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 10),
             ImportantRemindersWidget(),
             Divider(thickness: 2),
-            SingleChildScrollView(
+            Expanded(
               child: chewData?['payments'] != null &&
                       chewData?['payments'].isNotEmpty
                   ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
                       itemCount: chewData?['payments'].length,
                       itemBuilder: (context, index) {
                         var payment = chewData?['payments'][index];
@@ -445,42 +445,48 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                               padding: EdgeInsets.all(16),
                               child: Row(
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        payment['accountHolder'] ?? 'No Name',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                          'Bank: ${payment['bankName'] ?? 'No Bank Name'}'),
-                                      Text(
-                                          'Account Number: ${payment['accountNumber'] ?? 'No Account'}'),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.grey[700]
-                                              : Colors.grey[400],
-                                      foregroundColor:
-                                          Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          payment['accountHolder'] ?? 'No Name',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                            'Bank: ${payment['bankName'] ?? 'No Bank Name'}'),
+                                        Text(
+                                            'Account Number: ${payment['accountNumber'] ?? 'No Account'}'),
+                                      ],
                                     ),
-                                    onPressed: () =>
-                                        _confirmDelete(index, payment['id']),
-                                    child: Text('Delete'),
+                                  ),
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    width: 80,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey[700]
+                                                : Colors.grey[400],
+                                        foregroundColor:
+                                            Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black,
+                                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      onPressed: () =>
+                                          _confirmDelete(index, payment['id']),
+                                      child: Text('Delete'),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -489,20 +495,15 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                         );
                       },
                     )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Center(
-                        child: Text(
-                          'No bank accounts added yet',
-                          style: TextStyle(
-                              fontSize: 16, fontStyle: FontStyle.italic),
-                        ),
+                  : Center(
+                      child: Text(
+                        'No bank accounts added yet',
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
                       ),
                     ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
