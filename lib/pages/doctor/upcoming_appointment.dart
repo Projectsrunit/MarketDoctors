@@ -2,17 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 
 class UpcomingAppointmentPage extends StatelessWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-
-  UpcomingAppointmentPage({
-    required this.firstName,
-    required this.lastName,
-    required this.id,
-
-  });
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -33,12 +22,7 @@ class UpcomingAppointmentPage extends StatelessWidget {
             PendingAppointmentsTab(),
           ],
         ),
-        bottomNavigationBar: DoctorBottomNavBar(
-          firstName: firstName,
-          lastName: lastName,
-          id: id,
-
-        ),
+        bottomNavigationBar: DoctorBottomNavBar(),
       ),
     );
   }

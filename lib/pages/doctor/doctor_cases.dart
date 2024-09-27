@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 enum IconType { information, edit, delete }
 
 class DoctorCasesPage extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-  DoctorCasesPage(
-      {required this.firstName, required this.lastName, required this.id});
-
   @override
   DoctorCasesPageState createState() => DoctorCasesPageState();
 }
@@ -22,32 +19,49 @@ class DoctorCasesPage extends StatefulWidget {
 class DoctorCasesPageState extends State<DoctorCasesPage> {
   int? _activeCaseIndex;
   IconType? _activeIconType;
-  List<dynamic> cases = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchCases();
   }
 
-  Future<void> fetchCases() async {
-    final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=11');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      final List<dynamic> data = jsonData['data'];
-      setState(() {
-        cases = data;
-        isLoading = false;
-      });
-    } else {
-      print('Failed to load doctors');
-    }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
-  void _onIconTapped(int caseIndex, IconType iconType) {
+  // Future<void> fetchCases() async {
+  //   int chewId = context.watch<DataStore>().chewData?['id'];
+
+  //   final String baseUrl = dotenv.env['API_URL']!;
+  //   final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=$chewId');
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> jsonData = json.decode(response.body);
+  //       final List<dynamic> data = jsonData['data'];
+  //       setState(() {
+  //         // cases = data;
+  //         // isLoading = false;
+  //       });
+  //     } else {
+  //       print('Failed to load doctors');
+  //     }
+  //   } catch (e) {
+  //     print('this is the error: $e');
+  //     Fluttertoast.showToast(
+  //       msg: 'Failed to load. Try again',
+  //       toastLength: Toast.LENGTH_SHORT,
+  //       gravity: ToastGravity.CENTER,
+  //       timeInSecForIosWeb: 3,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,
+  //     );
+  //   }
+  // }
+
+  void _onIconTapped(int caseIndex, IconType iconType, [int? caseId]) {
     setState(() {
       if (_activeCaseIndex == caseIndex && _activeIconType == iconType) {
         _activeCaseIndex = null;
@@ -57,18 +71,18 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
         _activeIconType = iconType;
 
         if (iconType == IconType.delete) {
-          _showDeleteConfirmationDialog(caseIndex);
+          _showDeleteConfirmationDialog(caseIndex, caseId);
         }
       }
     });
   }
 
-  void _showDeleteConfirmationDialog(int index) {
+  void _showDeleteConfirmationDialog(int index, int? caseId) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete this file?'),
+          title: Text('Are you sure you want to delete this case?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -78,18 +92,49 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
                   _activeIconType = null;
                 });
               },
-              child: Text('No'),
+              child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                // Handle delete action (you can add specific logic here)
+                final String baseUrl = dotenv.env['API_URL']!;
+                final Uri url = Uri.parse('$baseUrl/api/cases/$caseId');
+                try {
+                  final response = await http.delete(url);
+                  if (response.statusCode == 200) {
+                    Fluttertoast.showToast(
+                      msg: 'Deleted successfully',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                    // setState(() {
+                    //   cases.removeAt(index);
+                    // });
+                  } else {
+                    print('this is the response ${response.body}');
+                    throw Exception('Failed to delete');
+                  }
+                } catch (e) {
+                  Fluttertoast.showToast(
+                    msg: 'Failed. Please try again',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 3,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                }
                 setState(() {
                   _activeCaseIndex = null;
                   _activeIconType = null;
                 });
               },
-              child: Text('Yes'),
+              child: Text('Delete'),
             ),
           ],
         );
@@ -97,11 +142,22 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
     );
   }
 
+  void updateCases(int index, Map<String, dynamic> updatedCase) {
+    // setState(() {
+    //   cases[index] = {
+    //     ...cases[index],
+    //     'attributes': {...cases[index], ...updatedCase}
+    //   };
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    List? cases = context.watch<DataStore>().chewData?['cases'];
+
     return Scaffold(
-      appBar:
-          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
+      appBar: ChewAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -114,26 +170,34 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              prefixIcon:
-                                  const Icon(Icons.search, color: Colors.black),
-                              hintText: 'Search Cases, Appointment , Pharmacy',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            height: 40,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Search cases",
+                                  hintStyle: GoogleFonts.nunito(
+                                    textStyle: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 8), // Reduce vertical padding
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.blue),
-                              ),
-                            ),
                           ),
                         ),
+                        IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            // Handle search action
+                          },
+                        )
                       ],
                     ),
                     SizedBox(height: 20),
@@ -152,34 +216,31 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    if (isLoading) ...[
-                      SizedBox(
-                        height: 100,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ] else if (cases.isNotEmpty)
+                  children: [                    
+                    if ( cases != null && cases.isNotEmpty)
                       ...cases.asMap().entries.map<Widget>((entry) {
                         final index = entry.key;
                         final caseData = entry.value;
                         return Column(
                           children: [
                             CaseInstance(
-                              firstName: caseData['attributes']['first_name'],
-                              lastName: caseData['attributes']['last_name'],
+                              firstName: caseData['first_name'],
+                              lastName: caseData['last_name'],
                               isActive: _activeCaseIndex == index,
                               activeIconType: _activeIconType,
-                              onIconTapped: (iconType) =>
-                                  _onIconTapped(index, iconType),
+                              onIconTapped: (iconType) => _onIconTapped(
+                                  index, iconType, caseData['id']),
                             ),
                             if (_activeCaseIndex == index)
                               CaseInstanceDetails(
-                                  editable: _activeCaseIndex == index &&
-                                      _activeIconType == IconType.edit,
-                                  saveId: caseData['id'],
-                                  caseData: caseData['attributes']),
+                                editable: _activeCaseIndex == index &&
+                                    _activeIconType == IconType.edit,
+                                saveId: caseData['id'],
+                                caseData: Map<String, dynamic>.from(
+                                    caseData),
+                                index: index,
+                                updateCases: updateCases,
+                              ),
                           ],
                         );
                       })
@@ -196,11 +257,7 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(
-        firstName: widget.firstName,
-        lastName: widget.lastName,
-        id: widget.id,
-      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
@@ -270,12 +327,16 @@ class CaseInstanceDetails extends StatefulWidget {
   final Map<String, dynamic> caseData;
   final bool editable;
   final int saveId;
+  final int index;
+  final Function(int, Map<String, dynamic>) updateCases;
 
   CaseInstanceDetails(
       {super.key,
       required this.caseData,
       required this.editable,
-      required this.saveId});
+      required this.saveId,
+      required this.index,
+      required this.updateCases});
 
   @override
   State<CaseInstanceDetails> createState() => _CaseInstanceDetailsState();
@@ -284,10 +345,8 @@ class CaseInstanceDetails extends StatefulWidget {
 class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _dateOfBirthController = TextEditingController();
-  final _homeAddressController = TextEditingController();
   final _bloodPressureController = TextEditingController();
-  final _genderController = TextEditingController();
+  String? _selectedGender;
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
   final _bmiController = TextEditingController();
@@ -296,10 +355,12 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _currentPrescriptionController = TextEditingController();
   final _chewsNotesController = TextEditingController();
 
-  
   @override
   void initState() {
     super.initState();
+    _selectedGender = widget.caseData['gender']?.isEmpty ?? true
+        ? null
+        : widget.caseData['gender'];
     _heightController.addListener(_calcBmi);
     _weightController.addListener(_calcBmi);
   }
@@ -319,21 +380,21 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
 
   @override
   Widget build(BuildContext context) {
-    _emailController.text = widget.caseData['email'] ?? '';
-    _phoneController.text = widget.caseData['phone_number'] ?? '';
-    _homeAddressController.text = widget.caseData['home_address'] ?? '';
-    _dateOfBirthController.text = widget.caseData['date_of_birth'] ?? '';
-    _bloodPressureController.text = widget.caseData['blood_pressure'] ?? '';
-    _genderController.text = widget.caseData['gender'] ?? '';
-    _weightController.text = widget.caseData['weight'] ?? '';
-    _heightController.text = widget.caseData['height'] ?? '';
-    _bmiController.text = widget.caseData['bmi'] ?? '';
-    _bloodGlucoseController.text = widget.caseData['blood_glucose'] ?? '';
+    _emailController.text = widget.caseData['email']?.toString() ?? '';
+    _phoneController.text = widget.caseData['phone_number']?.toString() ?? '';
+    _bloodPressureController.text =
+        widget.caseData['blood_pressure']?.toString() ?? '';
+    _weightController.text = widget.caseData['weight']?.toString() ?? '';
+    _heightController.text = widget.caseData['height']?.toString() ?? '';
+    _bmiController.text = widget.caseData['bmi']?.toString() ?? '';
+    _bloodGlucoseController.text =
+        widget.caseData['blood_glucose']?.toString() ?? '';
     _existingConditionController.text =
-        widget.caseData['existing_condition'] ?? '';
+        widget.caseData['existing_condition']?.toString() ?? '';
     _currentPrescriptionController.text =
-        widget.caseData['current_prescription'] ?? '';
-    _chewsNotesController.text = widget.caseData['doctors_note'] ?? '';
+        widget.caseData['current_prescription']?.toString() ?? '';
+    _chewsNotesController.text =
+        widget.caseData['chews_notes']?.toString() ?? '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -350,31 +411,23 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildTextField('Date Of Birth', _dateOfBirthController),
-              SizedBox(
-                height: 4,
-              ),
-              _buildGenderDropdown(_genderController),
+              _buildTextField('Email', _emailController),
               SizedBox(
                 height: 4,
               ),
               _buildTextField('Phone Number', _phoneController),
-              SizedBox(
-                height: 4,
-              ),
-              _buildTextField('Address No', _homeAddressController),
-              SizedBox(
-                height: 4,
-              ),
-              _buildTextField('Email Address', _emailController),
               SizedBox(height: 20),
               Text(
-                'Medical History',
+                'Medical Details',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               _buildTextField(
                   'Blood Pressure', _bloodGlucoseController, 'mmHg'),
+              SizedBox(
+                height: 4,
+              ),
+              _buildGenderDropdown(),
               SizedBox(
                 height: 4,
               ),
@@ -405,12 +458,13 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(
                 height: 4,
               ),
-              _buildTextArea('Doctor\'s Notes', _chewsNotesController),
+              _buildTextArea('CHEW\'s Notes', _chewsNotesController),
               SizedBox(height: 20),
               if (widget.editable)
                 ElevatedButton(
                   onPressed: () async {
-                    await _saveData();
+                    final updatedData = await _saveData();
+                    widget.updateCases(widget.index, updatedData);
                   },
                   child: Text('Save'),
                 ),
@@ -421,40 +475,87 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
   }
 
-  Future<void> _saveData() async {
+  Future<Map<String, Object?>> _saveData() async {
+    Fluttertoast.showToast(
+      msg: 'Saving...',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases/${widget.saveId}');
-
-    final response = await http.put(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
+    try {
+      final updatedData = {
+        'gender': _selectedGender,
         'email': _emailController.text,
-        'date_of_birth': _dateOfBirthController.text,
         'phone_number': _phoneController.text,
-        'blood_pressure': _bloodPressureController.text,
-        'gender': _genderController.text,
-        'home_address': _homeAddressController.text,
-        'weight': _weightController.text,
-        'height': _heightController.text,
-        'bmi': _bmiController.text,
-        'blood_glucose': _bloodGlucoseController.text,
+        if (_parseNumber(_bloodPressureController.text) != null)
+          'blood_pressure': _parseNumber(_bloodPressureController.text),
+        if (_parseNumber(_weightController.text) != null)
+          'weight': _parseNumber(_weightController.text),
+        if (_parseNumber(_heightController.text) != null)
+          'height': _parseNumber(_heightController.text),
+        if (_parseNumber(_bmiController.text) != null)
+          'bmi': _parseNumber(_bmiController.text),
+        if (_parseNumber(_bloodGlucoseController.text) != null)
+          'blood_glucose': _parseNumber(_bloodGlucoseController.text),
         'existing_condition': _existingConditionController.text,
         'current_prescription': _currentPrescriptionController.text,
-        'doctor_note': _chewsNotesController.text,
-        'chew': 11,
-      }),
-    );
+        'chews_notes': _chewsNotesController.text,
+      };
 
-    if (response.statusCode == 200) {
-      print('Data successfully updated');
-      // Handle success (e.g., show a confirmation message or navigate back)
-    } else {
-      print('Failed to update data: ${response.body}');
-      // Handle failure (e.g., show an error message)
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'data': updatedData}),
+      );
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'Data successfully updated',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return updatedData;
+      } else {
+        print('this is the response ${response.body}');
+        Fluttertoast.showToast(
+          msg: 'Failed. Please try again',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed. Please try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
+    return {};
+  }
+
+  double? _parseNumber(String text) {
+    final value = double.tryParse(text);
+    return value;
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
@@ -473,22 +574,20 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
   }
 
-  Widget _buildGenderDropdown(TextEditingController controller) {
-    final String? gender = controller.text.isNotEmpty ? controller.text : null;
-
+  Widget _buildGenderDropdown() {
     return DropdownButtonFormField<String?>(
-      value: gender,
+      value: _selectedGender,
       onChanged: widget.editable
           ? (String? value) {
               setState(() {
-                controller.text = value ?? '';
+                _selectedGender = value;
               });
             }
           : null,
-      items: ['Male', 'Female']
+      items: [null, 'Male', 'Female']
           .map((genderOption) => DropdownMenuItem<String?>(
                 value: genderOption,
-                child: Text(genderOption),
+                child: Text(genderOption ?? 'Select Gender'),
               ))
           .toList(),
       decoration: InputDecoration(

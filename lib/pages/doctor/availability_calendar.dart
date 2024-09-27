@@ -2,24 +2,17 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // For environment variables
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:provider/provider.dart';
 
 class AvailabilityCalendar extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-  const AvailabilityCalendar({
-    super.key,
-    required this.firstName,
-    required this.lastName,
-    required this.id,
-  });
+  const AvailabilityCalendar({super.key});
 
   @override
   State<AvailabilityCalendar> createState() => _AvailabilityCalendarState();
@@ -34,8 +27,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
+      appBar: DoctorApp(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -52,11 +44,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           ),
         ),
       ),
-       bottomNavigationBar: DoctorBottomNavBar(
-        firstName: widget.firstName,
-        lastName: widget.lastName,
-        id: widget.id,
-      ),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 
@@ -78,8 +66,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _selectedDate = selectedDay;
-              _selectedTimeSlots
-                  .clear(); // Clear previous time slots on new date selection
+              _selectedTimeSlots.clear(); // Clear previous time slots on new date selection
             });
           },
           calendarStyle: const CalendarStyle(
@@ -152,12 +139,10 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   }
 
   Future<void> _saveAvailability() async {
+    final doctorData = Provider.of<DataStore>(context, listen: false).doctorData;
+
     if (_selectedDate == null || _selectedTimeSlots.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a date and at least one time slot.'),
-        ),
-      );
+      _showSnackBar('Please select a date and at least one time slot.');
       return;
     }
 
@@ -177,14 +162,13 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     }
 
     // Map over selected time slots and format them
-    List<String> formattedTimeSlots =
-        _selectedTimeSlots.map(formatTime).toList();
+    List<String> formattedTimeSlots = _selectedTimeSlots.map(formatTime).toList();
 
     final body = jsonEncode({
       "data": {
         "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
-        "time": formattedTimeSlots.join(','), // Join time slots if multiple
-        "users_permissions_user": {"id": int.parse(widget.id)},
+        "time": formattedTimeSlots.join(','), 
+        "users_permissions_user": {"id": doctorData?['id']},
       },
     });
 
@@ -198,23 +182,17 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     try {
       final response = await http.post(uri, body: body, headers: headers);
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Availability saved successfully!')),
-        );
+        _showSnackBar('Availability saved successfully!');
         setState(() {
           _selectedDate = null;
           _selectedTimeSlots.clear();
         });
       } else {
         print('Response body: ${response.body}'); // Log the response body
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save: ${response.reasonPhrase}')),
-        );
+        _showSnackBar('Failed to save: ${response.reasonPhrase}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showSnackBar('Error: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -222,13 +200,15 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     }
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Widget _buildSaveButton() {
     return Align(
       alignment: Alignment.centerRight,
       child: ElevatedButton(
-        onPressed: _isLoading
-            ? null
-            : _saveAvailability, // Disable button when loading
+        onPressed: _isLoading ? null : _saveAvailability, // Disable button when loading
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(
