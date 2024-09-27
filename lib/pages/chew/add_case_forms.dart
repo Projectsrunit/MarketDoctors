@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/main.dart';
 import 'dart:convert';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/show_custom_toast.dart';
 import 'package:provider/provider.dart';
 
 class AddCaseForms extends StatelessWidget {
@@ -71,8 +71,7 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                           maxLines: 1,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)
-                            ),
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -98,8 +97,7 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                           decoration: InputDecoration(
                             // labelText: 'Location',
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)
-                            ),
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -206,7 +204,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
 
   @override
   Widget build(BuildContext context) {
-    int chewId = context.watch<DataStore>().chewData?['user']['id'] ?? 2; //remove this after testing
+    int chewId = context.watch<DataStore>().chewData?['id'];
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -267,6 +265,12 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(width: 10),
@@ -276,6 +280,12 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
                         keyboardType: TextInputType.phone,
                       ),
                     ),
@@ -367,7 +377,8 @@ class AddCaseForm2State extends State<AddCaseForm2> {
                             items: ['Male', 'Female'].map((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value),
+                                child: Text(value,
+                                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),),
                               );
                             }).toList(),
                             onChanged: (String? newValue) {
@@ -476,17 +487,7 @@ class AddCaseForm2State extends State<AddCaseForm2> {
   }
 
   Future<void> _saveData(chewId) async {
-    // int chewId;
-
-    Fluttertoast.showToast(
-      msg: 'Saving...',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    showCustomToast(context, 'Saving...');
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases');
     try {
@@ -522,42 +523,20 @@ class AddCaseForm2State extends State<AddCaseForm2> {
       );
 
       if (response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: 'Case added successfully',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        showCustomToast(context, 'Case added successfully');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AddCaseForms()),
+          MaterialPageRoute(
+              builder: (context) =>
+                  PopScope(canPop: false, child: AddCaseForms())),
         );
       } else {
         print('this is the response ${response.body}');
-        Fluttertoast.showToast(
-          msg: 'Failed. Please try again',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        throw Exception('Something went wrong');
       }
     } catch (e) {
       print('this is the error: $e');
-      Fluttertoast.showToast(
-        msg: 'Failed. Please try again',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showCustomToast(context, 'Failed. Please try again');
     }
   }
 

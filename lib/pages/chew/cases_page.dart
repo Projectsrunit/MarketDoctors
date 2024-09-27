@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/pages/show_custom_toast.dart';
 import 'package:provider/provider.dart';
 
 enum IconType { information, edit, delete }
@@ -467,15 +470,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   }
 
   Future<void> _saveData(index) async {
-    Fluttertoast.showToast(
-      msg: 'Saving...',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+showCustomToast(context, 'Saving...');
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases/${widget.saveId}');
     try {
@@ -503,15 +498,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
 
       if (response.statusCode == 200) {
         context.read<DataStore>().updateCase(index, updatedData);
-        Fluttertoast.showToast(
-          msg: 'Data successfully updated',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        showCustomToast(context, 'Data successfully updated');
       } else {
         print('this is the response ${response.body}');
         throw Exception('Something went wrong');
