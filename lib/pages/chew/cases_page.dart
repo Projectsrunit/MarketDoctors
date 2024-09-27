@@ -19,8 +19,6 @@ class CasesPage extends StatefulWidget {
 class CasesPageState extends State<CasesPage> {
   int? _activeCaseIndex;
   IconType? _activeIconType;
-  List<dynamic> cases = [];
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -30,40 +28,38 @@ class CasesPageState extends State<CasesPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    fetchCases();
   }
 
-  Future<void> fetchCases() async {
-    int chewId = context.watch<DataStore>().chewData?['user']['id'] ??
-        11; //remove the 11 after testing
+  // Future<void> fetchCases() async {
+  //   int chewId = context.watch<DataStore>().chewData?['id'];
 
-    final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=$chewId');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        final List<dynamic> data = jsonData['data'];
-        setState(() {
-          cases = data;
-          isLoading = false;
-        });
-      } else {
-        print('Failed to load doctors');
-      }
-    } catch (e) {
-      print('this is the error: $e');
-      Fluttertoast.showToast(
-        msg: 'Failed to load. Try again',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
-  }
+  //   final String baseUrl = dotenv.env['API_URL']!;
+  //   final Uri url = Uri.parse('$baseUrl/api/cases?filters[chew][id]=$chewId');
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> jsonData = json.decode(response.body);
+  //       final List<dynamic> data = jsonData['data'];
+  //       setState(() {
+  //         // cases = data;
+  //         // isLoading = false;
+  //       });
+  //     } else {
+  //       print('Failed to load doctors');
+  //     }
+  //   } catch (e) {
+  //     print('this is the error: $e');
+  //     Fluttertoast.showToast(
+  //       msg: 'Failed to load. Try again',
+  //       toastLength: Toast.LENGTH_SHORT,
+  //       gravity: ToastGravity.CENTER,
+  //       timeInSecForIosWeb: 3,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,
+  //     );
+  //   }
+  // }
 
   void _onIconTapped(int caseIndex, IconType iconType, [int? caseId]) {
     setState(() {
@@ -115,9 +111,9 @@ class CasesPageState extends State<CasesPage> {
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
-                    setState(() {
-                      cases.removeAt(index);
-                    });
+                    // setState(() {
+                    //   cases.removeAt(index);
+                    // });
                   } else {
                     print('this is the response ${response.body}');
                     throw Exception('Failed to delete');
@@ -147,16 +143,19 @@ class CasesPageState extends State<CasesPage> {
   }
 
   void updateCases(int index, Map<String, dynamic> updatedCase) {
-    setState(() {
-      cases[index] = {
-        ...cases[index],
-        'attributes': {...cases[index]['attributes'], ...updatedCase}
-      };
-    });
+    // setState(() {
+    //   cases[index] = {
+    //     ...cases[index],
+    //     'attributes': {...cases[index], ...updatedCase}
+    //   };
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    List? cases = context.watch<DataStore>().chewData?['cases'];
+
     return Scaffold(
       appBar: ChewAppBar(),
       body: Padding(
@@ -217,23 +216,16 @@ class CasesPageState extends State<CasesPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    if (isLoading) ...[
-                      SizedBox(
-                        height: 100,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ] else if (cases.isNotEmpty)
+                  children: [                    
+                    if ( cases != null && cases.isNotEmpty)
                       ...cases.asMap().entries.map<Widget>((entry) {
                         final index = entry.key;
                         final caseData = entry.value;
                         return Column(
                           children: [
                             CaseInstance(
-                              firstName: caseData['attributes']['first_name'],
-                              lastName: caseData['attributes']['last_name'],
+                              firstName: caseData['first_name'],
+                              lastName: caseData['last_name'],
                               isActive: _activeCaseIndex == index,
                               activeIconType: _activeIconType,
                               onIconTapped: (iconType) => _onIconTapped(
@@ -245,7 +237,7 @@ class CasesPageState extends State<CasesPage> {
                                     _activeIconType == IconType.edit,
                                 saveId: caseData['id'],
                                 caseData: Map<String, dynamic>.from(
-                                    caseData['attributes']),
+                                    caseData),
                                 index: index,
                                 updateCases: updateCases,
                               ),
