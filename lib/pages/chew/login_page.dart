@@ -48,10 +48,16 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
-          _showMessage('Welcome Back!', isError: false);
-          context.read<DataStore>().updateChewData(responseBody);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ChewHome()));
+          //to get full user record with profile picture etc
+          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          final fullRecord = await http.get(url);
+          if (fullRecord.statusCode == 200) {
+            var recordBody = jsonDecode(fullRecord.body);
+            _showMessage('Welcome Back!', isError: false);
+            context.read<DataStore>().updateChewData(recordBody);
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ChewHome()));
+          }
         } else {
           var errorResponse = jsonDecode(response.body);
           String errorMessage = errorResponse['error']?['message'] ??
@@ -253,5 +259,3 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
     );
   }
 }
-
-

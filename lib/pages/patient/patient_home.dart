@@ -19,7 +19,6 @@ class PatientHome extends StatelessWidget {
   final int cases = 0;
   final int doctorsOnline = 0;
   final int users = 0;
-  
 
   // // Add the required parameters
   // final String patientId;
@@ -58,58 +57,59 @@ class PatientHomeBody extends StatelessWidget {
           // Advertisement carousel
           Container(
             margin: EdgeInsets.only(bottom: 16.0),
-  child: Row(
-  children: [
-    Expanded(
-      child: SizedBox(
-        height: 40,  // Adjust the height as needed
-        child: TextField(
-          decoration: InputDecoration(
-            hintText: "Search doctor, field, drugs",
-            hintStyle: GoogleFonts.nunito(
-              textStyle: TextStyle(
-                fontSize: 14,  // Adjust the font size as needed
-                fontWeight: FontWeight.normal,  // Change the weight if necessary
-                color: Colors.grey,  // Change the color if you want a different hint color
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 40, // Adjust the height as needed
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search doctor, field, drugs",
+                        hintStyle: GoogleFonts.nunito(
+                          textStyle: TextStyle(
+                            fontSize: 14, // Adjust the font size as needed
+                            fontWeight: FontWeight
+                                .normal, // Change the weight if necessary
+                            color: Colors
+                                .grey, // Change the color if you want a different hint color
+                          ),
+                        ),
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10), // Reduce vertical padding
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                ElevatedButton(
+                  onPressed: () {
+                    // Add search functionality here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Search',
+                    style: GoogleFonts.nunito(
+                      textStyle: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            contentPadding: EdgeInsets.symmetric(vertical: 10), // Reduce vertical padding
-          ),
-        ),
-      ),
-    ),
-    SizedBox(width: 8.0),
-    ElevatedButton(
-      onPressed: () {
-        // Add search functionality here
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      child: Text(
-        'Search',
-        style: GoogleFonts.nunito(
-          textStyle: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    ),
-  ],
-),
-
-
           ),
           // Remaining widgets...
           Row(
@@ -180,12 +180,15 @@ class PatientHomeBody extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Doctors', style: GoogleFonts.nunito(
+                    Text(
+                      'Doctors',
+                      style: GoogleFonts.nunito(
                         textStyle: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
-                      ),),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -217,14 +220,15 @@ class PatientHomeBody extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4.0),
-                    Text('Pharmacy',
-                        style: GoogleFonts.nunito(
+                    Text(
+                      'Pharmacy',
+                      style: GoogleFonts.nunito(
                         textStyle: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      ),
+                    ),
                   ],
                 ),
               ),
@@ -244,14 +248,13 @@ class PatientHomeBody extends StatelessWidget {
             children: [
               Text(
                 'Popular Doctors',
-                 style: GoogleFonts.nunito(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                style: GoogleFonts.nunito(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
@@ -263,14 +266,13 @@ class PatientHomeBody extends StatelessWidget {
                 ),
                 child: Text(
                   'See all',
-                   style: GoogleFonts.nunito(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                 
+                  style: GoogleFonts.nunito(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -282,7 +284,6 @@ class PatientHomeBody extends StatelessWidget {
     );
   }
 }
-
 
 class Populars extends StatefulWidget {
   @override

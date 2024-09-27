@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/view_doc_profile.dart';
+import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
@@ -24,10 +26,7 @@ class ChewHome extends StatelessWidget {
     Map? chewData = Provider.of<DataStore>(context).chewData;
 
     if (chewData == null) {
-      return PopScope(
-        canPop: false,
-        child: ChooseUserTypePage()
-        );
+      return PopScope(canPop: false, child: ChooseUserTypePage());
     } else {
       return PopScope(
         canPop: false,
@@ -54,14 +53,26 @@ class ChewHomeBody extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search doctor, field, drugs",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  child: SizedBox(
+                    height: 40,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Search doctor, field, drugs",
+                          hintStyle: GoogleFonts.nunito(
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10), // Reduce vertical padding
+                        ),
                       ),
-                    ),
                   ),
                 ),
                 SizedBox(width: 8.0),
@@ -77,7 +88,16 @@ class ChewHomeBody extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
-                  child: Text('Search'),
+                  child: Text(
+                    'Search',
+                    style: GoogleFonts.nunito(
+                      textStyle: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -101,11 +121,11 @@ class ChewHomeBody extends StatelessWidget {
                       ),
                       child: Container(
                         padding: EdgeInsets.all(28.0),
-                        color: Colors.lightBlue[50], // Light blue background
+                        color: Colors.lightBlue[50],
                         child: Icon(
                           FontAwesomeIcons
                               .briefcaseMedical, // Medical case with a +
-                          size: 50,
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
@@ -113,7 +133,7 @@ class ChewHomeBody extends StatelessWidget {
                     SizedBox(height: 4.0),
                     Text('Cases',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -137,7 +157,7 @@ class ChewHomeBody extends StatelessWidget {
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
                           FontAwesomeIcons.stethoscope, // Stethoscope icon
-                          size: 50,
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
@@ -145,7 +165,7 @@ class ChewHomeBody extends StatelessWidget {
                     SizedBox(height: 4.0),
                     Text('Doctors',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -168,8 +188,8 @@ class ChewHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.userFriends, // Patients icon
-                          size: 50,
+                          FontAwesomeIcons.userGroup, // Patients icon
+                          size: 40,
                           color: Colors.blue, // Blue icon
                         ),
                       ),
@@ -177,7 +197,7 @@ class ChewHomeBody extends StatelessWidget {
                     SizedBox(height: 4.0),
                     Text('Patients',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -185,14 +205,13 @@ class ChewHomeBody extends StatelessWidget {
           ),
           SizedBox(height: 16.0),
           Container(
-            height: 130,
+            height: 170,
             decoration: BoxDecoration(
-                color: Colors.blue, borderRadius: BorderRadius.circular(8)),
-            child: Center(
-              child: Text(
-                'for advertisement',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
+                color: Colors.white, borderRadius: BorderRadius.circular(8)),
+            child: Row(
+              children: [
+                AdvertisementCarousel()
+              ],
             ),
           ),
           SizedBox(height: 16.0),
@@ -284,8 +303,8 @@ class PopularsState extends State<Populars> {
           ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
-            imageUrl:
-                doctors[0]['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+            imageUrl: doctors[0]['profile_picture'] ??
+                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: (doctors[0]['specialisation'] != null &&
                     doctors[0]['specialisation'].isNotEmpty)
@@ -305,7 +324,8 @@ class PopularsState extends State<Populars> {
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
-              imageUrl: doctors[1]['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+              imageUrl: doctors[1]['profile_picture'] ??
+                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
                       doctors[1]['specialisation'].isNotEmpty)
