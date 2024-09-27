@@ -12,6 +12,7 @@ import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
 class DoctorProfilePage extends StatelessWidget {
@@ -99,7 +100,7 @@ class DoctorProfilePage extends StatelessWidget {
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateDoctorData(null);
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DashboardPage()));
+              context, MaterialPageRoute(builder: (context) => ChooseUserTypePage()));
         }),
       ],
     );

@@ -53,7 +53,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Select Date',
+          'Select Date Available',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
@@ -66,7 +66,8 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _selectedDate = selectedDay;
-              _selectedTimeSlots.clear(); // Clear previous time slots on new date selection
+              _selectedTimeSlots
+                  .clear(); // Clear previous time slots on new date selection
             });
           },
           calendarStyle: const CalendarStyle(
@@ -97,6 +98,15 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
       '01:00 PM',
       '02:00 PM',
       '03:00 PM',
+      '04:00 PM',
+      '05:00 PM',
+      '06:00 PM',
+      '07:00 PM',
+      '08:00 PM',
+      '09:00 PM',
+      '10:00 PM',
+      '11:00 PM',
+      '00:00 AM',
     ];
 
     return Column(
@@ -138,8 +148,31 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     );
   }
 
+  String formatTime(String time) {
+    final DateFormat inputFormat = DateFormat('hh:mm a'); // '09:00 AM'
+    final DateFormat outputFormat = DateFormat('HH:mm:ss'); // '09:00:00'
+    DateTime dateTime = inputFormat.parse(time);
+    return outputFormat.format(dateTime);
+  }
+
+// List of time slots with start and end times
+  List<Map<String, String>> generateTimeSlotPairs(
+      List<String> selectedTimeSlots) {
+    List<Map<String, String>> timePairs = [];
+
+    for (int i = 0; i < selectedTimeSlots.length - 1; i++) {
+      timePairs.add({
+        'start_time': formatTime(selectedTimeSlots[i]),
+        'end_time': formatTime(selectedTimeSlots[i + 1]),
+      });
+    }
+
+    return timePairs;
+  }
+
   Future<void> _saveAvailability() async {
-    final doctorData = Provider.of<DataStore>(context, listen: false).doctorData;
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
 
     if (_selectedDate == null || _selectedTimeSlots.isEmpty) {
       _showSnackBar('Please select a date and at least one time slot.');
@@ -153,27 +186,17 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
     String? baseUrl = dotenv.env['API_URL'];
     final uri = Uri.parse('$baseUrl/api/availabilities');
 
-    // Function to format time to HH:mm:ss
-    String formatTime(String time) {
-      final DateFormat inputFormat = DateFormat('hh:mm a'); // '09:00 AM'
-      final DateFormat outputFormat = DateFormat('HH:mm:ss'); // '09:00:00'
-      DateTime dateTime = inputFormat.parse(time);
-      return outputFormat.format(dateTime);
-    }
-
-    // Map over selected time slots and format them
-    List<String> formattedTimeSlots = _selectedTimeSlots.map(formatTime).toList();
+    // Generate time slot pairs with start and end times
+    List<Map<String, String>> timeSlotPairs =
+        generateTimeSlotPairs(_selectedTimeSlots);
 
     final body = jsonEncode({
       "data": {
         "date": DateFormat('yyyy-MM-dd').format(_selectedDate!),
-        "time": formattedTimeSlots.join(','), 
-        "users_permissions_user": {"id": doctorData?['id']},
+        "users_permissions_user": doctorData?['id'],
+        "available_time": timeSlotPairs, // Provide the array of time slots
       },
     });
-
-    // Log the request body
-    print('Request body: $body');
 
     final headers = {
       'Content-Type': 'application/json',
@@ -188,7 +211,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           _selectedTimeSlots.clear();
         });
       } else {
-        print('Response body: ${response.body}'); // Log the response body
+        print('Response body: ${response.body}');
         _showSnackBar('Failed to save: ${response.reasonPhrase}');
       }
     } catch (e) {
@@ -201,14 +224,17 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildSaveButton() {
     return Align(
       alignment: Alignment.centerRight,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveAvailability, // Disable button when loading
+        onPressed: _isLoading
+            ? null
+            : _saveAvailability, // Disable button when loading
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(
