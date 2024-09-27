@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/availability_calendar.dart';
-import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -200,14 +198,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    'Doctor ${doctorData?['firstName'] ?? ''} ${doctorData?['lastName'] ?? ''}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(height: 30),
@@ -243,7 +233,6 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           ),
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 
