@@ -8,7 +8,7 @@ import 'package:market_doctor/pages/patient/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
 
   class PatientSignUpPage extends StatefulWidget {
-  const PatientSignUpPage({Key? key}) : super(key: key);
+  const PatientSignUpPage({super.key});
 
   @override
   State<PatientSignUpPage> createState() => _PatientSignUpPage();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/patient/verification_page.dart';
 
 class PatientCheckInboxPage extends StatelessWidget {
-  const PatientCheckInboxPage({Key? key}) : super(key: key);
+  const PatientCheckInboxPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +38,13 @@ class PatientCheckInboxPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Next'),
               style: TextButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
+              child: const Text('Next'),
             ),
           ],
         ),

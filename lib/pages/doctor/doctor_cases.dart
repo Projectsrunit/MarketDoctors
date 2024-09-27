@@ -272,11 +272,10 @@ class CaseInstanceDetails extends StatefulWidget {
   final int saveId;
 
   CaseInstanceDetails(
-      {Key? key,
+      {super.key,
       required this.caseData,
       required this.editable,
-      required this.saveId})
-      : super(key: key);
+      required this.saveId});
 
   @override
   State<CaseInstanceDetails> createState() => _CaseInstanceDetailsState();

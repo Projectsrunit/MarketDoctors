@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/daphnenaggayi/Documents/MarketDoctors/linux"
+    "cmake.sourceDirectory": "/Users/daphnenaggayi/Documents/MarketDoctors/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

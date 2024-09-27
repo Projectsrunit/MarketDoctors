@@ -563,6 +563,6 @@ class AddCaseForm2State extends State<AddCaseForm2> {
 
   double? _parseNumber(String text) {
     final value = double.tryParse(text);
-    return value != null ? value : null;
+    return value;
   }
 }

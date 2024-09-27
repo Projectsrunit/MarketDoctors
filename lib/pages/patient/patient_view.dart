@@ -74,7 +74,7 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                             }).toList(),
                             onChanged: (value) {
                               setState(() {
-                                _selectedDropDown1 = value as String?;
+                                _selectedDropDown1 = value;
                               });
                             },
                           ),
@@ -110,7 +110,7 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                             }).toList(),
                             onChanged: (value) {
                               setState(() {
-                                _selectedDropDown2 = value as String?;
+                                _selectedDropDown2 = value;
                               });
                             },
                           ),

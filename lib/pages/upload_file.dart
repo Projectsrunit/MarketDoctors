@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:market_doctor/pages/success_page.dart';
 
 class UploadCredentialsPage extends StatelessWidget {
