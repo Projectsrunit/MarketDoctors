@@ -263,11 +263,10 @@ class CaseInstanceDetails extends StatefulWidget {
   final int saveId;
 
   CaseInstanceDetails(
-      {Key? key,
+      {super.key,
       required this.caseData,
       required this.editable,
-      required this.saveId})
-      : super(key: key);
+      required this.saveId});
 
   @override
   State<CaseInstanceDetails> createState() => _CaseInstanceDetailsState();
@@ -487,7 +486,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
 
   double? _parseNumber(String text) {
     final value = double.tryParse(text);
-    return value != null ? value : null;
+    return value;
   }
 
   Widget _buildTextField(String label, TextEditingController controller,

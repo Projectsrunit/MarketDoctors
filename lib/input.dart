@@ -46,7 +46,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
         obscureText: _obscure,
         obscuringCharacter: '*',
         validator: widget.validator,
-        decoration: new InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,

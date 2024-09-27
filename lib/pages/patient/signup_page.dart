@@ -9,7 +9,7 @@ import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/patient/verification_page.dart';
 
   class PatientSignUpPage extends StatefulWidget {
-  const PatientSignUpPage({Key? key}) : super(key: key);
+  const PatientSignUpPage({super.key});
 
   @override
   State<PatientSignUpPage> createState() => _PatientSignUpPage();

@@ -40,7 +40,7 @@ class AdvertisementCarouselState extends State<AdvertisementCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 160,
       child: isLoading
           ? Center(child: CircularProgressIndicator())

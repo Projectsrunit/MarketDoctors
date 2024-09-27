@@ -142,6 +142,23 @@ class DataStore with ChangeNotifier {
     }
   }
 
+  void removeCase(int index) {
+    if (userData != null && userData?['cases'] != null) {
+      userData?['cases'].removeAt(index);
+      print('the userdata cases now ${userData?['cases']}');
+      notifyListeners();
+    }
+  }
+
+  void updateCase(int index, Map updates) {
+    if (userData != null && userData?['cases'] != null) {
+      userData?['cases'][index] = {
+        ...userData?['cases'][index],
+        ...updates
+      };
+    }
+  }
+
   void updatePatientData(Map? newValue) {
     userData = newValue;
     notifyListeners();
