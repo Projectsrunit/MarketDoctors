@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:provider/provider.dart';
 
 class PaymentsMainWidget extends StatefulWidget {
   @override
@@ -23,10 +25,12 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          _isPaymentsSelected ? Color(0xFF617DEF) : Colors.white,
-                      foregroundColor:
-                          _isPaymentsSelected ? Colors.white : Color(0xFF617DEF),
+                      backgroundColor: _isPaymentsSelected
+                          ? Color(0xFF617DEF)
+                          : Colors.white,
+                      foregroundColor: _isPaymentsSelected
+                          ? Colors.white
+                          : Color(0xFF617DEF),
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(8), // Rounded corners
@@ -43,10 +47,12 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          !_isPaymentsSelected ? Color(0xFF617DEF) : Colors.white,
-                      foregroundColor:
-                          !_isPaymentsSelected ? Colors.white : Color(0xFF617DEF),
+                      backgroundColor: !_isPaymentsSelected
+                          ? Color(0xFF617DEF)
+                          : Colors.white,
+                      foregroundColor: !_isPaymentsSelected
+                          ? Colors.white
+                          : Color(0xFF617DEF),
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(8), // Rounded corners
@@ -74,6 +80,7 @@ class PaymentsMainWidgetState extends State<PaymentsMainWidget> {
 class PaymentsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    List? cases = context.watch<DataStore>().chewData?['cases'];
     return Expanded(
       child: SingleChildScrollView(
         child: Column(
@@ -94,8 +101,10 @@ class PaymentsWidget extends StatelessWidget {
                     // Add search functionality here
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     minimumSize: Size(40, 40),
+                    backgroundColor:Colors.grey[700],
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -107,17 +116,14 @@ class PaymentsWidget extends StatelessWidget {
             SizedBox(height: 20),
             Column(
               children: [
-                // Row with Cases and Amount headers
                 Row(
                   children: [
-                    // First column for "Cases", taking half of the screen width
                     Expanded(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Align(
-                          alignment: Alignment
-                              .centerLeft, // Ensures it starts from the beginning
+                          alignment: Alignment.centerLeft,
                           child: Text(
                             'Cases',
                             style: TextStyle(
@@ -128,14 +134,12 @@ class PaymentsWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Second column for "Amount", taking the other half of the screen width
                     Expanded(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Align(
-                          alignment: Alignment
-                              .centerLeft, // Ensures it starts from the beginning
+                          alignment: Alignment.centerLeft,
                           child: Text(
                             'Amount',
                             style: TextStyle(
@@ -148,11 +152,11 @@ class PaymentsWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(
-                    height:
-                        10), // Space between the header row and the PaymentCase rows
-                // List of PaymentCase widgets
-                ...List.generate(11, (index) => PaymentCase(index: index)),
+                SizedBox(height: 10),
+                if (cases != null)
+                  ...cases
+                      .map((caseItem) => PaymentCase(caseItem: caseItem))
+                      .toList(),
               ],
             ),
           ],
@@ -163,32 +167,42 @@ class PaymentsWidget extends StatelessWidget {
 }
 
 class PaymentCase extends StatelessWidget {
-  final int index;
+  final Map caseItem;
 
-  PaymentCase({required this.index});
+  PaymentCase({required this.caseItem});
+
+  int _calculateAge(String dateOfBirth) {
+    DateTime dob = DateTime.parse(dateOfBirth);
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - dob.year;
+    if (currentDate.month < dob.month ||
+        (currentDate.month == dob.month && currentDate.day < dob.day)) {
+      age--;
+    }
+    return age;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Column for patient details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'John Doe',
+                  '${caseItem['first_name']} ${caseItem['last_name']}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Age: 30',
+                  'Age: ${caseItem['date_of_birth'] != null ? _calculateAge(caseItem['date_of_birth']) : 'Not Set'}',
                   style: TextStyle(fontSize: 14),
                 ),
                 Text(
-                  'Location: Lagos',
+                  'Location: ${caseItem['home_address'] ?? 'unset'}',
                   style: TextStyle(fontSize: 14),
                 ),
               ],
@@ -202,7 +216,6 @@ class PaymentCase extends StatelessWidget {
                 width: 80,
                 child: TextField(
                   decoration: InputDecoration(
-                    // hintText: '',
                     contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                   ),
                   keyboardType: TextInputType.number,
@@ -210,8 +223,15 @@ class PaymentCase extends StatelessWidget {
               ),
             ],
           ),
-          // Button without label above it
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 8,),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey[700]
+            ),
             onPressed: () {
               // Handle button press
             },
@@ -288,8 +308,7 @@ class ImportantRemindersWidget extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text('1. Payments are disbursed on the last day of the month.'),
-            Text(
-                '2. All account numbers must match the name of the profile.'),
+            Text('2. All account numbers must match the name of the profile.'),
             Text(
                 '3. Earnings must be greater than N20,000 before disbursement is made.'),
           ],
