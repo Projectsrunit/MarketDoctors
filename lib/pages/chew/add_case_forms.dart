@@ -531,6 +531,9 @@ class AddCaseForm2State extends State<AddCaseForm2> {
       );
 
       if (response.statusCode == 200) {
+        var jsoned = jsonDecode(response.body);
+        context.read<DataStore>().addCase({'id' : jsoned['data']['id'], ...jsoned['data']['attributes']});
+
         Fluttertoast.showToast(
           msg: 'Case added successfully',
           toastLength: Toast.LENGTH_SHORT,
