@@ -253,7 +253,7 @@ class DoctorCard extends StatelessWidget {
                        onTap: onViewProfilePressed,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8.0),
+                            vertical: 6.0, horizontal: 8.0),
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.circular(5),

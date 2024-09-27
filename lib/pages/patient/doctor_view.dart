@@ -116,7 +116,13 @@ class _DoctorViewState extends State<DoctorView> {
                               builder: (context) =>
                                   ViewDocProfile(doctorCard: doc)));
                     },
-                    onBookAppointmentPressed: () {},
+                    onBookAppointmentPressed: () {
+                       Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ViewDocProfile(doctorCard: doc)));
+                    },
                   );
                 },
               ),
