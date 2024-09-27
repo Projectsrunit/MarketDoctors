@@ -2,22 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
-import 'package:market_doctor/pages/chew/payments_main_widget.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
+
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
+import 'package:market_doctor/pages/doctor/profile_page.dart';
 
 class DoctorBottomNavBar extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-  DoctorBottomNavBar({
-    required this.firstName,
-    required this.lastName,
-    required this.id,
-  });
-
   @override
   State<DoctorBottomNavBar> createState() => _DoctorBottomNavBarState();
 }
@@ -50,18 +42,16 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.home, size: 36, color: Color(0xFF617DEF)),
+                    icon: Icon(
+                      Icons.home,
+                      size: 36,
+                      color: Colors.blue,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DashboardPage(
-                            firstName: widget.firstName,
-                            lastName: widget.lastName,
-                            id: widget.id,
-
-                          ),
-                        ),
+                            builder: (context) => DashboardPage()),
                       );
                     },
                   ),
@@ -72,20 +62,16 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.business_center,
-                        size: 36, color: Color(0xFF617DEF)),
+                    icon: Icon(
+                      Icons.business_center,
+                      size: 36,
+                      color: Colors.blue,
+                    ),
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DoctorCasesPage(
-                            firstName: widget.firstName,
-                            lastName: widget.lastName,
-                            id: widget.id,
-
-                          ),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DoctorCasesPage()));
                     },
                   ),
                   Text("Cases"),
@@ -96,38 +82,35 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.credit_card,
-                        size: 36, color: Color(0xFF617DEF)),
+                    icon: Icon(
+                      Icons.watch_sharp,
+                      size: 36,
+                      color: Colors.blue,
+                    ),
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PaymentsMainWidget(),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AvailabilityCalendar()));
                     },
                   ),
-                  Text("Payment"),
+                  Text("Availability"),
                 ],
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon:
-                        Icon(Icons.person, size: 36, color: Color(0xFF617DEF)),
+                    icon: Icon(
+                      Icons.person,
+                      size: 36,
+                      color: Colors.blue,
+                    ),
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DoctorFormPage(
-                            firstName: widget.firstName,
-                            lastName: widget.lastName,
-                            id: widget.id,
-
-                          ),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DoctorProfilePage()));
                     },
                   ),
                   Text("Profile"),
@@ -148,7 +131,6 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
               });
               Future.delayed(Duration.zero, () {
                 showMenu(
-                  // ignore: use_build_context_synchronously
                   context: context,
                   position: RelativeRect.fromLTRB(100, 600, 100, 100),
                   shape: RoundedRectangleBorder(
@@ -160,7 +142,10 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                       child: Row(
                         children: [
                           SizedBox(width: 10),
-                          Icon(Icons.add, color: Color(0xFF617DEF)),
+                          Icon(
+                            Icons.add,
+                            color: Colors.blue,
+                          ),
                           SizedBox(width: 10),
                           Text('Add a case'),
                           SizedBox(width: 10),
@@ -168,11 +153,9 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                       ),
                       onTap: () {
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddCaseForms(),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddCaseForms()));
                       },
                     ),
                     PopupMenuItem(
@@ -286,7 +269,7 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                 height: 70,
                 width: 70,
                 decoration: BoxDecoration(
-                  color: Color(0xFF617DEF),
+                  color: Colors.blue,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

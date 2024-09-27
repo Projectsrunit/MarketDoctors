@@ -1,24 +1,18 @@
 // ignore_for_file: unnecessary_string_interpolations, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
+import 'package:market_doctor/pages/doctor/pharmacy.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String id;
-
-  const DashboardPage({
-    super.key,
-    required this.firstName,
-    required this.lastName,
-    required this.id,
-  });
+  const DashboardPage({super.key});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -29,31 +23,28 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Accessing the doctorData from Provider
+    final doctorData = Provider.of<DataStore>(context).doctorData;
+    final String? userId = doctorData?['user']?['id'];
+
     return Scaffold(
-      appBar:
-          doctorAppBar(firstName: widget.firstName, lastName: widget.lastName),
+      appBar:  DoctorApp(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSearchbar(),
-              const SizedBox(height: 16),
-              _buildDashboardCards(),
-              const SizedBox(height: 16),
-              _buildBanner(),
-              const SizedBox(height: 16),
-              _buildNextAppointmentSection(),
-            ],
-          ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSearchbar(),
+            const SizedBox(height: 16),
+            _buildDashboardCards(userId),
+            const SizedBox(height: 16),
+            AdvertisementCarousel(),
+            const SizedBox(height: 16),
+            _buildNextAppointmentSection(),
+          ],
         ),
       ),
-      bottomNavigationBar: DoctorBottomNavBar(
-        firstName: widget.firstName,
-        lastName: widget.lastName,
-        id: widget.id,
-      ),
+      bottomNavigationBar:  DoctorBottomNavBar(),
     );
   }
 
@@ -65,26 +56,22 @@ class _DashboardPageState extends State<DashboardPage> {
             margin: const EdgeInsets.symmetric(vertical: 16.0),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(10), // Border radius added here
+              borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.3),
                   spreadRadius: 2,
                   blurRadius: 5,
-                  offset: const Offset(0, 2), // Shadow position
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: TextField(
               decoration: InputDecoration(
                 hintText: 'Search Cases, Appointment, Pharmacy',
-                hintStyle:
-                    TextStyle(color: Colors.grey[500]), // Subtle hint color
-                prefixIcon: const Icon(Icons.search,
-                    color: Colors.black), // Search icon inside
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12.0), // Comfortable padding
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                prefixIcon: const Icon(Icons.search, color: Colors.black),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
                 border: InputBorder.none,
               ),
             ),
@@ -94,14 +81,13 @@ class _DashboardPageState extends State<DashboardPage> {
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius:
-                BorderRadius.circular(10), // Border radius here as well
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.3),
                 spreadRadius: 2,
                 blurRadius: 5,
-                offset: const Offset(0, 2), // Shadow position
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -109,20 +95,13 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: () {
               // Handle filter action
             },
-            icon: const Icon(Icons.filter_list,
-                color: Colors.black), // Filter icon
-            label: const Text(
-              'Filter',
-              style:
-                  TextStyle(color: Colors.black), // Text for the filter button
-            ),
+            icon: const Icon(Icons.filter_list, color: Colors.black),
+            label: const Text('Filter', style: TextStyle(color: Colors.black)),
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 15.0, vertical: 12.0), // Consistent padding
-              backgroundColor: Colors.white, // White background for consistency
-              foregroundColor: Colors.black, // Black text/icon color
+              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
@@ -131,7 +110,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildDashboardCards() {
+  Widget _buildDashboardCards(String? userId) {
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 3,
@@ -139,33 +118,24 @@ class _DashboardPageState extends State<DashboardPage> {
       mainAxisSpacing: 16,
       children: [
         _buildDashboardCardWithLabel(
-          image: AssetImage('assets/images/cases-image.png'),
+          image: const AssetImage('assets/images/cases-image.png'),
           label: 'Cases',
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DoctorCasesPage(
-                        firstName: widget.firstName,
-                        lastName: widget.lastName,
-                        id: widget.id,
-                      )),
+                  builder: (context) => DoctorCasesPage()),
             );
           },
         ),
         _buildDashboardCardWithLabel(
-          image: AssetImage('assets/images/pills-image.png'),
+          image: const AssetImage('assets/images/pills-image.png'),
           label: 'Pharmacy',
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => AvailabilityCalendar(
-                        firstName: widget.firstName,
-                        lastName: widget.lastName,
-                        id: widget.id,
-                        
-                      )),
+                  builder: (context) =>  DoctorPharmacyListPage()),
             );
           },
         ),
@@ -176,11 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DoctorAppointmentPage(
-                        firstName: widget.firstName,
-                        lastName: widget.lastName,
-                        id: widget.id,
-                      )),
+                  builder: (context) => const DoctorAppointmentPage()),
             );
           },
         ),
@@ -201,17 +167,14 @@ class _DashboardPageState extends State<DashboardPage> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
-              // height: 100,
               decoration: BoxDecoration(
-                color: Color(0xFF617DEF).withOpacity(0.2),
+                color: const Color(0xFF617DEF).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: image != null
                     ? Image(image: image, fit: BoxFit.contain)
-                    : Icon(icon,
-                        size: 40,
-                        color: Color(0xFF617DEF)), // Increased icon size
+                    : Icon(icon, size: 40, color: const Color(0xFF617DEF)),
               ),
             ),
           ),
@@ -229,19 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      height: 120,
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Color(0xFF617DEF).withOpacity(0.5),
-      ),
-      child: Row(children: [
-        AdvertisementCarousel(),
-      ]),
-    );
-  }
+
 
   Widget _buildNextAppointmentSection() {
     return Column(
@@ -267,38 +218,18 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ],
         ),
-        const SizedBox(
-            height: 16), // Spacing between the heading and the card rows
-        // Row for smaller cards showing time and date with a blue line in between
+        const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSmallAppointmentCard(
-              time: '02:00 PM',
-              date: 'April 2, 2024',
-            ),
-            const SizedBox(width: 4), // Spacing between the card and the line
-            Container(
-              width: 70,
-              height: 2,
-              color: Color(0xFF4672ff),
-            ),
+            _buildSmallAppointmentCard(time: '02:00 PM', date: 'April 2, 2024'),
             const SizedBox(width: 4),
-            _buildSmallAppointmentCard(
-              time: '02:00 PM',
-              date: 'April 2, 2024',
-            ),
-            const SizedBox(width: 4), // Spacing between the card and the line
-
-            Container(
-              width: 30,
-              height: 2,
-              color: Color(0xFF4672ff),
-            ),
+            Container(width: 70, height: 2, color: const Color(0xFF4672ff)),
+            const SizedBox(width: 4),
+            _buildSmallAppointmentCard(time: '02:00 PM', date: 'April 2, 2024'),
           ],
         ),
-        const SizedBox(height: 16), // Spacing between rows of cards
-        // Row for larger cards showing label and doctor’s name
+        const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -308,7 +239,7 @@ class _DashboardPageState extends State<DashboardPage> {
               time: '02:00 PM',
               date: 'April 2, 2024',
             ),
-            const SizedBox(width: 16), // Spacing between larger cards
+            const SizedBox(width: 16),
             _buildLargeAppointmentCard(
               label: 'Audio Consultation',
               doctorName: 'Dr. John Ogundipe',
@@ -321,36 +252,21 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildSmallAppointmentCard({
-    required String time,
-    required String date,
-  }) {
+  Widget _buildSmallAppointmentCard({required String time, required String date}) {
     return Container(
       width: 120,
       height: 60,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Color(0xFF617DEF),
+        color: const Color(0xFF617DEF),
       ),
       padding: const EdgeInsets.all(5.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            '$time',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
-          ),
-          Text(
-            '$date',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
-          ),
+          Text(time, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(date, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );
@@ -367,44 +283,19 @@ class _DashboardPageState extends State<DashboardPage> {
       height: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Color(0xFF617DEF),
+        color: const Color(0xFF617DEF),
       ),
       padding: const EdgeInsets.all(12.0),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // White line on the left
-          Container(
-            width: 4, // Increased thickness of the white line
-            height: 45, // Full height of the card
-            color: Colors.white,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  doctorName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+          const SizedBox(height: 8),
+          Text(doctorName, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(time, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(date, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

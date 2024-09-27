@@ -87,7 +87,7 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                   _verifyOtp();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const DoctorsUploadCredentialsPage(),
+                      builder: (context) => const DoctorsSuccessPage(),
                     ),
                   );
                 },

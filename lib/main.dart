@@ -119,6 +119,7 @@ class DataStore with ChangeNotifier {
 
   Map? get chewData => userData;
   Map? get patientData => userData;
+  Map? get doctorData => userData;
 
   void updateChewData(Map? newValue) {
     userData = newValue;
@@ -160,6 +161,11 @@ class DataStore with ChangeNotifier {
   }
 
   void updatePatientData(Map? newValue) {
+    userData = newValue;
+    notifyListeners();
+  }
+
+  void updateDoctorData(Map? newValue) {
     userData = newValue;
     notifyListeners();
   }

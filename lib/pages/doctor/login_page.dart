@@ -1,9 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/signup_page.dart';
+import 'package:provider/provider.dart';
 
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
@@ -11,6 +15,7 @@ class DoctorLoginPage extends StatefulWidget {
   @override
   State<DoctorLoginPage> createState() => _DoctorLoginPageState();
 }
+
 
 class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -50,25 +55,16 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
-          if (responseBody.containsKey('user')) {
-            firstName = responseBody['user']['firstName'] ?? '';
-            lastName = responseBody['user']['lastName'] ?? '';
-            id = responseBody['user']['id'].toString();
-          } 
-          _showMessage('Welcome Back, $firstName $lastName!', isError: false);
-
+          //to get full user record with profile picture etc
+          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          final fullRecord = await http.get(url);
+          if (fullRecord.statusCode == 200) {
+            var recordBody = jsonDecode(fullRecord.body);
+            _showMessage('Welcome Back!', isError: false);
+            context.read<DataStore>().updateDoctorData(recordBody);
             Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DashboardPage(
-                  firstName: firstName!,
-                  lastName: lastName!,
-                  id: id!,
-                ),
-              ),
-            );
-          
-          
+                context, MaterialPageRoute(builder: (context) => DashboardPage()));
+          }
         } else {
           var errorResponse = jsonDecode(response.body);
 
