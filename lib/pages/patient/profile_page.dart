@@ -4,8 +4,6 @@ import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
-import 'package:market_doctor/pages/patient/update_qualification_patient.dart';
-import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:http/http.dart' as http;
@@ -21,9 +19,7 @@ import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-     int? patientId; 
     Map? patientData = Provider.of<DataStore>(context).patientData;
-     patientId = patientData?['user']['id']; 
     return Scaffold(
       appBar: PatientAppBar(),
       body: Padding(

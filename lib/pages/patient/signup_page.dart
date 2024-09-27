@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/patient/check_inbox.dart';
+// import 'package:market_doctor/pages/patient/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
+import 'package:market_doctor/pages/patient/verification_page.dart';
 
   class PatientSignUpPage extends StatefulWidget {
   const PatientSignUpPage({super.key});
@@ -74,7 +75,7 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
             _showSnackBar('Sign up successful');
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                  builder: (context) => const  PatientCheckInboxPage()),
+                  builder: (context) => const   PatientVerificationPage()),
             );
           } else {
             _showSnackBar('Sign up failed: ${response.body}');

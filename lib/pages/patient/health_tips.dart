@@ -42,8 +42,9 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Market Doctor Health Tips'),
-        backgroundColor: Colors.green,
+        title: Text('Market Doctor Health Tips', style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.blue,
+         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/patient/cases_page.dart';
+import 'package:market_doctor/pages/patient/hospital.dart';
+import 'package:market_doctor/pages/patient/pharmacy.dart';
 import 'package:market_doctor/pages/patient/doctor_view.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,6 @@ import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PatientHome extends StatelessWidget {
-  final int cases = 0;
   final int doctorsOnline = 0;
   final int users = 0;
 
@@ -121,7 +121,7 @@ class PatientHomeBody extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PatientCasesPage()));
+                          builder: (context) => HospitalListPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -199,7 +199,7 @@ class PatientHomeBody extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PatientCasesPage()));
+                          builder: (context) => PharmacyListPage()));
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

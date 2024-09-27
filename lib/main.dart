@@ -94,8 +94,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      home: ChooseUserTypePage(),
-      // home: OnboardingScreen()
+      // home: ChooseUserTypePage(),
+      home: OnboardingScreen()
     );
   }
 }
@@ -140,6 +140,23 @@ class DataStore with ChangeNotifier {
       }
       userData!['payments'].add(payment);
       notifyListeners();
+    }
+  }
+
+  void removeCase(int index) {
+    if (userData != null && userData?['cases'] != null) {
+      userData?['cases'].removeAt(index);
+      print('the userdata cases now ${userData?['cases']}');
+      notifyListeners();
+    }
+  }
+
+  void updateCase(int index, Map updates) {
+    if (userData != null && userData?['cases'] != null) {
+      userData?['cases'][index] = {
+        ...userData?['cases'][index],
+        ...updates
+      };
     }
   }
 

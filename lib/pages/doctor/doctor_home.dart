@@ -7,6 +7,7 @@ import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
+import 'package:market_doctor/pages/doctor/pharmacy.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:provider/provider.dart';
 
@@ -134,7 +135,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>  AvailabilityCalendar()),
+                  builder: (context) =>  DoctorPharmacyListPage()),
             );
           },
         ),
