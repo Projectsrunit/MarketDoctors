@@ -282,10 +282,19 @@ Widget _buildConsultationFeeSection() {
 
   // Availability section with date and time centered
   // Availability section with date and time centered
-Widget _buildAvailabilitySection() {
-  return Center( // Wrap the Container with Center to align it in the middle of the screen
+  Widget _buildAvailabilitySection() {
+  DateTime today = DateTime.now(); // Get today's date
+
+  // Filter availabilities to only include today and future dates
+  List<dynamic> upcomingAvailabilities = widget.doctorCard['doctor_availabilities']
+      .where((availability) {
+        DateTime availabilityDate = DateTime.parse(availability['date']);
+        return availabilityDate.isAfter(today) || availabilityDate.isAtSameMomentAs(today);
+      }).toList();
+
+  return Center(
     child: Container(
-      width: double.infinity, // Take full width of the screen
+      width: double.infinity,
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
@@ -301,7 +310,7 @@ Widget _buildAvailabilitySection() {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center, // Center-align the column contents
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             'Availability',
@@ -312,13 +321,12 @@ Widget _buildAvailabilitySection() {
             ),
           ),
           SizedBox(height: 10),
-          widget.doctorCard['doctor_availabilities'] != null &&
-                  widget.doctorCard['doctor_availabilities'].isNotEmpty
+          upcomingAvailabilities.isNotEmpty
               ? Column(
                   children: List.generate(
-                    widget.doctorCard['doctor_availabilities'].length,
+                    upcomingAvailabilities.length,
                     (index) {
-                      var availability = widget.doctorCard['doctor_availabilities'][index];
+                      var availability = upcomingAvailabilities[index];
                       var formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(availability['date']));
                       bool isTimeVisible = false;
 
@@ -333,7 +341,7 @@ Widget _buildAvailabilitySection() {
                                 });
                               },
                               child: Container(
-                                width: double.infinity, // Ensure the inner container also takes full width
+                                width: double.infinity,
                                 padding: EdgeInsets.all(10.0),
                                 decoration: BoxDecoration(
                                   color: Colors.blue[50],
