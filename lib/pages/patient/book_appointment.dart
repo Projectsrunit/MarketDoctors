@@ -281,8 +281,11 @@ Widget _buildConsultationFeeSection() {
 
 
   // Availability section with date and time centered
-  Widget _buildAvailabilitySection() {
-    return Container(
+  // Availability section with date and time centered
+Widget _buildAvailabilitySection() {
+  return Center( // Wrap the Container with Center to align it in the middle of the screen
+    child: Container(
+      width: double.infinity, // Take full width of the screen
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
@@ -298,7 +301,7 @@ Widget _buildConsultationFeeSection() {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center, // Center-align the column contents
         children: [
           Text(
             'Availability',
@@ -312,63 +315,71 @@ Widget _buildConsultationFeeSection() {
           widget.doctorCard['doctor_availabilities'] != null &&
                   widget.doctorCard['doctor_availabilities'].isNotEmpty
               ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.center, // Center the content
                   children: List.generate(
                     widget.doctorCard['doctor_availabilities'].length,
                     (index) {
                       var availability = widget.doctorCard['doctor_availabilities'][index];
                       var formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(availability['date']));
+                      bool isTimeVisible = false;
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        child: Container(
-                          padding: EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(8.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center, // Center the dates and times
-                            children: [
-                              Text(
-                                'Date: $formattedDate',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue[700],
-                                  fontSize: 18,
+                        child: StatefulBuilder(
+                          builder: (context, setState) {
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isTimeVisible = !isTimeVisible;
+                                });
+                              },
+                              child: Container(
+                                width: double.infinity, // Ensure the inner container also takes full width
+                                padding: EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue[50],
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withOpacity(0.1),
+                                      spreadRadius: 1,
+                                      blurRadius: 6,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              SizedBox(height: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center, // Center the times
-                                children: List.generate(
-                                  availability['available_time'].length,
-                                  (timeIndex) {
-                                    var timeSlot = availability['available_time'][timeIndex];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 5.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '${timeSlot['start_time']} - ${timeSlot['end_time']}',
-                                            style: TextStyle(color: Colors.grey[800]),
-                                          ),
-                                        ],
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Date: $formattedDate',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue[700],
+                                        fontSize: 18,
                                       ),
-                                    );
-                                  },
+                                    ),
+                                    SizedBox(height: 5),
+                                    if (isTimeVisible)
+                                      Column(
+                                        children: List.generate(
+                                          availability['available_time'].length,
+                                          (timeIndex) {
+                                            var timeSlot = availability['available_time'][timeIndex];
+                                            return Padding(
+                                              padding: const EdgeInsets.only(bottom: 5.0),
+                                              child: Text(
+                                                '${timeSlot['start_time']} - ${timeSlot['end_time']}',
+                                                style: TextStyle(color: Colors.grey[800]),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       );
                     },
@@ -377,6 +388,7 @@ Widget _buildConsultationFeeSection() {
               : Text('No availability times provided', style: TextStyle(color: Colors.grey)),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
