@@ -250,7 +250,7 @@ class DoctorCard extends StatelessWidget {
                     ),
                     Spacer(),
                     GestureDetector(
-                       onTap: onViewProfilePressed,
+                       onTap: onBookAppointmentPressed,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             vertical: 6.0, horizontal: 8.0),

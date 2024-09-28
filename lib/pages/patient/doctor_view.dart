@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'dart:convert';
-
+import 'package:market_doctor/pages/patient/book_appointment.dart';
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 
 class DoctorView extends StatefulWidget {
@@ -121,7 +121,7 @@ class _DoctorViewState extends State<DoctorView> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  ViewDocProfile(doctorCard: doc)));
+                                  DoctorAppointmentPag(doctorCard: doc)));
                     },
                   );
                 },

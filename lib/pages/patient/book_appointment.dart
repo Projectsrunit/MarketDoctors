@@ -1,189 +1,381 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import this package for date formatting
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
+import 'package:market_doctor/pages/patient/doctor_like_card.dart';
 
-class UpcomingAppointmentPage extends StatelessWidget {
+class DoctorAppointmentPag extends StatefulWidget {
+  final Map<String, dynamic> doctorCard;
+
+  DoctorAppointmentPag({required this.doctorCard});
+
+  @override
+  State<DoctorAppointmentPag> createState() => _DoctorAppointmentPagState();
+}
+
+class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
+  bool _isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Appointments'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Upcoming Appointments'),
-              Tab(text: 'Pending Appointments'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
+    return Scaffold(
+      appBar: PatientAppBar(),
+      body: Padding(
+        padding: EdgeInsets.all(8),
+        child: Flex(
+          direction: Axis.vertical,
           children: [
-            UpcomingAppointmentsTab(),
-            PendingAppointmentsTab(),
-          ],
-        ),
-        bottomNavigationBar: PatientBottomNavBar()
-      ),
-    );
-  }
-}
+            // Video, Call, and Chat icons with grey border
+            // Spacing between icons and next section
 
-// Widget for Upcoming Appointments Tab
-class UpcomingAppointmentsTab extends StatelessWidget {
-  const UpcomingAppointmentsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: 5, // Number of upcoming appointments
-      itemBuilder: (context, index) {
-        return AppointmentCard(
-          patientName: 'John Doe',
-          patientAge: 32,
-          appointmentDate: '09/09/2024',
-          appointmentTime: '10:30 AM',
-          imageUrl: 'assets/images/patient.png',
-          isPending: false,
-        );
-      },
-    );
-  }
-}
-
-// Widget for Pending Appointments Tab
-class PendingAppointmentsTab extends StatelessWidget {
-  const PendingAppointmentsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: 3, // Number of pending appointments
-      itemBuilder: (context, index) {
-        return AppointmentCard(
-          patientName: 'Jane Smith',
-          patientAge: 29,
-          appointmentDate: '09/09/2024',
-          appointmentTime: '1:00 PM',
-          imageUrl: 'assets/images/patient.png',
-          isPending: true,
-        );
-      },
-    );
-  }
-}
-
-// Reusable Appointment Card Widget
-class AppointmentCard extends StatelessWidget {
-  final String patientName;
-  final int patientAge;
-  final String appointmentTime;
-  final String appointmentDate;
-  final String imageUrl;
-  final bool isPending;
-
-  const AppointmentCard({
-    super.key,
-    required this.patientName,
-    required this.patientAge,
-    required this.appointmentTime,
-    required this.appointmentDate,
-    required this.imageUrl,
-    required this.isPending,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // First Row: Image and Patient Info
+            DocLikeCard(
+              imageUrl: widget.doctorCard['profile_picture'] ?? 
+                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+              name: 'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+              profession: (widget.doctorCard['specialisation'] != null &&
+                      widget.doctorCard['specialisation'].isNotEmpty)
+                  ? widget.doctorCard['specialisation']
+                  : 'General Practice',
+              rating: 4.5,
+              onChatPressed: () {},
+            ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Patient Image
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage(imageUrl),
-                ),
-                const SizedBox(width: 16),
-                // Patient Name and Age
-                Expanded(
+                _buildIcon(Icons.call),
+                SizedBox(width: 10), // Spacing between icons
+                _buildIcon(Icons.video_call),
+                SizedBox(width: 10),
+                _buildIcon(Icons.chat),
+              ],
+            ),
+
+            SizedBox(height: 20),
+
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        patientName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text('Age: $patientAge years'),
+                      // About doctor section
+                      _buildAboutDoctorSection(),
+
+                      // Consultation Fee section
+                      _buildConsultationFeeSection(),
+
+                      // Availability section
+                      _buildAvailabilitySection(),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 20),
-
-            // Second Row: Date and Time
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(Icons.calendar_month),
-                Text(
-                  'Date: $appointmentDate',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                Icon(Icons.punch_clock_sharp),
-                Text(
-                  'Time: $appointmentTime',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // Third Row: Action Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle Schedule Action
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      foregroundColor: Colors.white,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Center(
+                child: FractionallySizedBox(
+                  widthFactor: 0.6,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Your button functionality here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context)
+                              .textButtonTheme
+                              .style
+                              ?.backgroundColor
+                              ?.resolve({}) ?? Colors.white,
+                      foregroundColor: Theme.of(context)
+                              .textButtonTheme
+                              .style
+                              ?.foregroundColor
+                              ?.resolve({}) ?? Colors.blue,
+                      padding: EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      )),
-                  child: const Text('ReSchedule'),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text("Send message"),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle Proceed Action
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isPending ? Colors.blueAccent : Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      )),
-                  child: Text(isPending ? 'PrReScheduleoceed' : 'Proceed'),
-                ),
-              ],
+              ),
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: PatientBottomNavBar(),
+    );
+  }
+
+  Widget _buildIcon(IconData icon) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey), // Grey border
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, color: Colors.blue),
+    );
+  }
+
+  // About Doctor section
+  Widget _buildAboutDoctorSection() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'About doctor',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[800],
+            ),
+          ),
+          SizedBox(height: 10),
+          widget.doctorCard['about'] != null && widget.doctorCard['about'].isNotEmpty
+              ? GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: RichText(
+                    text: TextSpan(
+                      text: _isExpanded
+                          ? widget.doctorCard['about'] // Full description
+                          : widget.doctorCard['about'].substring(
+                              0,
+                              widget.doctorCard['about'].length > 100
+                                  ? 100
+                                  : widget.doctorCard['about'].length), // Shortened description
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      children: [
+                        if (!_isExpanded && widget.doctorCard['about'].length > 100)
+                          TextSpan(
+                            text: '... read more',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                      ],
+                    ),
+                  ),
+                )
+              : Text('No description provided', style: TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  // Consultation Fee Section
+  // Consultation Fee Section
+Widget _buildConsultationFeeSection() {
+  // Fetch the consultation fee and ensure it's an integer or double
+  var consultationFee = widget.doctorCard['consultation_fee'] != null
+      ? double.tryParse(widget.doctorCard['consultation_fee'].toString()) ?? 0.0
+      : 0.0;
+
+  const double bookingFee = 1000.0; // Constant booking fee
+  double totalFee = consultationFee + bookingFee; // Calculate total fee
+
+  return Container(
+    padding: EdgeInsets.all(16.0),
+    margin: EdgeInsets.symmetric(vertical: 10.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.3),
+          spreadRadius: 2,
+          blurRadius: 10,
+          offset: Offset(0, 5),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Consultation Fee',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            Text(
+              'N${consultationFee.toStringAsFixed(2)}', // Displaying the consultation fee
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10), // Add spacing between lines
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Booking Fee',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            Text(
+              'N${bookingFee.toStringAsFixed(2)}', // Displaying the constant booking fee
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10), // Add spacing between lines
+        Divider(), // Optional: Add a divider for clarity
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total Fee',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            Text(
+              'N${totalFee.toStringAsFixed(2)}', // Displaying the total fee
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+
+  // Availability section with date and time centered
+  Widget _buildAvailabilitySection() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Availability',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[800],
+            ),
+          ),
+          SizedBox(height: 10),
+          widget.doctorCard['doctor_availabilities'] != null &&
+                  widget.doctorCard['doctor_availabilities'].isNotEmpty
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center, // Center the content
+                  children: List.generate(
+                    widget.doctorCard['doctor_availabilities'].length,
+                    (index) {
+                      var availability = widget.doctorCard['doctor_availabilities'][index];
+                      var formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(availability['date']));
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(8.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center, // Center the dates and times
+                            children: [
+                              Text(
+                                'Date: $formattedDate',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue[700],
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center, // Center the times
+                                children: List.generate(
+                                  availability['available_time'].length,
+                                  (timeIndex) {
+                                    var timeSlot = availability['available_time'][timeIndex];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 5.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${timeSlot['start_time']} - ${timeSlot['end_time']}',
+                                            style: TextStyle(color: Colors.grey[800]),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              : Text('No availability times provided', style: TextStyle(color: Colors.grey)),
+        ],
       ),
     );
   }

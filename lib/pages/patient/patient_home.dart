@@ -6,6 +6,7 @@ import 'package:market_doctor/pages/patient/hospital.dart';
 import 'package:market_doctor/pages/patient/pharmacy.dart';
 import 'package:market_doctor/pages/patient/doctor_view.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
+import 'package:market_doctor/pages/patient/book_appointment.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
@@ -364,7 +365,14 @@ class PopularsState extends State<Populars> {
                 ),
               );
             },
-            onBookAppointmentPressed: () {},
+            onBookAppointmentPressed: () {
+               Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DoctorAppointmentPag(doctorCard: doctors[0]),
+                ),
+              );
+            },
           ),
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
@@ -386,7 +394,15 @@ class PopularsState extends State<Populars> {
                   ),
                 );
               },
-              onBookAppointmentPressed: () {},
+              onBookAppointmentPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DoctorAppointmentPag(doctorCard: doctors[1]),
+                  ),
+                );
+              },
             ),
           ],
         ] else ...[
