@@ -97,7 +97,7 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: Text("Send message"),
+                    child: Text("Book Appointment"),
                   ),
                 ),
               ),
@@ -223,7 +223,7 @@ Widget _buildConsultationFeeSection() {
               ),
             ),
             Text(
-              'N${consultationFee.toStringAsFixed(2)}', // Displaying the consultation fee
+              'N${consultationFee.toStringAsFixed(1)}', // Displaying the consultation fee
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.black,
@@ -244,7 +244,7 @@ Widget _buildConsultationFeeSection() {
               ),
             ),
             Text(
-              'N${bookingFee.toStringAsFixed(2)}', // Displaying the constant booking fee
+              'N${bookingFee.toStringAsFixed(1)}', // Displaying the constant booking fee
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.black,
@@ -266,10 +266,11 @@ Widget _buildConsultationFeeSection() {
               ),
             ),
             Text(
-              'N${totalFee.toStringAsFixed(2)}', // Displaying the total fee
+              'N${totalFee.toStringAsFixed(1)}', // Displaying the total fee
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
