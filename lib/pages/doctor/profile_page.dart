@@ -6,14 +6,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/availability_calendar.dart';
+import 'package:market_doctor/pages/doctor/doctor_availability.dart';
 import 'package:market_doctor/pages/doctor/doctor_information.dart';
 import 'package:market_doctor/pages/doctor/payments_main_widget.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
-import 'package:market_doctor/pages/doctor/doctor_form.dart';
-import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
@@ -75,7 +74,7 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.task_alt_outlined, "Task Management", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AvailabilityCalendar()));
+              MaterialPageRoute(builder: (context) => DoctorAvailability()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.medical_information_outlined, "Medical Profile",
