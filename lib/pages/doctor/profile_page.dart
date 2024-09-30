@@ -13,6 +13,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
@@ -69,7 +70,7 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.medical_services, "Patient Overview", () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ManagePaymentsDoctor()));
+              MaterialPageRoute(builder: (context) => UpcomingAppointmentPage()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.task_alt_outlined, "Task Management", () {
@@ -77,10 +78,10 @@ class DoctorProfilePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => DoctorAvailability()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.medical_information_outlined, "Medical Profile",
+        _buildArrowRow(Icons.medical_information_outlined, "Payment Accounts",
             () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AvailabilityCalendar()));
+              MaterialPageRoute(builder: (context) => ManagePaymentsDoctor()));
         }),
         Divider(color: Colors.grey[300], thickness: 2),
       ],
