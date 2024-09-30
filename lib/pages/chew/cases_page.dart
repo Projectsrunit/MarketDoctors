@@ -21,11 +21,6 @@ class CasesPageState extends State<CasesPage> {
   int? _activeCaseIndex;
   IconType? _activeIconType;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -127,15 +122,6 @@ class CasesPageState extends State<CasesPage> {
         );
       },
     );
-  }
-
-  void updateCases(int index, Map<String, dynamic> updatedCase) {
-    // setState(() {
-    //   cases[index] = {
-    //     ...cases[index],
-    //     'attributes': {...cases[index], ...updatedCase}
-    //   };
-    // });
   }
 
   @override

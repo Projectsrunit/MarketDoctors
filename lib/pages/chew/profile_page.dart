@@ -282,7 +282,8 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                   );
 
                   if (response.statusCode == 200) {
-                    context.read<DataStore>().addPayment(paymentData);
+                    var jsoned = jsonDecode(response.body);
+                    context.read<DataStore>().addPayment({'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
 
                     Fluttertoast.showToast(
                       msg: 'Saved successfully',
@@ -299,6 +300,7 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                     throw Exception('Failed to delete');
                   }
                 } catch (e) {
+                  print('this is the error: $e');
                   Fluttertoast.showToast(
                     msg: 'Failed. Please try again',
                     toastLength: Toast.LENGTH_SHORT,
@@ -308,7 +310,6 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                     textColor: Colors.white,
                     fontSize: 16.0,
                   );
-                  print('Error: $e');
                 }
               },
               child: Text('Save'),
