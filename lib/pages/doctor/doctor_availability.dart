@@ -1,15 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/main.dart';
+import 'package:intl/intl.dart';
 
 class DoctorAvailability extends StatefulWidget {
   const DoctorAvailability({super.key});
@@ -20,14 +15,15 @@ class DoctorAvailability extends StatefulWidget {
 
 class _DoctorAvailabilityState extends State<DoctorAvailability> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _yearsOfExperienceController = TextEditingController();
-  final TextEditingController _clinicHealthFacilityController = TextEditingController();
-  final TextEditingController _specializationController = TextEditingController();
-  final TextEditingController _awardsAndRecognitionController = TextEditingController();
+  final TextEditingController _yearsOfExperienceController =
+      TextEditingController();
+  final TextEditingController _clinicHealthFacilityController =
+      TextEditingController();
+  final TextEditingController _specializationController =
+      TextEditingController();
+  final TextEditingController _awardsAndRecognitionController =
+      TextEditingController();
   final TextEditingController _languageController = TextEditingController();
-
-  final ImagePicker _picker = ImagePicker();
-  File? _profileImage;
 
   @override
   void initState() {
@@ -36,33 +32,30 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
   }
 
   Future<void> _fetchUserData() async {
-    final doctorData = Provider.of<DataStore>(context, listen: false).doctorData;
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
     if (doctorData != null) {
-      _yearsOfExperienceController.text = doctorData['yearsOfExperience']?.toString() ?? '';
-      _clinicHealthFacilityController.text = doctorData['clinicHealthFacility'] ?? '';
+      _yearsOfExperienceController.text =
+          doctorData['yearsOfExperience']?.toString() ?? '';
+      _clinicHealthFacilityController.text =
+          doctorData['clinicHealthFacility'] ?? '';
       _specializationController.text = doctorData['specialization'] ?? '';
       _languageController.text = doctorData['languages'] ?? '';
-      _awardsAndRecognitionController.text = doctorData['awardsAndRecognition'] ?? '';
+      _awardsAndRecognitionController.text =
+          doctorData['awardsAndRecognition'] ?? '';
     } else {
       _showSnackBar('No doctor data found.');
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
-  }
-
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildDoctorProfile() {
-    final doctorData = Provider.of<DataStore>(context, listen: false).doctorData;
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
     final name = doctorData != null
         ? '${doctorData['firstName']} ${doctorData['lastName']}'
         : 'Unknown Doctor';
@@ -70,26 +63,39 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
     final profilePic = doctorData?['profile_picture'];
     final availabilities = doctorData?['doctor_availabilities'] ?? [];
 
+    final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+    final DateTime currentDate = DateTime.now();
+
+    // Filter availabilities to show only current and future dates
+    final upcomingAvailabilities = availabilities.where((availability) {
+      final DateTime availabilityDate = DateTime.parse(availability['date']);
+      return availabilityDate.isAfter(currentDate) || 
+             availabilityDate.isAtSameMomentAs(currentDate);
+    }).toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Profile section
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 40,
                 backgroundImage: profilePic != null
                     ? NetworkImage(profilePic)
-                    : const AssetImage('assets/images/placeholder.png') as ImageProvider,
+                    : const AssetImage('assets/images/placeholder.png')
+                        as ImageProvider,
               ),
               const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                   Text(specialization,
                       style: const TextStyle(fontSize: 16, color: Colors.grey)),
                 ],
@@ -102,36 +108,92 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
           const Text('Availability:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          ...availabilities.map<Widget>((availability) {
-            final date = availability['date'];
-            final availableTimes = availability['available_time'];
+          upcomingAvailabilities.isNotEmpty
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: upcomingAvailabilities.map<Widget>((availability) {
+                    final date = availability['date'];
+                    final availableTimes = availability['available_time'];
 
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Date: $date',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    availableTimes != null && availableTimes.isNotEmpty
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: availableTimes.map<Widget>((time) {
-                              return Text('Time: ${time['start_time']} - ${time['end_time']}');
-                            }).toList(),
-                          )
-                        : const Text('No available time'),
-                  ],
+                    return Card(
+                      elevation: 5,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Date: $date',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 5),
+                            availableTimes != null && availableTimes.isNotEmpty
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children:
+                                        availableTimes.map<Widget>((time) {
+                                      return Text(
+                                          'Time: ${time['start_time']} - ${time['end_time']}');
+                                    }).toList(),
+                                  )
+                                : const Text('No available time'),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                )
+              : const Center(
+                  child: Text(
+                    'No upcoming availabilities',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return Align(
+      alignment: Alignment.center,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AvailabilityCalendar(),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.blueAccent,
+        ),
+        child: const Text(
+          'Add Availability',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
       ),
     );
   }
@@ -140,12 +202,13 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DoctorApp(),
+      backgroundColor: Colors.grey[200], // Background color set to grey
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Center(
                 child: Text(
@@ -159,8 +222,9 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
                 ),
               ),
               const SizedBox(height: 30),
-              // Add more form fields and logic here
               _buildDoctorProfile(),
+              const SizedBox(height: 50),
+              _buildSaveButton(),
             ],
           ),
         ),
