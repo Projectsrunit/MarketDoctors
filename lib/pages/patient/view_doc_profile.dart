@@ -159,18 +159,8 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
-                      widget.doctorCard['languages'] != null &&
-                              widget.doctorCard['languages'].isNotEmpty
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(
-                                  widget.doctorCard['languages'].length,
-                                  (index) {
-                                return Text(
-                                    widget.doctorCard['languages'][index]);
-                              }),
-                            )
-                          : Text('Undeclared'),
+                      widget.doctorCard['languages'] != null  ? 
+                      Text(widget.doctorCard['languages']) : Text('Undeclared'),
                     ],
                   ),
                 ),
