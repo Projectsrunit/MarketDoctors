@@ -146,7 +146,6 @@ class DataStore with ChangeNotifier {
   void removeCase(int index) {
     if (userData != null && userData?['cases'] != null) {
       userData?['cases'].removeAt(index);
-      print('the userdata cases now ${userData?['cases']}');
       notifyListeners();
     }
   }
@@ -158,6 +157,16 @@ class DataStore with ChangeNotifier {
         ...updates
       };
     }
+  }
+
+  void addCase(Map newCase) {
+    if (userData != null) {
+      if (userData!['cases'] == null) {
+        userData!['cases'] = [];
+      }
+      userData!['cases'].add(newCase);
+      notifyListeners();
+    } 
   }
 
   void updatePatientData(Map? newValue) {

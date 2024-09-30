@@ -24,10 +24,10 @@ class DoctorCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800]! :Colors.grey.shade300,
           width: 1,
         ),
         boxShadow: [
@@ -129,27 +129,6 @@ class DoctorCard extends StatelessWidget {
                     ],
                   ),
                   Spacer(),
-                  GestureDetector(
-                    onTap: onBookAppointmentPressed,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(5)),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: 'Book',
-                                style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 4,)
                 ],
               ),
             ),
