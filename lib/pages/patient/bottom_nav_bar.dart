@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:market_doctor/pages/patient/profile_page.dart';
+import 'package:market_doctor/pages/patient/contact.dart';
 import 'package:market_doctor/pages/patient/health_tips.dart';
 import 'package:market_doctor/pages/patient/patient_home.dart';
 
@@ -116,7 +117,7 @@ class _PatientBottomNavBarState extends State<PatientBottomNavBar> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PatientProfilePage(),
+                      builder: (context) => ContactPage(),
                     ),
                   );
                 },

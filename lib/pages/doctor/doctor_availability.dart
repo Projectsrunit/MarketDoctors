@@ -71,8 +71,8 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
     // Filter availabilities to show only current and future dates
     final upcomingAvailabilities = availabilities.where((availability) {
       final DateTime availabilityDate = DateTime.parse(availability['date']);
-      return availabilityDate.isAfter(currentDate) || 
-             availabilityDate.isAtSameMomentAs(currentDate);
+      return availabilityDate.isAfter(currentDate) ||
+          availabilityDate.isAtSameMomentAs(currentDate);
     }).toList();
 
     return SingleChildScrollView(
@@ -124,6 +124,7 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9, // Wider card
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -143,7 +144,10 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
                             Text(
                               'Date: $date',
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue, // Blue color for the date
+                              ),
                             ),
                             const SizedBox(height: 5),
                             availableTimes != null && availableTimes.isNotEmpty
