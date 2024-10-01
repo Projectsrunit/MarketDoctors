@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
