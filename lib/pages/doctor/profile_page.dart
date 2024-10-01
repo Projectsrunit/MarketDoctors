@@ -69,8 +69,10 @@ class DoctorProfilePage extends StatelessWidget {
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.medical_services, "Patient Overview", () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => UpcomingAppointmentPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpcomingAppointmentPage()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildArrowRow(Icons.task_alt_outlined, "Task Management", () {
@@ -104,8 +106,11 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildNoArrowRow(context, Icons.person_2,
-            "Upload / Update Profile", _showPinPopup),
+        _buildArrowRow(Icons.medical_information_outlined, "Upload/ Update Profile Picture",
+            () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => DoctorInformation()));
+        }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateDoctorData(null);

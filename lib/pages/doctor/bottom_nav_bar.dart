@@ -72,7 +72,7 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                               builder: (context) => UpcomingAppointmentPage()));
                     },
                   ),
-                  Text("Cases"),
+                  Text("Appointments"),
                 ],
               ),
               SizedBox(width: 70),

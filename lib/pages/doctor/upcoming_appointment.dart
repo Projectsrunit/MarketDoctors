@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'dart:convert';
 
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ class UpcomingAppointmentPage extends StatelessWidget {
             AppointmentListTab(isPending: true),
           ],
         ),
+        bottomNavigationBar: DoctorBottomNavBar(),
       ),
     );
   }
@@ -95,7 +97,8 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
                   appointment['attributes']['patient']['data']['attributes'];
               return AppointmentCard(
                 patientName: '${patient['firstName']} ${patient['lastName']}',
-                patientAge: calculateAge(DateTime.parse(patient['dateOfBirth'])),
+                patientAge:
+                    calculateAge(DateTime.parse(patient['dateOfBirth'])),
                 appointmentDate: appointment['attributes']['appointment_date'],
                 appointmentTime: appointment['attributes']['appointment_time'],
                 imageUrl: 'assets/images/patient.png',
@@ -123,12 +126,18 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
 }
 
 // Reusable AppointmentCard Widget
-class AppointmentCard extends StatelessWidget {
+
+ 
+
+
+           
+    
+  class AppointmentCard extends StatelessWidget {
   final String patientName;
   final int patientAge;
   final String appointmentDate;
   final String appointmentTime;
-  final String imageUrl;
+  final String? imageUrl; // Make imageUrl nullable
   final bool isPending;
 
   const AppointmentCard({
@@ -137,7 +146,7 @@ class AppointmentCard extends StatelessWidget {
     required this.patientAge,
     required this.appointmentDate,
     required this.appointmentTime,
-    required this.imageUrl,
+    this.imageUrl, // Optional image URL
     required this.isPending,
   });
 
@@ -156,7 +165,12 @@ class AppointmentCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: AssetImage(imageUrl),
+                  backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
+                      ? AssetImage(imageUrl!) // Use image if available
+                      : null, // No image
+                  child: imageUrl == null || imageUrl!.isEmpty
+                      ? const Icon(Icons.person, size: 30) // Display icon if no image
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -243,3 +257,5 @@ class AppointmentCard extends StatelessWidget {
     );
   }
 }
+
+
