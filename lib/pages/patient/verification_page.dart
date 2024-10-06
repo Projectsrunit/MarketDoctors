@@ -15,6 +15,7 @@ class PatientVerificationPage extends StatefulWidget {
 
 class _PatientVerificationPageState extends State<PatientVerificationPage> {
   final _otpControllers = List.generate(4, (index) => TextEditingController());
+  final _focusNodes = List.generate(4, (index) => FocusNode()); // Create FocusNodes
   bool _isLoading = false;  // For loading state during API request
   String baseUrl = dotenv.env['API_URL']!; // Get the API baseUrl from environment
 
@@ -25,7 +26,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
     if (otp.length != 4) {
       // Show error if OTP is not 4 digits long
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 4-digit OTP.')),
+        const SnackBar(content: Text('Please enter a valid 4-digit OTP sent to your Email.')),
       );
       return;
     }
@@ -93,6 +94,9 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
     for (var controller in _otpControllers) {
       controller.dispose();
     }
+    for (var focusNode in _focusNodes) {
+      focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -113,7 +117,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Enter the OTP sent to your mail and phone number',
+                'Enter the OTP sent to your email',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
@@ -127,9 +131,19 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                     width: 50,
                     child: TextField(
                       controller: _otpControllers[index],
+                      focusNode: _focusNodes[index],  // Assign FocusNode
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1, // Only 1 digit per field
+                      onChanged: (value) {
+                        if (value.isNotEmpty && index < 3) {
+                          // Move to the next field when a digit is entered
+                          _focusNodes[index + 1].requestFocus();
+                        } else if (value.isEmpty && index > 0) {
+                          // Move to the previous field on backspace
+                          _focusNodes[index - 1].requestFocus();
+                        }
+                      },
                       decoration: InputDecoration(
                         counterText: '', // Hide the character counter
                         border: OutlineInputBorder(
@@ -163,7 +177,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
               GestureDetector(
                 onTap: _isLoading ? null : _resendOtp,  // Disable if loading
                 child: const Text(
-                  'Did not receive Code? Ask for Resend',
+                  'Check your Inbox / Spam folder for the code',
                   style: TextStyle(
                     color: Colors.blue,
                     decoration: TextDecoration.underline,

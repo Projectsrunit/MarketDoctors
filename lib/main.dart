@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:market_doctor/pages/patient/verification_page.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
@@ -95,7 +96,8 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: themeNotifier.themeMode,
       // home: ChooseUserTypePage(),
-      home: OnboardingScreen()
+      // home: OnboardingScreen()
+      home: PatientVerificationPage(reference: '',)
     );
   }
 }
