@@ -96,8 +96,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: themeNotifier.themeMode,
       // home: ChooseUserTypePage(),
-      // home: OnboardingScreen()
-      home: PatientVerificationPage(reference: '',)
+      home: OnboardingScreen()
     );
   }
 }
