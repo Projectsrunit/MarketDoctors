@@ -34,7 +34,7 @@ class PatientCheckInboxPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const PatientVerificationPage(),
+                    builder: (context) => const PatientVerificationPage(reference: '',),
                   ),
                 );
               },
