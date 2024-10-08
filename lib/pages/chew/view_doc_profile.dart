@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/chew/doctor_like_card.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +36,13 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   ? widget.doctorCard['specialisation']
                   : 'General Practice',
               rating: 4.5,
-              onChatPressed: () {},
+              onChatPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChattingPage(
+                doctorName: 'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                doctorImage: widget.doctorCard['profile_picture'] ??
+                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                  doctorPhoneNumber: widget.doctorCard['phone'],
+                  doctorId: widget.doctorCard['id'],
+              ))),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),

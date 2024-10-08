@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -82,7 +83,7 @@ class _DoctorViewState extends State<DoctorView> {
                   ),
                 ),
               ),
-              SizedBox( width: 48), 
+              SizedBox(width: 48),
             ],
           ),
           if (isLoading) ...[
@@ -100,15 +101,25 @@ class _DoctorViewState extends State<DoctorView> {
                 itemBuilder: (context, index) {
                   final doc = doctors[index];
                   return DoctorCard(
-                    imageUrl:
-                        doc['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                    imageUrl: doc['profile_picture'] ??
+                        'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
                     profession: (doc['specialisation'] != null &&
                             doc['specialisation'].isNotEmpty)
                         ? doc['specialisation']
                         : 'General Practice',
                     rating: 4.5,
-                    onChatPressed: () {},
+                    onChatPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChattingPage(
+                                  doctorId: doc['id'],
+                                  doctorName:
+                                      'Dr. ${doc['firstName']} ${doc['lastName']}',
+                                  doctorImage: doc['profile_picture'] ??
+                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                                  doctorPhoneNumber: doc['phone'],
+                                ))),
                     onViewProfilePressed: () {
                       Navigator.push(
                           context,
