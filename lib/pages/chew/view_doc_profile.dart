@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/chew/doctor_like_card.dart';
+import 'package:intl/intl.dart';
 
 class ViewDocProfile extends StatefulWidget {
   final Map<String, dynamic> doctorCard;
@@ -34,7 +36,17 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   ? widget.doctorCard['specialisation']
                   : 'General Practice',
               rating: 4.5,
-              onChatPressed: () {},
+              onChatPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChattingPage(
+                            doctorName:
+                                'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                            doctorImage: widget.doctorCard['profile_picture'] ??
+                                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                            doctorPhoneNumber: widget.doctorCard['phone'],
+                            doctorId: widget.doctorCard['id'],
+                          ))),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -45,15 +57,25 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                     children: [
                       Icon(Icons.groups, size: 30),
                       SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Flex(
+                        direction: Axis.vertical,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            '1000+',
+                            (widget.doctorCard['doctor_appoint'] != null &&
+                                    widget
+                                        .doctorCard['doctor_appoint'].isNotEmpty
+                                ? '${widget.doctorCard['doctor_appoint'].length}+'
+                                : '1+'),
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          Text('patients'),
+                          Text(
+                            'patients',
+                            style: TextStyle(fontSize: 14),
+                          )
                         ],
                       ),
                     ],
@@ -66,13 +88,17 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '10 years',
+                            (widget.doctorCard['years_of_experience'] != null
+                                ? '${widget.doctorCard['years_of_experience']} years'
+                                : '1+ years'),
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             'experience',
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(fontSize: 14),
                           ),
                         ],
                       ),
@@ -82,12 +108,15 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                     children: [
                       Icon(Icons.location_on, size: 30),
                       SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Any District', style: TextStyle(fontSize: 14)),
-                          Text('Nigeria', style: TextStyle(fontSize: 12)),
-                        ],
+                      Container(
+                        constraints: BoxConstraints(maxWidth: 100),
+                        child: Text(
+                          widget.doctorCard['facility'] ?? 'Nigeria',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -104,7 +133,7 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                       Text(
                         'About doctor',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       GestureDetector(
@@ -115,17 +144,22 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                         },
                         child: RichText(
                           text: TextSpan(
-                            text: _isExpanded
-                                ? widget.doctorCard['email']
-                                : widget.doctorCard['createdAt'],
-                            style: TextStyle(color: Colors.black),
-                            children: [
-                              if (!_isExpanded)
-                                TextSpan(
-                                  text: '... read more',
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                            ],
+                            text: widget.doctorCard['about'] == null
+                                ? 'Doctor\'s description not yet set'
+                                : (_isExpanded
+                                    ? (widget.doctorCard['about']!.length > 150
+                                        ? widget.doctorCard['about']
+                                                .substring(0, 150) +
+                                            '... read more'
+                                        : widget.doctorCard['about'])
+                                    : widget.doctorCard['about']),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                       ),
@@ -133,43 +167,73 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                       Text(
                         'Availability',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Monday-Friday'),
-                          Text('9am - 5pm'),
-                        ],
-                      ),
+                      widget.doctorCard['doctor_availabilities'] != null &&
+                              widget.doctorCard['doctor_availabilities']
+                                  .isNotEmpty
+                          ? SizedBox(
+                              height: widget.doctorCard['doctor_availabilities']
+                                          .length >
+                                      3
+                                  ? 100
+                                  : (widget.doctorCard['doctor_availabilities']
+                                          .length *
+                                      40.0),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: widget
+                                      .doctorCard['doctor_availabilities']
+                                      .map<Widget>((availability) {
+                                    DateTime date =
+                                        DateTime.parse(availability['date']);
+                                    String dayOfWeek =
+                                        DateFormat('EEE').format(date);
+                                    String dayOfMonth = date.day.toString();
+                                    String month =
+                                        DateFormat('MMMM').format(date);
+                                    return Column(
+                                      children: availability['available_time']
+                                          .map<Widget>((time) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                                '$dayOfWeek $dayOfMonth $month'),
+                                            Text(
+                                                '${time['start_time']} - ${time['end_time']}'),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            )
+                          : Text('No availability data available.'),
                       SizedBox(height: 20),
                       Text(
                         'Specialisation',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
-                      widget.doctorCard['specialisation'] != null  ? 
-                      Text(widget.doctorCard['specialisation']) : Text('Undeclared'),
+                      widget.doctorCard['specialisation'] != null
+                          ? Text(widget.doctorCard['specialisation'])
+                          : Text('Undeclared'),
                       SizedBox(height: 20),
                       Text(
                         'Languages',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
-                      widget.doctorCard['languages'] != null &&
-                              widget.doctorCard['languages'].isNotEmpty
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(
-                                  widget.doctorCard['languages'].length,
-                                  (index) {
-                                return Text(
-                                    widget.doctorCard['languages'][index]);
-                              }),
-                            )
+                      widget.doctorCard['languages'] != null
+                          ? Text(widget.doctorCard['languages'])
                           : Text('Undeclared'),
                     ],
                   ),
@@ -183,15 +247,19 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   widthFactor: 0.6,
                   child: ElevatedButton(
                     onPressed: () {
-                      // if (_formKey.currentState!.validate()) {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => AddCaseForm2(
-                      //             outreach: _outreachLocationController.text,
-                      //             partner: _choosePartnerController.text),
-                      //       ));
-                      // }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChattingPage(
+                            doctorName:
+                                'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                            doctorImage: widget.doctorCard['profile_picture'] ??
+                                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                            doctorPhoneNumber: widget.doctorCard['phone'],
+                            doctorId: widget.doctorCard['id'],
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context)

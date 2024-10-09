@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:market_doctor/pages/patient/verification_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(create: (_) => ChatStore()),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ChangeNotifierProvider(create: (_) => DataStore())
     ],
@@ -130,6 +129,122 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
+class ChatStore extends ChangeNotifier {
+  Map<int, Map<int, Map<String, dynamic>>> latestsMap = {};
+  Map<int, Map<int, Map<String, dynamic>>> _messages = {};
+  Map<String, dynamic>? _latestMessage;
+  Map? _getOlderMessagesFor;
+  int? _readStatusForId;
+  int? _deliveryStatusForId;
+
+  Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
+  Map? get getOlderMessagesFor => _getOlderMessagesFor;
+  Map<String, dynamic> get latestMessage => _latestMessage ?? {};
+  int? get readStatusForId => _readStatusForId;
+  int? get deliveryStatusForId => _deliveryStatusForId;
+
+  void addMessage(Map<String, dynamic> message, int docId) {
+    int messageId = message['id'];
+
+    if (!_messages.containsKey(docId)) {
+      _messages[docId] = {};
+    }
+    _messages[docId]![messageId] = message;
+    notifyListeners();
+  }
+
+  void addLatestsMessage(int doctorId, Map<String, dynamic> message) {
+    int messageId = message['id'];
+
+    if (!latestsMap.containsKey(doctorId)) {
+      latestsMap[doctorId] = {};
+    }
+    latestsMap[doctorId]?[messageId] = message;
+    notifyListeners();
+  }
+
+  void removeLatestsMessage(int doctorId) {
+    latestsMap.remove(doctorId);
+    notifyListeners();
+  }
+
+  void sendMessage(Map<String, dynamic> message, int docId) {
+    int messageId = message['id'];
+
+    if (!_messages.containsKey(docId)) {
+      _messages[docId] = {};
+    }
+
+    _messages[docId]![messageId] = message;
+    _latestMessage = message;
+    notifyListeners();
+  }
+
+  void getOlderMessages(Map params) {
+    _getOlderMessagesFor = params;
+    notifyListeners();
+  }
+
+  void resetNewMessageFlag() {
+    _latestMessage = null;
+  }
+
+  void resetOlderMessages() {
+    _getOlderMessagesFor = null;
+  }
+
+  void receiveDeliveryStatus(Map<String, dynamic> updatedMessage, int docId) {
+    int messageId = updatedMessage['id'];
+
+    if (_messages.containsKey(docId) &&
+        _messages[docId]!.containsKey(messageId)) {
+      _messages[docId]![messageId] = {
+        ..._messages[docId]![messageId]!,
+        'delivery_status': updatedMessage['delivery_status']
+      };
+      notifyListeners();
+    }
+  }
+
+  void receiveReadStatus(Map<String, dynamic> updatedMessage, int docId) {
+    int messageId = updatedMessage['id'];
+
+    if (_messages.containsKey(docId) &&
+        _messages[docId]!.containsKey(messageId)) {
+      _messages[docId]![messageId] = {
+        ..._messages[docId]![messageId]!,
+        'read_status': updatedMessage['read_status']
+      };
+      notifyListeners();
+    }
+  }
+
+  void sendDeliveryStatus(int id) {
+    _deliveryStatusForId = id;
+    notifyListeners();
+  }
+
+  void sendReadStatus(int id) {
+    _readStatusForId = id;
+    notifyListeners();
+  }
+
+  void resetReadId() {
+    _readStatusForId = null;
+  }
+
+  void resetDeliveryId() {
+    _deliveryStatusForId = null;
+  }
+
+  void removeMessage(int docId, int messageId) {
+    if (_messages.containsKey(docId)) {
+      _messages[docId]?.remove(messageId);
+      notifyListeners();
+    }
+  }
+}
+
 class DataStore with ChangeNotifier {
   Map? userData;
 
@@ -170,10 +285,7 @@ class DataStore with ChangeNotifier {
 
   void updateCase(int index, Map updates) {
     if (userData != null && userData?['cases'] != null) {
-      userData?['cases'][index] = {
-        ...userData?['cases'][index],
-        ...updates
-      };
+      userData?['cases'][index] = {...userData?['cases'][index], ...updates};
     }
   }
 
@@ -184,7 +296,7 @@ class DataStore with ChangeNotifier {
       }
       userData!['cases'].add(newCase);
       notifyListeners();
-    } 
+    }
   }
 
   void updatePatientData(Map? newValue) {
