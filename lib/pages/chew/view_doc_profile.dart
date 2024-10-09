@@ -36,13 +36,17 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   ? widget.doctorCard['specialisation']
                   : 'General Practice',
               rating: 4.5,
-              onChatPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChattingPage(
-                doctorName: 'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
-                doctorImage: widget.doctorCard['profile_picture'] ??
-                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                  doctorPhoneNumber: widget.doctorCard['phone'],
-                  doctorId: widget.doctorCard['id'],
-              ))),
+              onChatPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChattingPage(
+                            doctorName:
+                                'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                            doctorImage: widget.doctorCard['profile_picture'] ??
+                                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                            doctorPhoneNumber: widget.doctorCard['phone'],
+                            doctorId: widget.doctorCard['id'],
+                          ))),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -58,7 +62,9 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            (widget.doctorCard['doctor_appoint'] != null && widget.doctorCard['doctor_appoint'].isNotEmpty
+                            (widget.doctorCard['doctor_appoint'] != null &&
+                                    widget
+                                        .doctorCard['doctor_appoint'].isNotEmpty
                                 ? '${widget.doctorCard['doctor_appoint'].length}+'
                                 : '1+'),
                             style: TextStyle(
@@ -66,7 +72,10 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text('patients', style: TextStyle(fontSize: 14),)
+                          Text(
+                            'patients',
+                            style: TextStyle(fontSize: 14),
+                          )
                         ],
                       ),
                     ],
@@ -167,19 +176,25 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                               widget.doctorCard['doctor_availabilities']
                                   .isNotEmpty
                           ? SizedBox(
-                            height: widget.doctorCard['doctor_availabilities'].length > 3 ? 100 : (widget.doctorCard['doctor_availabilities'].length * 40.0),
-                            child: SingleChildScrollView(
+                              height: widget.doctorCard['doctor_availabilities']
+                                          .length >
+                                      3
+                                  ? 100
+                                  : (widget.doctorCard['doctor_availabilities']
+                                          .length *
+                                      40.0),
+                              child: SingleChildScrollView(
                                 child: Column(
                                   children: widget
                                       .doctorCard['doctor_availabilities']
                                       .map<Widget>((availability) {
                                     DateTime date =
                                         DateTime.parse(availability['date']);
-                                    String dayOfWeek = DateFormat('EEE')
-                                        .format(date);
+                                    String dayOfWeek =
+                                        DateFormat('EEE').format(date);
                                     String dayOfMonth = date.day.toString();
-                                    String month = DateFormat('MMMM')
-                                        .format(date);
+                                    String month =
+                                        DateFormat('MMMM').format(date);
                                     return Column(
                                       children: availability['available_time']
                                           .map<Widget>((time) {
@@ -198,7 +213,7 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                                   }).toList(),
                                 ),
                               ),
-                          )
+                            )
                           : Text('No availability data available.'),
                       SizedBox(height: 20),
                       Text(
@@ -232,15 +247,19 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   widthFactor: 0.6,
                   child: ElevatedButton(
                     onPressed: () {
-                      // if (_formKey.currentState!.validate()) {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => AddCaseForm2(
-                      //             outreach: _outreachLocationController.text,
-                      //             partner: _choosePartnerController.text),
-                      //       ));
-                      // }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChattingPage(
+                            doctorName:
+                                'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                            doctorImage: widget.doctorCard['profile_picture'] ??
+                                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                            doctorPhoneNumber: widget.doctorCard['phone'],
+                            doctorId: widget.doctorCard['id'],
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context)

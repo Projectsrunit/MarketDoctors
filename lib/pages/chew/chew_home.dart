@@ -46,8 +46,6 @@ class ChewHomeState extends State<ChewHome> {
     super.dispose();
     socket?.disconnect();
     _isSocketInitialized = false;
-    chatStore?.removeListener(_sendPendingUpdates);
-    chatStore?.removeListener(_sendPendingUpdates);
   }
 
   void _initializeSocket() {
@@ -133,8 +131,24 @@ class ChewHomeState extends State<ChewHome> {
     ChatStore chatStore = context.read<ChatStore>();
 
     if (chatStore.latestMessage.isNotEmpty) {
+      int messageId = chatStore.latestMessage['id'];
       if (socket!.connected) {
-        socket!.emit('new_message', chatStore.latestMessage);
+        socket!.emitWithAck(
+          'new_message',
+          chatStore.latestMessage,
+          ack: (response) {
+            if (response['success'] == true) {
+              Map<String, dynamic> newMessage = response['message'];
+              int docId = newMessage['receiver'];
+              chatStore.addMessage(newMessage, docId);
+              if (newMessage['id'] != messageId) {
+                chatStore.removeMessage(docId, messageId);
+              }
+            } else {
+              print('Error: ${response['error']}');
+            }
+          },
+        );
       } else {
         setState(() {
           unsentMessages.add(chatStore.latestMessage);
@@ -144,8 +158,8 @@ class ChewHomeState extends State<ChewHome> {
     }
 
     if (chatStore.readStatusForId != null) {
-      socket!.emit('update_read_status',
-          {'message_id': chatStore.readStatusForId});
+      socket!.emit(
+          'update_read_status', {'message_id': chatStore.readStatusForId});
       chatStore.resetReadId();
     }
 

@@ -38,17 +38,16 @@ class ChattingPageState extends State<ChattingPage> {
   @override
   void dispose() {
     super.dispose();
-    chatStore?.removeListener(doDeliveryChecks);
   }
 
   void doDeliveryChecks() {
-    final latestsMap = context.read<ChatStore>().latestsMap;
-    if (latestsMap[widget.doctorId] != null) {
-      latestsMap[widget.doctorId]?.forEach((messageId, message) {
+    final latestsMap = chatStore?.latestsMap;
+    if (latestsMap?[widget.doctorId] != null) {
+      latestsMap?[widget.doctorId]?.forEach((messageId, message) {
         _handleMessageStatus(message, messageId);
       });
 
-      context.read<ChatStore>().removeLatestsMessage(widget.doctorId);
+      chatStore?.removeLatestsMessage(widget.doctorId);
     }
   }
 
@@ -66,25 +65,22 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   void _checkAndSendUnreadDeliveryStatuses() {
-    final chatStore = context.read<ChatStore>();
-
-    final messages = chatStore.messages[widget.doctorId] ?? {};
+    final messages = chatStore?.messages[widget.doctorId] ?? {};
 
     messages.forEach((messageId, message) {
       if (message['sender'] == widget.doctorId) {
         if (message['delivery_status'] != true) {
-          chatStore.sendDeliveryStatus(messageId);
+          chatStore?.sendDeliveryStatus(messageId);
         }
 
         if (message['read_status'] == false || message['read_status'] == null) {
-          chatStore.sendReadStatus(messageId);
+          chatStore?.sendReadStatus(messageId);
         }
       }
     });
   }
 
   void _handleMessageStatus(Map<String, dynamic> message, int messageId) {
-
     if (message['delivery_status'] != true) {
       chatStore?.sendDeliveryStatus(messageId);
     }
@@ -96,14 +92,13 @@ class ChattingPageState extends State<ChattingPage> {
 
   void _loadOlderMessages() {
     int chewId = context.read<DataStore>().chewData?['id'];
-    final chatStore = context.read<ChatStore>();
 
     Map<String, dynamic> requestParams = {
       'own_id': chewId,
       'other_id': widget.doctorId,
     };
 
-    final messages = chatStore.messages[widget.doctorId] ?? {};
+    final messages = chatStore?.messages[widget.doctorId] ?? {};
 
     if (messages.isNotEmpty) {
       int oldestMessageId = messages.keys.reduce((a, b) => a < b ? a : b);
@@ -113,7 +108,7 @@ class ChattingPageState extends State<ChattingPage> {
       }
     }
 
-    chatStore.getOlderMessages(requestParams);
+    chatStore?.getOlderMessages(requestParams);
     loadedOlderMessages = true;
   }
 
@@ -177,116 +172,115 @@ class ChattingPageState extends State<ChattingPage> {
     bool isSender = message?['sender'] == chewId;
     String status = message?['delivery_status'] == true ? '✓✓' : '✓';
 
-return Align(
-  alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-  child: Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-    child: FractionallySizedBox(
-      widthFactor: 0.7,
-      child: Row(
-        mainAxisAlignment:
-            isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isSender)
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 14,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey, width: 2,
-                  ),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                          widget.doctorImage,
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                        )
-                ),
-              ),
-            ),
-          if (!isSender) SizedBox(width: 8),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-              decoration: BoxDecoration(
-                color: isSender ? Colors.green[100] : Colors.blue[100],
-                borderRadius: BorderRadius.only(
-                  topLeft: isSender ? Radius.circular(10) : Radius.zero,
-                  topRight: isSender ? Radius.zero : Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (message?['text_body'] != null)
-                    Text(
-                      message?['text_body'],
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+    return Align(
+      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        child: FractionallySizedBox(
+          widthFactor: 0.7,
+          child: Row(
+            mainAxisAlignment:
+                isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isSender)
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 14,
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 2,
                       ),
                     ),
-                  if (message?['document_url'] != null)
-                    Image.network(
-                      message?['document_url'],
-                      height: 150,
+                    child: ClipOval(
+                        child: Image.network(
+                      widget.doctorImage,
+                      width: 72,
+                      height: 72,
                       fit: BoxFit.cover,
-                    ),
-                  if (message?['sender'] == chewId)
-                    Text(
-                      status,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: message?['read_status'] == true
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          if (isSender) SizedBox(width: 8),
-          if (isSender)
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 14, // Adjust radius as needed
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey, width: 2, // Grey border
+                    )),
                   ),
                 ),
-                child: ClipOval(
-                  child: chewUrl != null
-                      ? Image.network(
-                          chewUrl,
-                          width: 72,
-                          height: 72,
+              if (!isSender) SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: isSender ? Colors.green[100] : Colors.blue[100],
+                    borderRadius: BorderRadius.only(
+                      topLeft: isSender ? Radius.circular(10) : Radius.zero,
+                      topRight: isSender ? Radius.zero : Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (message?['text_body'] != null)
+                        Text(
+                          message?['text_body'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      if (message?['document_url'] != null)
+                        Image.network(
+                          message?['document_url'],
+                          height: 150,
                           fit: BoxFit.cover,
-                        )
-                      : Icon(Icons.person),
+                        ),
+                      if (message?['sender'] == chewId)
+                        Text(
+                          status,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: message?['read_status'] == true
+                                ? Colors.blue
+                                : Colors.grey,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+              if (isSender) SizedBox(width: 8),
+              if (isSender)
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 14, // Adjust radius as needed
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.grey, width: 2, // Grey border
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: chewUrl != null
+                          ? Image.network(
+                              chewUrl,
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(Icons.person),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-);
-
+    );
   }
 
   @override
@@ -358,11 +352,17 @@ return Align(
                 final sortedMessages = messages.entries.toList()
                   ..sort((a, b) => a.key.compareTo(b.key));
 
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (_scrollController.hasClients) {
+                    _scrollController
+                        .jumpTo(_scrollController.position.maxScrollExtent);
+                  }
+                });
+
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: sortedMessages.length,
                   itemBuilder: (context, index) {
-                    // final messageId = sortedMessages[index].key;
                     final message = sortedMessages[index].value;
                     return _buildMessageBubble(message, chewId);
                   },

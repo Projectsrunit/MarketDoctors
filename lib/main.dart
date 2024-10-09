@@ -220,6 +220,13 @@ class ChatStore extends ChangeNotifier {
   void resetDeliveryId() {
     _deliveryStatusForId = null;
   }
+
+  void removeMessage(int docId, int messageId) {
+    if (_messages.containsKey(docId)) {
+      _messages[docId]?.remove(messageId);
+      notifyListeners();
+    }
+  }
 }
 
 class DataStore with ChangeNotifier {
