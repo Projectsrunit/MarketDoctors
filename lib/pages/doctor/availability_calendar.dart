@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // For date formatting
@@ -210,6 +211,11 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
           _selectedDate = null;
           _selectedTimeSlots.clear();
         });
+         Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DashboardPage(),
+            ),
+          );
       } else {
         print('Response body: ${response.body}');
         _showSnackBar('Failed to save: ${response.reasonPhrase}');

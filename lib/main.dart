@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/.env");
@@ -95,9 +95,25 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeNotifier.themeMode,
-      home: ChooseUserTypePage(),
-      // home: OnboardingScreen()
+      home: FutureBuilder<bool>(
+        future: _checkFirstTimeUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.data == true) {
+            return OnboardingScreen();
+          } else {
+            return const ChooseActionPage();
+          }
+        },
+      ),
     );
+  }
+
+  Future<bool> _checkFirstTimeUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isFirstTimeUser') ?? true;
   }
 }
 
@@ -386,22 +402,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         curve: Curves.easeInOut,
                       );
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChooseActionPage()),
-                      );
+                      _completeOnboarding();
                     }
                   },
-                  child: Text(
-                    _currentIndex == _pages.length - 1 ? 'Done' : 'Next',
-                  ),
+                  child: Text(_currentIndex < _pages.length - 1
+                      ? 'Next'
+                      : 'Get Started'),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTimeUser', false);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const ChooseActionPage()),
     );
   }
 }
@@ -412,42 +432,30 @@ class OnboardingPage extends StatelessWidget {
   final String imageUrl;
 
   const OnboardingPage({
+    super.key,
     required this.title,
     required this.description,
     required this.imageUrl,
-    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            imageUrl,
-            height: 350,
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(height: 35),
+          Image.asset(imageUrl, height: 300),
+          const SizedBox(height: 20),
           Text(
             title,
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ) ??
-                const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(context).textTheme.headlineMedium,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
           Text(
             description,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 20,
-                    ) ??
-                const TextStyle(fontSize: 20),
+            style: Theme.of(context).textTheme.bodyLarge,
             textAlign: TextAlign.center,
           ),
         ],

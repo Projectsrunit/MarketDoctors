@@ -29,9 +29,9 @@ class DoctorApp extends StatelessWidget implements PreferredSizeWidget {
                       Border.all(color: Colors.grey, width: 2), // Black border
                 ),
                 child: ClipOval(
-                  child: doctorData?['picture_url'] != null
+                  child: doctorData?['profile_picture'] != null
                       ? Image.network(
-                          doctorData?['picture_url'],
+                          doctorData?['profile_picture'],
                           width: 112,
                           height: 120,
                           fit: BoxFit.cover,

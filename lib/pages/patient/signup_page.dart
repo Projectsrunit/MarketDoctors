@@ -39,57 +39,72 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
     super.dispose();
   }
 
-  Future<void> _signUp() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (!_termsAccepted) {
-        _showSnackBar('Please accept the terms and conditions');
-      } else {
-        setState(() {
-          _isLoading = true;
-        });
+Future<void> _signUp() async {
+  if (_formKey.currentState?.validate() ?? false) {
+    if (!_termsAccepted) {
+      _showSnackBar('Please accept the terms and conditions');
+    } else {
+      setState(() {
+        _isLoading = true;
+      });
 
-        // API request setup
-        String baseUrl = dotenv.env['API_URL']!;
-        String url = '$baseUrl/api/auth/register';
+      // API request setup
+      String baseUrl = dotenv.env['API_URL']!;
+      String url = '$baseUrl/api/auth/register';
 
-        // Prepare the data to be sent to the backend
-        Map<String, dynamic> signUpData = {
-          "firstName": _firstNameController.text.trim(),
-          "lastName": _lastNameController.text.trim(),
-          "email": _emailController.text.trim(),
-          "password": _passwordController.text,
-          "dateOfBirth": _dobController.text,
-          "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
-          "role": 5
-        };
+      // Prepare the data to be sent to the backend
+      Map<String, dynamic> signUpData = {
+        "firstName": _firstNameController.text.trim(),
+        "lastName": _lastNameController.text.trim(),
+        "email": _emailController.text.trim(),
+        "password": _passwordController.text,
+        "dateOfBirth": _dobController.text,
+        "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
+        "role": 5
+      };
 
-        try {
-          // Make the POST request
-          http.Response response = await http.post(
-            Uri.parse(url),
-            headers: {"Content-Type": "application/json"},
-            body: json.encode(signUpData),
-          );
+      try {
+        // Make the POST request
+        http.Response response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(signUpData),
+        );
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            _showSnackBar('Sign up successful');
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => const   PatientVerificationPage()),
-            );
-          } else {
-            _showSnackBar('Sign up failed: ${response.body}');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // Parse the response
+          Map<String, dynamic> responseData = json.decode(response.body);
+
+          // Check if the OTP was sent successfully
+          if (responseData['message'] == "OTP sent successfully") {
+            // Show a message to the user
+            _showSnackBar('OTP message was sent to your email, check your inbox or spam');
           }
-        } catch (e) {
-          _showSnackBar('Error: $e');
-        } finally {
-          setState(() {
-            _isLoading = false;
-          });
+
+          // Get the reference from the response
+          String reference = responseData['sendchampResponse']['data']['reference'];
+
+          // Navigate to PatientVerificationPage with the reference
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => PatientVerificationPage(reference: reference),
+            ),
+          );
+        } else {
+          _showSnackBar('Sign up failed: ${response.body}');
         }
+      } catch (e) {
+        _showSnackBar('Error: $e');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
+}
+
+
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context)

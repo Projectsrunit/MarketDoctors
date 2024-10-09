@@ -3,11 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
 import 'package:market_doctor/pages/doctor/availability_calendar.dart';
-
-import 'package:market_doctor/pages/doctor/doctor_cases.dart';
-import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/profile_page.dart';
+import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 
 class DoctorBottomNavBar extends StatefulWidget {
   @override
@@ -71,10 +69,10 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DoctorCasesPage()));
+                              builder: (context) => UpcomingAppointmentPage()));
                     },
                   ),
-                  Text("Cases"),
+                  Text("Appointments"),
                 ],
               ),
               SizedBox(width: 70),
