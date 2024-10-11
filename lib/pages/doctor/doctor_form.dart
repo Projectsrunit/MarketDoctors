@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:market_doctor/pages/doctor/success_page.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class DoctorFormPage extends StatefulWidget {
   const DoctorFormPage({
@@ -66,44 +67,62 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     }
   }
 
-  Future<void> _updateUser() async {
-    if (_formKey.currentState!.validate()) {
-      final doctorData =
-          Provider.of<DataStore>(context, listen: false).doctorData;
-      String? baseUrl = dotenv.env['API_URL'];
-      final uri = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
-      final request = http.MultipartRequest('PUT', uri);
-      request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
-      request.fields['clinicHealthFacility'] =
-          _clinicHealthFacilityController.text;
-      request.fields['specialization'] = _specializationController.text;
-      request.fields['languages'] = _languageController.text;
-      request.fields['awardsAndRecognition'] =
-          _awardsAndRecognitionController.text;
 
-      if (_profileImage != null) {
-        final imageFile = await http.MultipartFile.fromPath(
-            'profile_picture', _profileImage!.path);
-        request.files.add(imageFile);
-      }
+Future<void> _updateUser() async {
+  if (_formKey.currentState!.validate()) {
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
 
+    // Upload image to Firebase Storage if it's selected
+    String? profileImageUrl;
+    if (_profileImage != null) {
       try {
-        final response = await request.send();
-        if (response.statusCode == 200) {
-          _showSnackBar('User updated successfully!');
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => DoctorsSuccessPage(),
-            ),
-          );
-        } else {
-          _showSnackBar('Failed to update user: ${response.reasonPhrase}');
-        }
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_pictures/${doctorData?['id']}.jpg'); // Use doctor ID as filename
+        await storageRef.putFile(_profileImage!); // Upload image
+        profileImageUrl = await storageRef.getDownloadURL(); // Get download URL
       } catch (e) {
-        _showSnackBar('Error: $e');
+        _showSnackBar('Error uploading image: $e');
+        return; // Exit if the image upload fails
       }
     }
+
+    // Prepare API request
+    String? baseUrl = dotenv.env['API_URL'];
+    final uri = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
+    final request = http.MultipartRequest('PUT', uri);
+    request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
+    request.fields['clinicHealthFacility'] =
+        _clinicHealthFacilityController.text;
+    request.fields['specialization'] = _specializationController.text;
+    request.fields['languages'] = _languageController.text;
+    request.fields['awardsAndRecognition'] =
+        _awardsAndRecognitionController.text;
+
+    // Include profile image URL in the request if available
+    if (profileImageUrl != null) {
+      request.fields['profile_picture'] = profileImageUrl;
+    }
+
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        _showSnackBar('User updated successfully!');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DoctorsSuccessPage(),
+          ),
+        );
+      } else {
+        _showSnackBar('Failed to update user: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      _showSnackBar('Error: $e');
+    }
   }
+}
+
 
   Widget _buildProfileImagePicker() {
     return Column(
