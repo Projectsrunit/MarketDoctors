@@ -426,7 +426,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await prefs.setBool('isFirstTimeUser', false);
     // ignore: use_build_context_synchronously
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const DoctorsUploadCredentialsPage()),
+      MaterialPageRoute(builder: (context) => const ChooseActionPage()),
     );
   }
 }

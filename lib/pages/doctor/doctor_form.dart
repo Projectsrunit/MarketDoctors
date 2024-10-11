@@ -79,7 +79,7 @@ Future<void> _updateUser() async {
       try {
         final storageRef = FirebaseStorage.instance
             .ref()
-            .child('profile_pictures/${doctorData?['id']}.jpg'); // Use doctor ID as filename
+            .child('profile_pictures/${doctorData?['id']}.jpg'); 
         await storageRef.putFile(_profileImage!); // Upload image
         profileImageUrl = await storageRef.getDownloadURL(); // Get download URL
       } catch (e) {
