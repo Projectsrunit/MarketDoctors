@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class DoctorInformation extends StatefulWidget {
-  const DoctorInformation({Key? key}) : super(key: key);
+  const DoctorInformation({super.key});
 
   @override
   State<DoctorInformation> createState() => _DoctorInformationPageState();

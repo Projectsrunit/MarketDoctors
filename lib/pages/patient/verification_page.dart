@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 class PatientVerificationPage extends StatefulWidget {
   final String reference;  // Accept reference parameter
 
-  const PatientVerificationPage({Key? key, required this.reference}) : super(key: key);
+  const PatientVerificationPage({super.key, required this.reference});
 
   @override
   State<PatientVerificationPage> createState() => _PatientVerificationPageState();
