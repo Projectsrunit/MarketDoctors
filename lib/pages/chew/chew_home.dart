@@ -8,6 +8,7 @@ import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/pages/choose_action.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +16,6 @@ import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/view_doc_profile.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
-import 'package:market_doctor/pages/user_type.dart';
 import 'package:provider/provider.dart';
 
 class ChewHome extends StatefulWidget {
@@ -180,7 +180,7 @@ class ChewHomeState extends State<ChewHome> {
     Map? chewData = context.read<DataStore>().chewData;
 
     if (chewData == null) {
-      return PopScope(canPop: false, child: ChooseUserTypePage());
+      return PopScope(canPop: false, child: ChooseActionPage());
     } else {
       return PopScope(
         canPop: false,

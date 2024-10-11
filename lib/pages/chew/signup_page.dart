@@ -4,9 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/chew/check_inbox.dart';
-import 'package:market_doctor/pages/chew/login_page.dart';
 import 'package:market_doctor/data/countries.dart';
+import 'package:market_doctor/pages/chew/verification_page.dart';
 
 class ChewSignUpPage extends StatefulWidget {
   const ChewSignUpPage({super.key});
@@ -72,12 +71,25 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {
-            _showSnackBar('Sign up successful');
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => const ChewCheckInboxPage()),
-            );
-          } else {
+          // Parse the response
+          Map<String, dynamic> responseData = json.decode(response.body);
+
+          // Check if the OTP was sent successfully
+          if (responseData['message'] == "OTP sent successfully") {
+            // Show a message to the user
+            _showSnackBar('OTP message was sent to your email, check your inbox or spam');
+          }
+
+          // Get the reference from the response
+          String reference = responseData['sendchampResponse']['data']['reference'];
+
+          // Navigate to PatientVerificationPage with the reference
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => ChewVerificationPage(reference: reference),
+            ),
+          );
+        }  else {
             _showSnackBar('Sign up failed: ${response.body}');
           }
         } catch (e) {
@@ -145,9 +157,9 @@ Widget build(BuildContext context) {
       ),
         GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ChewLoginPage()),
-            );
+            // Navigator.of(context).push(
+            //   MaterialPageRoute(builder: (context) => const ChewLoginPage()),
+            // );
           },
           child: const Text(
             'Log In',
