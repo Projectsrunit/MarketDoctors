@@ -9,7 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 class DoctorVerificationPage extends StatefulWidget {
   final String reference;  
 
-  const DoctorVerificationPage({Key? key, required this.reference}) : super(key: key);
+  const DoctorVerificationPage({super.key, required this.reference});
 
   @override
   State<DoctorVerificationPage> createState() => _DoctorVerificationPageState();

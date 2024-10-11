@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:490656782971:android:28a4fb133a2e902b4b20de",
+        "mobilesdk_app_id": "1:490656782971:android:1e3f65f9f142cd2e4b20de",
         "android_client_info": {
-          "package_name": "com.marketdoctor"
+          "package_name": "com.example.market_doctor"
         }
       },
       "oauth_client": [],

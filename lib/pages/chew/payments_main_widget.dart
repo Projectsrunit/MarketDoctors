@@ -156,7 +156,7 @@ class PaymentsWidget extends StatelessWidget {
                 if (cases != null)
                   ...cases
                       .map((caseItem) => PaymentCase(caseItem: caseItem))
-                      .toList(),
+                      ,
               ],
             ),
           ],

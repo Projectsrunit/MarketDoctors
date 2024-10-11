@@ -1,6 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:market_doctor/pages/doctor/doctor_form.dart';
 
 class DoctorsUploadCredentialsPage extends StatelessWidget {
@@ -13,13 +18,19 @@ class DoctorsUploadCredentialsPage extends StatelessWidget {
 
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.single;
+        final filePath = file.path;
 
-        // Show file details or use the file
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('File selected: ${file.name}'),
-          ),
-        );
+        if (filePath != null) {
+          // Show file selected
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File selected: ${file.name}'),
+            ),
+          );
+
+          // Upload to Firebase Storage
+          await _uploadFileToFirebase(context, File(filePath), file.name);
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -29,8 +40,35 @@ class DoctorsUploadCredentialsPage extends StatelessWidget {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to pick file.'),
+        SnackBar(
+          content: Text('Failed to pick file: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _uploadFileToFirebase(
+      BuildContext context, File file, String fileName) async {
+    try {
+      // Create a reference to Firebase Storage
+      final storageRef = FirebaseStorage.instance.ref().child(fileName);
+      final uploadTask = storageRef.putFile(file);
+      final taskSnapshot = await uploadTask.whenComplete(() {});
+      final downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('File uploaded successfully! Download URL: $downloadURL'),
+        ),
+      );
+    } catch (e) {
+      print('this is the response $e');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to upload file: $e'),
+          
         ),
       );
     }
