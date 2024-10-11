@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
+import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
@@ -90,6 +91,7 @@ Widget _buildSystemList(BuildContext context) {
       _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNoArrowRow(context, Icons.logout, "Log out", () {
+        context.read<DataStore>().updatePatientData(null);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ChooseActionPage()), // Replace with your login or welcome page

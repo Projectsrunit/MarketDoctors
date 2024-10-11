@@ -16,6 +16,7 @@ import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:market_doctor/pages/choose_action.dart';
 
 class PatientHome extends StatelessWidget {
   final int doctorsOnline = 0;
@@ -33,7 +34,7 @@ class PatientHome extends StatelessWidget {
     Map? patientData = Provider.of<DataStore>(context).patientData;
 
     if (patientData == null) {
-      return PopScope(canPop: false, child: ChooseUserTypePage());
+      return PopScope(canPop: false, child: ChooseActionPage());
     } else {
       return PopScope(
         canPop: false,
