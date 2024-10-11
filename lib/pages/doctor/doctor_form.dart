@@ -47,7 +47,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
       _specializationController.text = doctorData['specialization'] ?? '';
       _languageController.text = doctorData['languages'] ?? '';
       _awardsAndRecognitionController.text =
-          doctorData['awardsAndRecognition'] ?? '';
+          doctorData['awards'] ?? '';
     } else {
       _showSnackBar('No doctor data found.');
     }
@@ -97,7 +97,7 @@ Future<void> _updateUser() async {
         _clinicHealthFacilityController.text;
     request.fields['specialization'] = _specializationController.text;
     request.fields['languages'] = _languageController.text;
-    request.fields['awardsAndRecognition'] =
+    request.fields['awards'] =
         _awardsAndRecognitionController.text;
 
     // Include profile image URL in the request if available
@@ -205,18 +205,7 @@ Future<void> _updateUser() async {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 30),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[400]!, width: 1.0),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.all(12.0),
-                ),
-              ),
+              ),             
               const SizedBox(height: 30),
               _buildLabeledTextField(
                 controller: _yearsOfExperienceController,
