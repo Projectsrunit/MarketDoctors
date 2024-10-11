@@ -33,7 +33,7 @@ class ChewCheckInboxPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ChewVerificationPage(),
+                    builder: (context) => const ChewVerificationPage(reference: '',),
                   ),
                 );
               },
