@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:market_doctor/pages/doctor/doctor_form.dart';
-import 'package:market_doctor/pages/doctor/success_page.dart';
 
 class DoctorsUploadCredentialsPage extends StatelessWidget {
   const DoctorsUploadCredentialsPage({super.key});

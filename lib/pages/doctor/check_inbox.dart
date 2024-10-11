@@ -33,7 +33,7 @@ class DoctorCheckInboxPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const DoctorVerificationPage(),
+                    builder: (context) => const DoctorVerificationPage(reference: '',),
                   ),
                 );
               },

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:market_doctor/pages/doctor/check_inbox.dart';
+import 'package:market_doctor/pages/doctor/success_page.dart';
 import 'package:provider/provider.dart';
 
 class DoctorFormPage extends StatefulWidget {
@@ -93,7 +93,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           _showSnackBar('User updated successfully!');
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => DoctorCheckInboxPage(),
+              builder: (context) => DoctorsSuccessPage(),
             ),
           );
         } else {

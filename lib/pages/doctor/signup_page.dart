@@ -10,8 +10,7 @@ import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
-import 'package:market_doctor/pages/doctor/upload_file.dart';
-import 'package:market_doctor/pages/upload_file.dart';
+import 'package:market_doctor/pages/doctor/verification_page.dart';
 import 'package:provider/provider.dart';
 
 class DoctorSignUpPage extends StatefulWidget {
@@ -78,18 +77,32 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
           );
 
           if (response.statusCode == 200) {
-          var responseBody = jsonDecode(response.body);
-          //to get full user record with profile picture etc
-          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
-          final fullRecord = await http.get(url);
-          if (fullRecord.statusCode == 200) {
-            var recordBody = jsonDecode(fullRecord.body);
-            
-            context.read<DataStore>().updateDoctorData(recordBody);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => DoctorsUploadCredentialsPage()));
-          }
-        } else {
+            var responseBody = jsonDecode(response.body);
+            var url = Uri.parse(
+                '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+            Map<String, dynamic> responseData = json.decode(response.body);
+            if (responseData['message'] == "OTP sent successfully") {
+              // Show a message to the user
+              _showSnackBar(
+                  'OTP message was sent to your email, check your inbox or spam');
+            }
+
+            // Get the reference from the response
+            String reference =
+                responseData['sendchampResponse']['data']['reference'];
+
+            final fullRecord = await http.get(url);
+            if (fullRecord.statusCode == 200) {
+              var recordBody = jsonDecode(fullRecord.body);
+
+              context.read<DataStore>().updateDoctorData(recordBody);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          DoctorVerificationPage(reference: reference)));
+            }
+          } else {
             _showSnackBar('Sign up failed: ${response.body}');
           }
         } catch (e) {
@@ -110,52 +123,50 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
 
   @override
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Theme.of(context).brightness == Brightness.dark
-        ? Colors.black   // Dark mode background
-        : Colors.white,  // Light mode background
-    body: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Let’s get you signed up',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 10),
-              _buildLoginPrompt(),
-              const SizedBox(height: 20),
-              _buildSignUpForm(),
-            ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.black // Dark mode background
+          : Colors.white, // Light mode background
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Let’s get you signed up',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                _buildLoginPrompt(),
+                const SizedBox(height: 20),
+                _buildSignUpForm(),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildLoginPrompt() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-         Text(
-        "Already Signed Up? ",
-        style: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white  // White text in dark mode
-              : Colors.black,  // Black text in light mode
-          fontSize: 16,
-          
+        Text(
+          "Already Signed Up? ",
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white // White text in dark mode
+                : Colors.black, // Black text in light mode
+            fontSize: 16,
+          ),
         ),
-      ),
         GestureDetector(
           onTap: () {
             Navigator.of(context).push(
@@ -244,128 +255,193 @@ Widget build(BuildContext context) {
     );
   }
 
-Widget _buildPasswordField() {
-  return Container(
-     height: 60,
-    decoration: BoxDecoration(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850] // Dark mode background
-          : Colors.grey[300], // Light mode grey background
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: Offset(0, 2), // Shadow position
-        ),
-      ],
-    ),
-    child: TextFormField(
-      controller: _passwordController,
-      obscureText: true,
-      decoration: InputDecoration(
-        labelText: 'Password',
-         labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-        prefixIcon: const Icon(Icons.lock),
-        filled: true,
-        fillColor: Colors.transparent, // Set fill color to transparent
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        } else if (value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
-    ),
-  );
-}
-
-
-
-
-
-Widget _buildPhoneField() {
-  return Row(
-    children: [
-      Expanded(
-        flex: 2,
-        child: Container(
-           height: 60,
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[850] // Dark mode background
-                : Colors.grey[300], // Light mode grey background
-                
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: Offset(0, 2), // Shadow position
-              ),
-            ],
+  Widget _buildPasswordField() {
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850] // Dark mode background
+            : Colors.grey[300], // Light mode grey background
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 2), // Shadow position
           ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedCountryCode,
-            items: countryCodes.map((country) {
-              return DropdownMenuItem<String>(
-                value: country['code'],
-                child: Row(
-                  children: [
-                    Image.network(
-                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
-                      width: 32,
-                      height: 20,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.flag);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Text('(${country['code']})'),
-                  ],
+        ],
+      ),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: 'Password',
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold, // Make the label text bold
+          ),
+          prefixIcon: const Icon(Icons.lock),
+          filled: true,
+          fillColor: Colors.transparent, // Set fill color to transparent
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your password';
+          } else if (value.length < 6) {
+            return 'Password must be at least 6 characters';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildPhoneField() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[850] // Dark mode background
+                  : Colors.grey[300], // Light mode grey background
+
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 2), // Shadow position
                 ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedCountryCode = value!;
-              });
-            },
-            decoration: InputDecoration(
-              fillColor: Colors.transparent, // Set fill color to transparent
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none, // Remove border in light mode
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none, // Remove border in light mode
+              ],
+            ),
+            child: DropdownButtonFormField<String>(
+              value: _selectedCountryCode,
+              items: countryCodes.map((country) {
+                return DropdownMenuItem<String>(
+                  value: country['code'],
+                  child: Row(
+                    children: [
+                      Image.network(
+                        country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                        width: 32,
+                        height: 20,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.flag);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Text('(${country['code']})'),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedCountryCode = value!;
+                });
+              },
+              decoration: InputDecoration(
+                fillColor: Colors.transparent, // Set fill color to transparent
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
               ),
             ),
           ),
         ),
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        flex: 3,
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 3,
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[850] // Dark mode background
+                  : Colors.grey[300], // Light mode grey background
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 2), // Shadow position
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [LengthLimitingTextInputFormatter(10)],
+              decoration: InputDecoration(
+                prefixText: '$_selectedCountryCode ',
+                labelText: 'Phone Number',
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.bold, // Make the label text bold
+                ),
+                filled: true,
+                fillColor: Colors.transparent, // Set fill color to transparent
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your phone number';
+                }
+                return null;
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDobField() {
+    return GestureDetector(
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime(2000),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+        );
+        if (pickedDate != null) {
+          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+          _dobController.text = formattedDate;
+        }
+      },
+      child: AbsorbPointer(
         child: Container(
-           height: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850] // Dark mode background
@@ -381,18 +457,17 @@ Widget _buildPhoneField() {
             ],
           ),
           child: TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [LengthLimitingTextInputFormatter(10)],
+            controller: _dobController,
             decoration: InputDecoration(
-              prefixText: '$_selectedCountryCode ',
-              labelText: 'Phone Number',
-               labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
+              labelText: 'Date of Birth',
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold, // Make the label text bold
+              ),
+              prefixIcon: const Icon(Icons.calendar_today),
               filled: true,
               fillColor: Colors.transparent, // Set fill color to transparent
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none, // Remove border in light mode
@@ -402,74 +477,11 @@ Widget _buildPhoneField() {
                 borderSide: BorderSide.none, // Remove border in light mode
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              return null;
-            },
           ),
         ),
       ),
-    ],
-  );
-}
-Widget _buildDobField() {
-  return GestureDetector(
-    onTap: () async {
-      DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime(2000),
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
-      );
-      if (pickedDate != null) {
-        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-        _dobController.text = formattedDate;
-      }
-    },
-    child: AbsorbPointer(
-      child: Container(
-         height: 60,
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[850] // Dark mode background
-              : Colors.grey[300], // Light mode grey background
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, 2), // Shadow position
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: _dobController,
-          decoration: InputDecoration(
-            labelText: 'Date of Birth',
-             labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-            prefixIcon: const Icon(Icons.calendar_today),
-            filled: true,
-            fillColor: Colors.transparent, // Set fill color to transparent
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none, // Remove border in light mode
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none, // Remove border in light mode
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildTermsAndConditions() {
     return Row(
@@ -492,86 +504,79 @@ Widget _buildDobField() {
     );
   }
 
- Widget _buildSignUpButton() {
-  return ElevatedButton(
-    onPressed: _isLoading ? null : _signUp,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue, // Background color
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      minimumSize: const Size(double.infinity, 48),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _signUp,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue, // Background color
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
-    ),
-    child: _isLoading
-        ? const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          )
-        : const Text(
-            'Sign Up',
-            style: TextStyle(
-              color: Colors.white, // Text color
-              fontWeight: FontWeight.bold, // Bold text
+      child: _isLoading
+          ? const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            )
+          : const Text(
+              'Sign Up',
+              style: TextStyle(
+                color: Colors.white, // Text color
+                fontWeight: FontWeight.bold, // Bold text
+              ),
             ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    TextInputType? keyboardType,
+    Widget? prefixIcon,
+    String? Function(String?)? validator,
+    double height = 60.0, // Default height, adjust as needed
+  }) {
+    return Container(
+      height: height, // Set the height of the container
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850] // Dark mode background
+            : Colors.grey[300], // Light mode grey background
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 2), // Shadow position
           ),
-  );
-}
-
-
-Widget _buildTextField({
-  required TextEditingController controller,
-  required String labelText,
-  TextInputType? keyboardType,
-  Widget? prefixIcon,
-  String? Function(String?)? validator,
-  double height = 60.0, // Default height, adjust as needed
-}) {
-  return Container(
-    height: height, // Set the height of the container
-    decoration: BoxDecoration(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850] // Dark mode background
-          : Colors.grey[300], // Light mode grey background
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: Offset(0, 2), // Shadow position
-        ),
-      ],
-    ),
-    child: TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-        prefixIcon: prefixIcon,
-        filled: true,
-        fillColor: Colors.transparent, // Set fill color to transparent
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // Increased vertical padding
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
+        ],
       ),
-      validator: validator,
-    ),
-  );
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold, // Make the label text bold
+          ),
+          prefixIcon: prefixIcon,
+          filled: true,
+          fillColor: Colors.transparent, // Set fill color to transparent
+          contentPadding: const EdgeInsets.symmetric(
+              vertical: 16, horizontal: 12), // Increased vertical padding
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+        ),
+        validator: validator,
+      ),
+    );
+  }
 }
-
-
-
-
-
-}
-
-
