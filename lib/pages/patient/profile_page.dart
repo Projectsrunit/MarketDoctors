@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
-import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
@@ -19,7 +18,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Map? patientData = Provider.of<DataStore>(context).patientData;
     return Scaffold(
       appBar: PatientAppBar(),
       body: Padding(
@@ -345,7 +343,7 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
 
     // Get the patient ID from the context
     Map? patientData = Provider.of<DataStore>(context, listen: false).patientData;
-    patientId = patientData?['user']['id'];
+    patientId = patientData?['id'];
 
     // Check if patient ID is retrieved
     print("Retrieved patient ID: $patientId");

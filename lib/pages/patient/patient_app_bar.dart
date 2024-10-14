@@ -23,7 +23,7 @@ class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
             SizedBox(width: 8),
             Flexible(
               child: Text(
-                'Hi, ${patientData?['user']['firstName']} ${patientData?['user']['lastName']}!',
+                'Hi, ${patientData?['firstName']} ${patientData?['lastName']}!',
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.nunito(
                   fontSize: 19, // Reduces the size of the text

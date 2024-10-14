@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -108,7 +109,16 @@ class _DoctorViewState extends State<DoctorView> {
                         ? doc['specialisation']
                         : 'General Practice',
                     rating: 4.5,
-                    onChatPressed: () {},
+                    onChatPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChattingPage(
+                                  guestId: doc['id'],
+                                  guestName: '${doc['firstName']} ${doc['lastName']}',
+                                  guestImage: doc['profile_picture'] ??
+                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                                  guestPhoneNumber: doc['phone'],
+                                ))),
                     onViewProfilePressed: () {
                       Navigator.push(
                           context,
