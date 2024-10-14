@@ -335,7 +335,7 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
     );
   }
 
-  void _confirmDelete(listIndex, id) {
+   void _confirmDelete(listIndex, id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -422,6 +422,7 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
