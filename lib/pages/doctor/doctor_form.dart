@@ -29,7 +29,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
   final ImagePicker _picker = ImagePicker();
 
   File? _profileImage;
-
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -46,8 +46,7 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
           doctorData['clinicHealthFacility'] ?? '';
       _specializationController.text = doctorData['specialization'] ?? '';
       _languageController.text = doctorData['languages'] ?? '';
-      _awardsAndRecognitionController.text =
-          doctorData['awards'] ?? '';
+      _awardsAndRecognitionController.text = doctorData['awards'] ?? '';
     } else {
       _showSnackBar('No doctor data found.');
     }
@@ -67,62 +66,73 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
     }
   }
 
+  Future<void> _updateUser() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-Future<void> _updateUser() async {
-  if (_formKey.currentState!.validate()) {
-    final doctorData =
-        Provider.of<DataStore>(context, listen: false).doctorData;
+      final doctorData =
+          Provider.of<DataStore>(context, listen: false).doctorData;
 
-    // Upload image to Firebase Storage if it's selected
-    String? profileImageUrl;
-    if (_profileImage != null) {
+      // Upload image to Firebase Storage if it's selected
+      String? profileImageUrl;
+      if (_profileImage != null) {
+        try {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('profile_pictures/${doctorData?['id']}.jpg');
+          await storageRef.putFile(_profileImage!); // Upload image
+          profileImageUrl =
+              await storageRef.getDownloadURL(); // Get download URL
+        } catch (e) {
+          _showSnackBar('Error uploading image');
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+
+      // Prepare API request
+      String? baseUrl = dotenv.env['API_URL'];
+      final uri = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
+      final request = http.MultipartRequest('PUT', uri);
+      request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
+      request.fields['clinicHealthFacility'] =
+          _clinicHealthFacilityController.text;
+      request.fields['specialization'] = _specializationController.text;
+      request.fields['languages'] = _languageController.text;
+      request.fields['awards'] = _awardsAndRecognitionController.text;
+
+      // Include profile image URL in the request if available
+      if (profileImageUrl != null) {
+        request.fields['profile_picture'] = profileImageUrl;
+      }
+
       try {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('profile_pictures/${doctorData?['id']}.jpg'); 
-        await storageRef.putFile(_profileImage!); // Upload image
-        profileImageUrl = await storageRef.getDownloadURL(); // Get download URL
+        final response = await request.send();
+        setState(() {
+          _isLoading = false;
+        });
+        if (response.statusCode == 200) {
+          _showSnackBar('User updated successfully!');
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DoctorsSuccessPage(),
+            ),
+          );
+        } else {
+          _showSnackBar('Failed to update user');
+        }
       } catch (e) {
-        _showSnackBar('Error uploading image: $e');
-        return; // Exit if the image upload fails
+        _showSnackBar('Error: $e');
+        setState(() {
+          _isLoading = false;
+        });
       }
-    }
-
-    // Prepare API request
-    String? baseUrl = dotenv.env['API_URL'];
-    final uri = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
-    final request = http.MultipartRequest('PUT', uri);
-    request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
-    request.fields['clinicHealthFacility'] =
-        _clinicHealthFacilityController.text;
-    request.fields['specialization'] = _specializationController.text;
-    request.fields['languages'] = _languageController.text;
-    request.fields['awards'] =
-        _awardsAndRecognitionController.text;
-
-    // Include profile image URL in the request if available
-    if (profileImageUrl != null) {
-      request.fields['profile_picture'] = profileImageUrl;
-    }
-
-    try {
-      final response = await request.send();
-      if (response.statusCode == 200) {
-        _showSnackBar('User updated successfully!');
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DoctorsSuccessPage(),
-          ),
-        );
-      } else {
-        _showSnackBar('Failed to update user: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      _showSnackBar('Error: $e');
     }
   }
-}
-
 
   Widget _buildProfileImagePicker() {
     return Column(
@@ -205,7 +215,7 @@ Future<void> _updateUser() async {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),             
+              ),
               const SizedBox(height: 30),
               _buildLabeledTextField(
                 controller: _yearsOfExperienceController,
@@ -302,7 +312,7 @@ Future<void> _updateUser() async {
     return Align(
       alignment: Alignment.centerRight,
       child: ElevatedButton(
-        onPressed: _updateUser, // Disable button when loading
+        onPressed: _isLoading ? null : _updateUser,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -310,10 +320,19 @@ Future<void> _updateUser() async {
           ),
           backgroundColor: Colors.blueAccent,
         ),
-        child: const Text(
-          'Save',
-          style: TextStyle(fontSize: 18, color: Colors.white),
-        ),
+        child: _isLoading
+            ? SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Text(
+                'Save',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
       ),
     );
   }
