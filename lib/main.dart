@@ -309,6 +309,12 @@ class DataStore with ChangeNotifier {
 
   void updateDoctorData(Map? newValue) {
     userData = newValue;
+
+    notifyListeners();
+  }
+
+  void setDoctorData(Map<String, dynamic> data) {
+    userData = data;
     notifyListeners();
   }
 }
