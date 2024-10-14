@@ -106,10 +106,12 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.medical_information_outlined, "Upload/ Update Profile Picture",
-            () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DoctorUpdateProfileImage()));
+        _buildArrowRow(Icons.medical_information_outlined,
+            "Upload/ Update Profile Picture", () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DoctorUpdateProfileImage()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
@@ -335,7 +337,7 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
     );
   }
 
-   void _confirmDelete(listIndex, id) {
+  void _confirmDelete(listIndex, id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -422,7 +424,6 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_field
 
 import 'dart:convert';
 import 'dart:io';
@@ -35,6 +35,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
   late TextEditingController _aboutDoctorController;
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  late TextEditingController _doctorIdController;
   @override
   void initState() {
     super.initState();
@@ -46,6 +47,8 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         Provider.of<DataStore>(context, listen: false).doctorData;
     _firstNameController =
         TextEditingController(text: doctorData?['firstName'] ?? '');
+    _doctorIdController =
+        TextEditingController(text: doctorData?['id']?.toString() ?? '');
     _lastNameController =
         TextEditingController(text: doctorData?['lastName'] ?? '');
     _emailController = TextEditingController(text: doctorData?['email'] ?? '');
@@ -185,6 +188,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
               'Years of Experience', TextInputType.number),
           _buildEditableField(_languagesController, 'Languages'),
           _buildEditableField(_awardsController, 'Awards & Recognition'),
+          _buildEditableField(_specializationController, 'Specialization'),
           _buildEditableField(_aboutDoctorController, 'About Doctor'),
         ],
       ),
@@ -273,20 +277,27 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     setState(() {
       _isEditing = !_isEditing;
       if (!_isEditing) {
-        _initializeControllers(); // Reset to initial values if editing is canceled
+        _initializeControllers();
       }
     });
   }
 
   Future<void> _updateUser() async {
     if (_formKey.currentState?.validate() != true) return;
-
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
+    print('Updating doctor with ID: ${doctorData?['id']}');
     setState(() {
       _isLoading = true;
     });
 
     try {
+      final doctorData =
+          Provider.of<DataStore>(context, listen: false).doctorData;
+
       final userData = {
+        'firstName': doctorData?['firstName'] ?? '',
+        'lastName': doctorData?['lastName'] ?? '',
         'email': _emailController.text,
         'phone': _phoneController.text,
         'years_of_experience': _yearsOfExperienceController.text,
@@ -294,25 +305,28 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         'awards': _awardsController.text,
         'specialisation': _specializationController.text,
         'about': _aboutDoctorController.text,
-        'firstName': _firstNameController.text,
-        'lastName': _lastNameController.text,
       };
 
       if (_profileImage != null) {
         final profileImageUrl = await _uploadProfileImage();
         userData['profile_picture'] = profileImageUrl;
+      } else {
+        userData['profile_picture'] = doctorData?['profile_picture'];
       }
+
+      print('User Data to update: $userData'); // Debugging line
 
       final response = await _updateDoctorData(userData);
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
+        // Update state with new data from the server
+        final updatedData = jsonDecode(response.body);
         Provider.of<DataStore>(context, listen: false)
-            .updateDoctorData(userData);
+            .updateDoctorData(updatedData);
         _showSuccessDialog();
       } else {
         _showErrorDialog('Failed to update data. Please try again.');
-        // print('${response.status}');
       }
     } catch (e) {
       _showErrorDialog('An error occurred: $e');
