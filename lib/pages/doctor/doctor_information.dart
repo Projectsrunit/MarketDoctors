@@ -33,7 +33,8 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
   late TextEditingController _awardsController;
   late TextEditingController _specializationController;
   late TextEditingController _aboutDoctorController;
-
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   @override
   void initState() {
     super.initState();
@@ -43,7 +44,10 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
   void _initializeControllers() {
     final doctorData =
         Provider.of<DataStore>(context, listen: false).doctorData;
-
+    _firstNameController =
+        TextEditingController(text: doctorData?['firstName'] ?? '');
+    _lastNameController =
+        TextEditingController(text: doctorData?['lastName'] ?? '');
     _emailController = TextEditingController(text: doctorData?['email'] ?? '');
     _aboutDoctorController =
         TextEditingController(text: doctorData?['about'] ?? '');
@@ -290,6 +294,8 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         'awards': _awardsController.text,
         'specialisation': _specializationController.text,
         'about': _aboutDoctorController.text,
+        'firstName': _firstNameController.text,
+        'lastName': _lastNameController.text,
       };
 
       if (_profileImage != null) {
