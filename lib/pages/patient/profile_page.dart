@@ -18,7 +18,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 class PatientProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Map? patientData = Provider.of<DataStore>(context).patientData;
     return Scaffold(
       appBar: PatientAppBar(),
       body: Padding(
@@ -344,7 +343,7 @@ class UpdateProfilePatientState extends State<UpdateProfilePatient> {
 
     // Get the patient ID from the context
     Map? patientData = Provider.of<DataStore>(context, listen: false).patientData;
-    patientId = patientData?['user']['id'];
+    patientId = patientData?['id'];
 
     // Check if patient ID is retrieved
     print("Retrieved patient ID: $patientId");

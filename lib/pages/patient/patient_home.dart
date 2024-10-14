@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/hospital.dart';
@@ -13,20 +14,169 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 
-class PatientHome extends StatelessWidget {
+class PatientHome extends StatefulWidget {
+  @override
+  State<PatientHome> createState() => _PatientHomeState();
+}
+
+class _PatientHomeState extends State<PatientHome> {
   final int doctorsOnline = 0;
   final int users = 0;
+  IO.Socket? socket;
+  List<Map<String, dynamic>> unsentMessages = [];
+  bool _isSocketInitialized = false;
+  ChatStore? chatStore;
 
-  // // Add the required parameters
-  // final String patientId;
-  // final String patientName;
+  @override
+  void initState() {
+    super.initState();
+    if (!_isSocketInitialized) {
+      _initializeSocket();
+      _isSocketInitialized = true;
+    }
+    chatStore = context.read<ChatStore>();
+    chatStore?.addListener(_sendPendingUpdates);
+    chatStore?.addListener(_sendPendingUpdates);
+  }
 
-  // // Constructor to accept patientId and patientName
-  // const PatientHome({Key? key, required this.patientId, required this.patientName}) : super(key: key);
+  @override
+  void dispose() {
+    super.dispose();
+    socket?.disconnect();
+    _isSocketInitialized = false;
+  }
+
+  void _initializeSocket() {
+    ChatStore chatStore = context.read<ChatStore>();
+    int? chewId =
+        Provider.of<DataStore>(context, listen: false).chewData?['id'];
+
+    if (chewId != null) {
+      final String socketUrl = dotenv.env['API_URL']!;
+
+      setState(() {
+        socket = IO.io(socketUrl, <String, dynamic>{
+          'transports': ['websocket'],
+          'autoConnect': false,
+        });
+
+        socket!.connect();
+        socket!.emit('authenticate', {'own_id': chewId});
+
+        socket!.on('connect', (_) {
+          print('Socket connected');
+          _resendUnsentMessages();
+        });
+
+        socket!.on('unread_messages', (messages) {
+          _handleArrayOfMessages(messages, chewId);
+        });
+
+        socket!.on('new_message', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.addMessage(message, docId);
+        });
+
+        socket!.on('older_messages', (messages) {
+          _handleArrayOfMessages(messages, chewId);
+        });
+
+        socket!.on('delivery_status_updated', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.receiveDeliveryStatus(message, docId);
+        });
+
+        socket!.on('read_status_updated', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.receiveReadStatus(message, docId);
+        });
+      });
+
+      socket!.on('disconnect', (_) {
+        print('Socket disconnected');
+        _isSocketInitialized = false;
+      });
+    }
+  }
+
+  void _resendUnsentMessages() {
+    if (unsentMessages.isNotEmpty) {
+      for (Map<String, dynamic> message in unsentMessages) {
+        socket!.emit('new_message', message);
+      }
+      unsentMessages.clear();
+    }
+  }
+
+  void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
+    final addMessage = context.read<ChatStore>().addMessage;
+
+    for (Map<String, dynamic> message in messages) {
+      int docId = (message['sender'] == chewId)
+          ? message['receiver']
+          : message['sender'];
+      addMessage(message, docId);
+    }
+  }
+
+  void _sendPendingUpdates() {
+    ChatStore chatStore = context.read<ChatStore>();
+
+    if (chatStore.latestMessage.isNotEmpty) {
+      int messageId = chatStore.latestMessage['id'];
+      if (socket!.connected) {
+        socket!.emitWithAck(
+          'new_message',
+          chatStore.latestMessage,
+          ack: (response) {
+            if (response['success'] == true) {
+              Map<String, dynamic> newMessage = response['message'];
+              int docId = newMessage['receiver'];
+              chatStore.addMessage(newMessage, docId);
+              if (newMessage['id'] != messageId) {
+                chatStore.removeMessage(docId, messageId);
+              }
+            } else {
+              print('Error: ${response['error']}');
+            }
+          },
+        );
+      } else {
+        setState(() {
+          unsentMessages.add(chatStore.latestMessage);
+        });
+      }
+      chatStore.resetNewMessageFlag();
+    }
+
+    if (chatStore.readStatusForId != null) {
+      socket!.emit(
+          'update_read_status', {'message_id': chatStore.readStatusForId});
+      chatStore.resetReadId();
+    }
+
+    if (chatStore.deliveryStatusForId != null) {
+      socket!.emit('update_delivery_status',
+          {'message_id': chatStore.deliveryStatusForId});
+      chatStore.resetDeliveryId();
+    }
+
+    if (chatStore.getOlderMessagesFor != null) {
+      socket!.emit('get_older_messages', chatStore.getOlderMessagesFor);
+      chatStore.resetOlderMessages();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -356,7 +506,16 @@ class PopularsState extends State<Populars> {
                 ? doctors[0]['total_overall_rating'] /
                     (doctors[0]['total_raters'] ?? 1)
                 : 0,
-            onChatPressed: () {},
+            onChatPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChattingPage(
+                                  guestId: doctors[0]['id'],
+                                  guestName: '${doctors[0]['firstName']} ${doctors[0]['lastName']}',
+                                  guestImage: doctors[0]['profile_picture'] ??
+                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                                  guestPhoneNumber: doctors[0]['phone'],
+                                ))),
             onViewProfilePressed: () {
               Navigator.push(
                 context,
@@ -384,7 +543,16 @@ class PopularsState extends State<Populars> {
                   ? doctors[1]['specialisation']
                   : 'General Practice',
               rating: 4.0,
-              onChatPressed: () {},
+              onChatPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChattingPage(
+                                  guestId: doctors[1]['id'],
+                                  guestName: '${doctors[1]['firstName']} ${doctors[1]['lastName']}',
+                                  guestImage: doctors[1]['profile_picture'] ??
+                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                                  guestPhoneNumber: doctors[1]['phone'],
+                                ))),
               onViewProfilePressed: () {
                 Navigator.push(
                   context,
