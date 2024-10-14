@@ -53,7 +53,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
       // Handle the response
       if (response.statusCode == 200) {
         // Parse the response (if needed)
-        final responseBody = jsonDecode(response.body);
+        // final responseBody = jsonDecode(response.body);
 
         // Navigate to the success page on success
         Navigator.of(context).pushReplacement(

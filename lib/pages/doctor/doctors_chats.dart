@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/chatting_page.dart';
-import 'package:market_doctor/pages/doctor/chew_card.dart';
+import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,6 +15,7 @@ class DoctorsChats extends StatefulWidget {
 
 class DoctorsChatsState extends State<DoctorsChats> {
   List<dynamic> chews = [];
+  List<dynamic> patients = [];
   bool isChewLoading = true;
   bool isPatientLoading = true;
   bool _isChewsSelected = true;
@@ -24,6 +25,9 @@ class DoctorsChatsState extends State<DoctorsChats> {
     super.initState();
     if (chews.isEmpty) {
       fetchChews();
+    }
+    if (patients.isEmpty) {
+      fetchPatients();
     }
   }
 
@@ -55,6 +59,33 @@ class DoctorsChatsState extends State<DoctorsChats> {
     }
   }
 
+  Future<void> fetchPatients() async {
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url =
+        Uri.parse('$baseUrl/api/users?filters[role][\$eq]=5&populate=*');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          patients = data;
+          isPatientLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load Patients');
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Failed to load Patients',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +141,7 @@ class DoctorsChatsState extends State<DoctorsChats> {
             Expanded(
               child: _isChewsSelected
                   ? ChewsWidget(isLoading: isChewLoading, chews: chews)
-                  : PatientsWidget(isLoading: isPatientLoading),
+                  : PatientsWidget(isLoading: isPatientLoading, patients: patients),
             ),
           ],
         ),
@@ -146,7 +177,7 @@ class ChewsWidget extends StatelessWidget {
                 separatorBuilder: (context, index) => SizedBox(height: 8.0),
                 itemBuilder: (context, index) {
                   final chew = chews[index];
-                  return ChewCard(
+                  return ChewOrPatientCard(
                     imageUrl: chew['profile_picture'] ??
                         'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: '${chew['firstName']} ${chew['lastName']}',
@@ -178,11 +209,56 @@ class ChewsWidget extends StatelessWidget {
 
 class PatientsWidget extends StatelessWidget {
   final bool isLoading;
+  final List<dynamic> patients;
 
-  PatientsWidget({required this.isLoading});
+  PatientsWidget({required this.isLoading, required this.patients});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox();
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        children: [
+          if (isLoading)
+            SizedBox(
+              height: 200,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (patients.isNotEmpty)
+            Flexible(
+              child: ListView.separated(
+                itemCount: patients.length,
+                separatorBuilder: (context, index) => SizedBox(height: 8.0),
+                itemBuilder: (context, index) {
+                  final chew = patients[index];
+                  return ChewOrPatientCard(
+                    imageUrl: chew['profile_picture'] ??
+                        'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                    name: '${chew['firstName']} ${chew['lastName']}',
+                    onChatPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChattingPage(
+                                  guestId: chew['id'],
+                                  guestName:
+                                      '${chew['firstName']} ${chew['lastName']}',
+                                  guestImage: chew['profile_picture'] ??
+                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                                  guestPhoneNumber: chew['phone'],
+                                ))),
+                  );
+                },
+              ),
+            )
+          else
+            SizedBox(
+              height: 100,
+              child: Center(child: Text('No CHEWs available')),
+            ),
+        ],
+      ),
+    );
   }
 }

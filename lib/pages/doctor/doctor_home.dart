@@ -1,13 +1,16 @@
 // ignore_for_file: unnecessary_string_interpolations, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/choose_action.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/pharmacy.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -18,33 +21,188 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int _currentIndex = 0;
+  IO.Socket? socket;
+  List<Map<String, dynamic>> unsentMessages = [];
+  bool _isSocketInitialized = false;
+  ChatStore? chatStore;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_isSocketInitialized) {
+      _initializeSocket();
+      _isSocketInitialized = true;
+    }
+    chatStore = context.read<ChatStore>();
+    chatStore?.addListener(_sendPendingUpdates);
+    chatStore?.addListener(_sendPendingUpdates);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    socket?.disconnect();
+    _isSocketInitialized = false;
+  }
+
+  void _initializeSocket() {
+    ChatStore chatStore = context.read<ChatStore>();
+    int? chewId =
+        Provider.of<DataStore>(context, listen: false).chewData?['id'];
+
+    if (chewId != null) {
+      final String socketUrl = dotenv.env['API_URL']!;
+
+      setState(() {
+        socket = IO.io(socketUrl, <String, dynamic>{
+          'transports': ['websocket'],
+          'autoConnect': false,
+        });
+
+        socket!.connect();
+        socket!.emit('authenticate', {'own_id': chewId});
+
+        socket!.on('connect', (_) {
+          print('Socket connected');
+          _resendUnsentMessages();
+        });
+
+        socket!.on('unread_messages', (messages) {
+          _handleArrayOfMessages(messages, chewId);
+        });
+
+        socket!.on('new_message', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.addMessage(message, docId);
+        });
+
+        socket!.on('older_messages', (messages) {
+          _handleArrayOfMessages(messages, chewId);
+        });
+
+        socket!.on('delivery_status_updated', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.receiveDeliveryStatus(message, docId);
+        });
+
+        socket!.on('read_status_updated', (message) {
+          int docId = (message['sender'] == chewId)
+              ? message['receiver']
+              : message['sender'];
+          chatStore.receiveReadStatus(message, docId);
+        });
+      });
+
+      socket!.on('disconnect', (_) {
+        print('Socket disconnected');
+        _isSocketInitialized = false;
+      });
+    }
+  }
+
+  void _resendUnsentMessages() {
+    if (unsentMessages.isNotEmpty) {
+      for (Map<String, dynamic> message in unsentMessages) {
+        socket!.emit('new_message', message);
+      }
+      unsentMessages.clear();
+    }
+  }
+
+  void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
+    final addMessage = context.read<ChatStore>().addMessage;
+
+    for (Map<String, dynamic> message in messages) {
+      int docId = (message['sender'] == chewId)
+          ? message['receiver']
+          : message['sender'];
+      addMessage(message, docId);
+    }
+  }
+
+  void _sendPendingUpdates() {
+    ChatStore chatStore = context.read<ChatStore>();
+
+    if (chatStore.latestMessage.isNotEmpty) {
+      int messageId = chatStore.latestMessage['id'];
+      if (socket!.connected) {
+        socket!.emitWithAck(
+          'new_message',
+          chatStore.latestMessage,
+          ack: (response) {
+            if (response['success'] == true) {
+              Map<String, dynamic> newMessage = response['message'];
+              int docId = newMessage['receiver'];
+              chatStore.addMessage(newMessage, docId);
+              if (newMessage['id'] != messageId) {
+                chatStore.removeMessage(docId, messageId);
+              }
+            } else {
+              print('Error: ${response['error']}');
+            }
+          },
+        );
+      } else {
+        setState(() {
+          unsentMessages.add(chatStore.latestMessage);
+        });
+      }
+      chatStore.resetNewMessageFlag();
+    }
+
+    if (chatStore.readStatusForId != null) {
+      socket!.emit(
+          'update_read_status', {'message_id': chatStore.readStatusForId});
+      chatStore.resetReadId();
+    }
+
+    if (chatStore.deliveryStatusForId != null) {
+      socket!.emit('update_delivery_status',
+          {'message_id': chatStore.deliveryStatusForId});
+      chatStore.resetDeliveryId();
+    }
+
+    if (chatStore.getOlderMessagesFor != null) {
+      socket!.emit('get_older_messages', chatStore.getOlderMessagesFor);
+      chatStore.resetOlderMessages();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // Accessing the doctorData from Provider
     final doctorData = Provider.of<DataStore>(context).doctorData;
     final String? userId = doctorData?['user']?['id'];
-
-    return Scaffold(
-      appBar:  DoctorApp(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSearchbar(),
-            const SizedBox(height: 16),
-            _buildDashboardCards(userId),
-            const SizedBox(height: 16),
-            AdvertisementCarousel(),
-            const SizedBox(height: 16),
-            _buildNextAppointmentSection(),
-          ],
+    if (doctorData == null) {
+      return PopScope(canPop: false, child: ChooseActionPage());
+    } else {
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: DoctorApp(),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSearchbar(),
+                const SizedBox(height: 16),
+                _buildDashboardCards(userId),
+                const SizedBox(height: 16),
+                AdvertisementCarousel(),
+                const SizedBox(height: 16),
+                _buildNextAppointmentSection(),
+              ],
+            ),
+          ),
+          bottomNavigationBar: DoctorBottomNavBar(),
         ),
-      ),
-      bottomNavigationBar:  DoctorBottomNavBar(),
-    );
+      );
+    }
   }
 
   Widget _buildSearchbar() {
@@ -97,7 +255,8 @@ class _DashboardPageState extends State<DashboardPage> {
             icon: const Icon(Icons.filter_list, color: Colors.black),
             label: const Text('Filter', style: TextStyle(color: Colors.black)),
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -122,8 +281,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => DoctorCasesPage()),
+              MaterialPageRoute(builder: (context) => DoctorCasesPage()),
             );
           },
         ),
@@ -133,8 +291,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) =>  DoctorPharmacyListPage()),
+              MaterialPageRoute(builder: (context) => DoctorPharmacyListPage()),
             );
           },
         ),
@@ -190,8 +347,6 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
   }
-
-
 
   Widget _buildNextAppointmentSection() {
     return Column(
@@ -251,7 +406,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildSmallAppointmentCard({required String time, required String date}) {
+  Widget _buildSmallAppointmentCard(
+      {required String time, required String date}) {
     return Container(
       width: 120,
       height: 60,
@@ -289,9 +445,11 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+          Text(label,
+              style: const TextStyle(color: Colors.white, fontSize: 14)),
           const SizedBox(height: 8),
-          Text(doctorName, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(doctorName,
+              style: const TextStyle(color: Colors.white, fontSize: 12)),
           const SizedBox(height: 4),
           Text(time, style: const TextStyle(color: Colors.white, fontSize: 12)),
           Text(date, style: const TextStyle(color: Colors.white, fontSize: 12)),

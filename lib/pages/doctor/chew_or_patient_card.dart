@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ChewCard extends StatelessWidget {
+class ChewOrPatientCard extends StatelessWidget {
   final String imageUrl;
   final String name;
   final VoidCallback onChatPressed;
 
-  ChewCard({
+  ChewOrPatientCard({
     required this.imageUrl,
     required this.name,
     required this.onChatPressed,
@@ -61,7 +61,7 @@ class ChewCard extends StatelessWidget {
                     constraints: BoxConstraints(
                       minHeight: 24,
                     ),
-                    child: Text('Chat with CHEW',
+                    child: Text('Open Chat',
                         style: TextStyle(fontSize: 13,
                         fontWeight: FontWeight.bold, color: Colors.white)),
                   ),

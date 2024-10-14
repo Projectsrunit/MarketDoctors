@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/check_inbox.dart';
 import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/doctor/verification_page.dart';

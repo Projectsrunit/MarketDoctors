@@ -10,7 +10,6 @@ import 'package:market_doctor/pages/patient/book_appointment.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'package:market_doctor/pages/user_type.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
