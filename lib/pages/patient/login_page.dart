@@ -56,10 +56,15 @@ Future<void> _loginUser() async {
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
-             _showMessage('Welcome Back!', isError: false);
-          context.read<DataStore>().updatePatientData(responseBody);
+        var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+        final fullRecord = await http.get(url);
+        if (fullRecord.statusCode == 200) {
+          var recordBody = jsonDecode(fullRecord.body);
+          _showMessage('Welcome Back!', isError: false);
+          context.read<DataStore>().updatePatientData(recordBody);
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => PatientHome()));
+        }
         
         // // Extract patient details
         // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
