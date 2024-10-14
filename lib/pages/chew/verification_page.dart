@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 class ChewVerificationPage extends StatefulWidget {
   final String reference;  // Accept reference parameter
 
-  const ChewVerificationPage({Key? key, required this.reference}) : super(key: key);
+  const ChewVerificationPage({super.key, required this.reference});
 
   @override
   State<ChewVerificationPage> createState() => _ChewVerificationPageState();

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/pages/doctor/upload_file.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
