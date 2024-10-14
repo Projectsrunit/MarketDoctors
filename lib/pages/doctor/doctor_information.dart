@@ -221,6 +221,8 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
           }
           return null;
         },
+        minLines: label == 'About Doctor' ? 3 : 1,
+        maxLines: label == 'About Doctor' ? null : 1,
       ),
     );
   }
