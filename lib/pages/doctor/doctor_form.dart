@@ -41,10 +41,10 @@ class _DoctorFormPageState extends State<DoctorFormPage> {
         Provider.of<DataStore>(context, listen: false).doctorData;
     if (doctorData != null) {
       _yearsOfExperienceController.text =
-          doctorData['yearsOfExperience']?.toString() ?? '';
+          doctorData['years_of_experience']?.toString() ?? '';
       _clinicHealthFacilityController.text =
-          doctorData['clinicHealthFacility'] ?? '';
-      _specializationController.text = doctorData['specialization'] ?? '';
+          doctorData['facility'] ?? '';
+      _specializationController.text = doctorData['specialisation'] ?? '';
       _languageController.text = doctorData['languages'] ?? '';
       _awardsAndRecognitionController.text = doctorData['awards'] ?? '';
     } else {
