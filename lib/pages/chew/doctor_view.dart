@@ -144,23 +144,3 @@ class _DoctorViewState extends State<DoctorView> {
     );
   }
 }
-
-class AvailableDocs extends StatelessWidget {
-  final String name;
-  final int age;
-  final String location;
-
-  AvailableDocs(
-      {required this.name, required this.age, required this.location});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(name),
-        Text('Age: $age'),
-        Text('Location: $location'),
-      ],
-    );
-  }
-}
