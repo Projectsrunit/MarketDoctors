@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,8 +5,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_storage/firebase_storage.dart';
 
 class DoctorInformation extends StatefulWidget {
   const DoctorInformation({super.key});
@@ -20,6 +21,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
   final _formKey = GlobalKey<FormState>();
   bool _isEditing = false;
   File? _profileImage;
+  bool _isLoading = false;
 
   // Controllers for editable fields
   late TextEditingController _emailController;
@@ -50,7 +52,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     _awardsController = TextEditingController(
         text: doctorData?['awards'] ?? 'Bachelor in Medicine');
     _specializationController = TextEditingController(
-        text: doctorData?['specialisation'] ?? 'General Pratice');
+        text: doctorData?['specialisation'] ?? 'General Practice');
   }
 
   @override
@@ -166,6 +168,8 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
             ),
             const SizedBox(height: 30),
             _buildActionButton(),
+            // Show loading indicator
+            if (_isLoading) Center(child: CircularProgressIndicator()),
           ],
         ),
       ),
@@ -274,46 +278,75 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     });
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _updateUser() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       final doctorData =
           Provider.of<DataStore>(context, listen: false).doctorData;
+
+      // Upload image to Firebase Storage if it's selected
+      String? profileImageUrl;
+      if (_profileImage != null) {
+        try {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('profile_pictures/${doctorData?['id']}.jpg');
+          await storageRef.putFile(_profileImage!); // Upload image
+          profileImageUrl =
+              await storageRef.getDownloadURL(); // Get download URL
+        } catch (e) {
+          _showSnackBar('Error uploading image: $e');
+          return; // Exit if the image upload fails
+        }
+      }
+
+      // Prepare API request
       String? baseUrl = dotenv.env['API_URL'];
       final uri = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
+      final request = http.MultipartRequest('PUT', uri);
+      request.fields['yearsOfExperience'] = _yearsOfExperienceController.text;
+      request.fields['clinicHealthFacility'] =
+          _clinicHealthFacilityController.text;
+      request.fields['specialization'] = _specializationController.text;
+      request.fields['languages'] = _languagesController.text;
+      request.fields['awards'] = _awardsController.text;
 
-      Map<String, dynamic> updatedData = {
-        'years_of_experience': _yearsOfExperienceController.text,
-        'languages': _languagesController.text,
-        'awards': _awardsController.text,
-        'specialisation': _specializationController.text,
-        'clinic_health_facility': _clinicHealthFacilityController.text,
-      };
+      // Include profile image URL in the request if available
+      if (profileImageUrl != null) {
+        request.fields['profile_picture'] = profileImageUrl;
+      }
 
       try {
-        final response = await http.put(
-          uri,
-          headers: {
-            'Authorization': 'Bearer ${doctorData?['token']}',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(updatedData),
-        );
-
+        final response = await request.send();
         if (response.statusCode == 200) {
-          _showSnackBar('Profile updated successfully');
-          _toggleEditing();
+          _showSnackBar('User updated successfully!');
+          setState(() {
+            _isEditing = false;
+          });
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DoctorProfilePage(),
+            ),
+          );
         } else {
-          print('Error: ${response.statusCode}, Body: ${response.body}');
-          _showSnackBar('Failed to update profile');
+          _showSnackBar('Failed to update user: ${response.reasonPhrase}');
+          setState(() {
+            _isLoading = false;
+          });
         }
       } catch (e) {
         _showSnackBar('Error: $e');
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
-  }
-
-  void _showSnackBar(message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
   }
 }
