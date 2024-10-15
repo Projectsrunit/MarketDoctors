@@ -127,12 +127,7 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
 
 // Reusable AppointmentCard Widget
 
- 
-
-
-           
-    
-  class AppointmentCard extends StatelessWidget {
+class AppointmentCard extends StatelessWidget {
   final String patientName;
   final int patientAge;
   final String appointmentDate;
@@ -169,7 +164,8 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
                       ? AssetImage(imageUrl!) // Use image if available
                       : null, // No image
                   child: imageUrl == null || imageUrl!.isEmpty
-                      ? const Icon(Icons.person, size: 30) // Display icon if no image
+                      ? const Icon(Icons.person,
+                          size: 30) // Display icon if no image
                       : null,
                 ),
                 const SizedBox(width: 16),
@@ -230,6 +226,7 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -243,6 +240,7 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         isPending ? Colors.orangeAccent : Colors.green,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -257,5 +255,3 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
     );
   }
 }
-
-
