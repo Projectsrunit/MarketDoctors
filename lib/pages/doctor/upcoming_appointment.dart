@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'dart:convert';
-
 import 'package:provider/provider.dart';
 import 'package:market_doctor/main.dart';
 
@@ -32,6 +31,32 @@ class UpcomingAppointmentPage extends StatelessWidget {
         bottomNavigationBar: DoctorBottomNavBar(),
       ),
     );
+  }
+}
+
+Future<bool> confirmAppointment(int appointmentId) async {
+  String? baseUrl = dotenv.env['API_URL'];
+  final apiUrl = '$baseUrl/api/appointments/$appointmentId';
+  final headers = {'Content-Type': 'application/json'};
+
+  try {
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: json.encode({
+        "data": {"status": "confirmed"}
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true; // Confirmation successful
+    } else {
+      print('Failed to confirm appointment: ${response.body}');
+      return false; // Confirmation failed
+    }
+  } catch (e) {
+    print('Error confirming appointment: $e');
+    return false;
   }
 }
 
@@ -65,16 +90,12 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        // Parse the appointments
         List<dynamic> allAppointments = json.decode(response.body)['data'];
-
-        // Filter based on the tab (pending or confirmed)
         List<dynamic> filteredAppointments =
             allAppointments.where((appointment) {
           String status = appointment['attributes']['status'];
           return widget.isPending ? status == 'pending' : status == 'confirmed';
         }).toList();
-
         return filteredAppointments;
       } else {
         throw Exception('Failed to load appointments');
@@ -106,6 +127,7 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
               final patient =
                   appointment['attributes']['patient']['data']['attributes'];
               return AppointmentCard(
+                appointmentId: appointment['id'],
                 patientName: '${patient['firstName']} ${patient['lastName']}',
                 patientAge:
                     calculateAge(DateTime.parse(patient['dateOfBirth'])),
@@ -113,6 +135,11 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
                 appointmentTime: appointment['attributes']['appointment_time'],
                 imageUrl: 'assets/images/patient.png',
                 isPending: widget.isPending,
+                onAppointmentConfirmed: () {
+                  setState(() {
+                    appointments = fetchAppointments(); // Refresh list
+                  });
+                },
               );
             },
           );
@@ -136,23 +163,26 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
 }
 
 // Reusable AppointmentCard Widget
-
 class AppointmentCard extends StatelessWidget {
+  final int appointmentId;
   final String patientName;
   final int patientAge;
   final String appointmentDate;
   final String appointmentTime;
   final String? imageUrl; // Make imageUrl nullable
   final bool isPending;
+  final VoidCallback onAppointmentConfirmed;
 
   const AppointmentCard({
     super.key,
+    required this.appointmentId,
     required this.patientName,
     required this.patientAge,
     required this.appointmentDate,
     required this.appointmentTime,
     this.imageUrl, // Optional image URL
     required this.isPending,
+    required this.onAppointmentConfirmed,
   });
 
   @override
@@ -186,9 +216,7 @@ class AppointmentCard extends StatelessWidget {
                       Text(
                         patientName,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text('Age: $patientAge years'),
                     ],
@@ -197,7 +225,6 @@ class AppointmentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-
             // Row: Date and Time
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,7 +252,6 @@ class AppointmentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-
             // Row: Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,9 +270,25 @@ class AppointmentCard extends StatelessWidget {
                   child: const Text('Reschedule'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle Proceed Action
-                  },
+                  onPressed: isPending
+                      ? () async {
+                          bool success =
+                              await confirmAppointment(appointmentId);
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Appointment confirmed')),
+                            );
+                            onAppointmentConfirmed(); // Trigger list refresh
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Failed to confirm appointment')),
+                            );
+                          }
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         isPending ? Colors.orangeAccent : Colors.green,
