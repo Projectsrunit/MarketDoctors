@@ -335,11 +335,18 @@ class AppointmentCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    elevation: 5.0,
+                    shadowColor: Colors.black54,
                   ),
-                  child: const Text('Reschedule'),
+                  child: const Text(
+                    'Reschedule',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: isPending
@@ -363,13 +370,21 @@ class AppointmentCard extends StatelessWidget {
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        isPending ? Colors.orangeAccent : Colors.green,
+                        isPending ? Colors.orangeAccent : Colors.greenAccent,
                     foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    elevation: 5.0,
+                    shadowColor: Colors.black54,
                   ),
-                  child: Text(isPending ? 'Confirm' : 'Proceed'),
+                  child: Text(
+                    isPending ? 'Confirm' : 'Proceed',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
