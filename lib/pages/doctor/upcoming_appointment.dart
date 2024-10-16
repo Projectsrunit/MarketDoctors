@@ -18,7 +18,7 @@ class UpcomingAppointmentPage extends StatelessWidget {
           title: const Text('Appointments'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Upcoming Appointments'),
+              Tab(text: 'Confirmed Appointments'),
               Tab(text: 'Pending Appointments'),
             ],
           ),
@@ -65,7 +65,17 @@ class _AppointmentListTabState extends State<AppointmentListTab> {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        return json.decode(response.body)['data'];
+        // Parse the appointments
+        List<dynamic> allAppointments = json.decode(response.body)['data'];
+
+        // Filter based on the tab (pending or confirmed)
+        List<dynamic> filteredAppointments =
+            allAppointments.where((appointment) {
+          String status = appointment['attributes']['status'];
+          return widget.isPending ? status == 'pending' : status == 'confirmed';
+        }).toList();
+
+        return filteredAppointments;
       } else {
         throw Exception('Failed to load appointments');
       }
