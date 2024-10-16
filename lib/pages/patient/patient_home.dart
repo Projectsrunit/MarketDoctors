@@ -78,10 +78,12 @@ class _PatientHomeState extends State<PatientHome> {
         });
 
         socket!.on('new_message', (message) {
+          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
           int docId = (message['sender'] == chewId)
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, docId);
+          deliverer(docId, message);
         });
 
         socket!.on('older_messages', (messages) {
@@ -123,10 +125,12 @@ class _PatientHomeState extends State<PatientHome> {
     final addMessage = context.read<ChatStore>().addMessage;
 
     for (Map<String, dynamic> message in messages) {
-      int docId = (message['sender'] == chewId)
+      int? docId = (message['sender'] == chewId)
           ? message['receiver']
           : message['sender'];
+      if (docId != null) {
       addMessage(message, docId);
+      }
     }
   }
 
