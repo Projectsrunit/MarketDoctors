@@ -166,7 +166,7 @@ class ChatStore extends ChangeNotifier {
 
   void addMessage(Map<String, dynamic> message, int docId) {
     int messageId = message['id'];
-    print('going to add for $message');
+    // print('going to add for $message');
     if (!_messages.containsKey(docId)) {
       _messages[docId] = {};
     }

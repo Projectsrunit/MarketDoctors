@@ -94,6 +94,7 @@ class DoctorsChatsState extends State<DoctorsChats> {
       );
     }
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
