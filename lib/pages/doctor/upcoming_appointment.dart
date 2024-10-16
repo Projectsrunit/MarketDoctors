@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -56,6 +58,37 @@ Future<bool> confirmAppointment(int appointmentId) async {
     }
   } catch (e) {
     print('Error confirming appointment: $e');
+    return false;
+  }
+}
+
+Future<bool> rescheduleAppointment(
+    int appointmentId, String newDate, String newTime) async {
+  String? baseUrl = dotenv.env['API_URL'];
+  final apiUrl = '$baseUrl/api/appointments/$appointmentId';
+  final headers = {'Content-Type': 'application/json'};
+
+  try {
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: json.encode({
+        "data": {
+          "status": "pending",
+          "appointment_date": newDate,
+          "appointment_time": newTime
+        }
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true; // Reschedule successful
+    } else {
+      print('Failed to reschedule appointment: ${response.body}');
+      return false; // Reschedule failed
+    }
+  } catch (e) {
+    print('Error rescheduling appointment: $e');
     return false;
   }
 }
@@ -257,8 +290,47 @@ class AppointmentCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle Reschedule Action
+                  onPressed: () async {
+                    // Select new date
+                    DateTime? newDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+
+                    // If a new date is selected, show time picker
+                    if (newDate != null) {
+                      TimeOfDay? newTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+
+                      if (newTime != null) {
+                        // Convert DateTime and TimeOfDay to desired string format
+                        String formattedDate =
+                            "${newDate.year}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}";
+                        String formattedTime =
+                            "${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00.000";
+
+                        // Call the reschedule function with selected date and time
+                        bool success = await rescheduleAppointment(
+                            appointmentId, formattedDate, formattedTime);
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Appointment rescheduled')),
+                          );
+                          onAppointmentConfirmed(); // Refresh the list
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Failed to reschedule appointment')),
+                          );
+                        }
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
