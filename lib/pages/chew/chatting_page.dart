@@ -27,12 +27,13 @@ class ChattingPageState extends State<ChattingPage> {
   final ImagePicker _picker = ImagePicker();
   bool loadedOlderMessages = false;
   ChatStore? chatStore;
+  RealTimeDelivery? deliverer;
 
   @override
   void initState() {
     super.initState();
-    chatStore = context.read<ChatStore>();
-    chatStore?.addListener(doDeliveryChecks);
+    deliverer = context.read<RealTimeDelivery>();
+    deliverer?.addListener(doDeliveryChecks);
   }
 
   @override
@@ -41,13 +42,13 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   void doDeliveryChecks() {
-    final latestsMap = chatStore?.latestsMap;
+    final latestsMap = deliverer?.latestsMap;
     if (latestsMap?[widget.doctorId] != null) {
       latestsMap?[widget.doctorId]?.forEach((messageId, message) {
         _handleMessageStatus(message, messageId);
-      });
 
-      chatStore?.removeLatestsMessage(widget.doctorId);
+      });
+      deliverer?.removeLatestsMessage(widget.doctorId);
     }
   }
 
@@ -80,13 +81,14 @@ class ChattingPageState extends State<ChattingPage> {
     });
   }
 
-  void _handleMessageStatus(Map<String, dynamic> message, int messageId) {
-    if (message['delivery_status'] != true) {
-      chatStore?.sendDeliveryStatus(messageId);
+  void _handleMessageStatus(Map<String, dynamic>? message, int messageId) {
+    ChatStore chatStore = context.read<ChatStore>();
+    if (message?['delivery_status'] != true) {
+      chatStore.sendDeliveryStatus(messageId);
     }
 
-    if (message['read_status'] == false || message['read_status'] == null) {
-      chatStore?.sendReadStatus(messageId);
+    if (message?['read_status'] == false || message?['read_status'] == null) {
+      chatStore.sendReadStatus(messageId);
     }
   }
 
