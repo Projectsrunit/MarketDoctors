@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -22,9 +20,10 @@ class DoctorsUploadCredentialsPage extends StatefulWidget {
 
 class _DoctorsUploadCredentialsPageState
     extends State<DoctorsUploadCredentialsPage> {
-  bool _isLoading = false; // To manage loading state
+  bool _isLoading = false;
 
-  // Function to pick a file using file picker
+  String? _fileName; // To store the file name dynamically
+
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles();
@@ -38,22 +37,24 @@ class _DoctorsUploadCredentialsPageState
       final filePath = file.path;
 
       if (filePath != null) {
-        _showSnackBar('File selected: ${file.name}');
-        await _uploadFileToFirebase(File(filePath), file.name);
+        setState(() {
+          _fileName = file.name; // Store the dynamic file name
+        });
+
+        _showSnackBar('File selected: $_fileName');
+        await _uploadFileToFirebase(File(filePath), _fileName!);
       }
     } catch (e) {
       _showSnackBar('Failed to pick file: ${e.toString()}');
     }
   }
 
-  // Function to upload the file to Firebase and get its download URL
   Future<void> _uploadFileToFirebase(File file, String fileName) async {
     setState(() {
-      _isLoading = true; // Set loading state
+      _isLoading = true;
     });
 
     try {
-      // Reference to Firebase Storage folder 'certifying_docs'
       final storageRef =
           FirebaseStorage.instance.ref().child('certifying_docs/$fileName');
 
@@ -61,21 +62,18 @@ class _DoctorsUploadCredentialsPageState
       final taskSnapshot = await uploadTask.whenComplete(() {});
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
-      // Show success message
       _showSnackBar('Document uploaded successfully!');
-
-      // Send file URL to the backend
-      await _sendFileUrlToServer(downloadURL);
+      await _sendFileUrlToServer(downloadURL, fileName); // Send file URL with dynamic name
     } catch (e) {
       _showSnackBar('Error during file upload. Please try again.');
     } finally {
       setState(() {
-        _isLoading = false; // Reset loading state
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> _sendFileUrlToServer(String fileUrl) async {
+  Future<void> _sendFileUrlToServer(String fileUrl, String fileName) async {
     final doctorData =
         Provider.of<DataStore>(context, listen: false).doctorData;
 
@@ -88,7 +86,7 @@ class _DoctorsUploadCredentialsPageState
       final url = Uri.parse('$baseUrl/api/qualifications');
       final body = jsonEncode({
         "data": {
-          "name": "Certify document",
+          "name": fileName, 
           "file_url": fileUrl,
           "user": doctorData['id'],
         }
@@ -111,7 +109,6 @@ class _DoctorsUploadCredentialsPageState
     }
   }
 
-  // Snackbar for displaying messages
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
@@ -212,7 +209,7 @@ class _DoctorsUploadCredentialsPageState
               ),
             ),
             if (_isLoading)
-              CircularProgressIndicator(), // Show loading indicator
+              CircularProgressIndicator(),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
