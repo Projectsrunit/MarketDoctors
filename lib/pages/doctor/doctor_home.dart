@@ -1,5 +1,7 @@
 // ignore_for_file: unnecessary_string_interpolations, unused_field
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
@@ -9,9 +11,11 @@ import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/pharmacy.dart';
+import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -25,7 +29,9 @@ class _DashboardPageState extends State<DashboardPage> {
   List<Map<String, dynamic>> unsentMessages = [];
   bool _isSocketInitialized = false;
   ChatStore? chatStore;
-
+  bool isLoading = true;
+  bool hasError = false;
+  List<dynamic> appointments = [];
   @override
   void initState() {
     super.initState();
@@ -36,6 +42,7 @@ class _DashboardPageState extends State<DashboardPage> {
     chatStore = context.read<ChatStore>();
     chatStore?.addListener(_sendPendingUpdates);
     chatStore?.addListener(_sendPendingUpdates);
+    _fetchAppointments();
   }
 
   @override
@@ -115,6 +122,42 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _fetchAppointments() async {
+    setState(() {
+      isLoading = true;
+      hasError = false;
+    });
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
+    String? baseUrl = dotenv.env['API_URL'];
+
+    final String apiUrl =
+        "$baseUrl/api/appointments?filters[doctor][id]=${doctorData?['id']}&populate=*";
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          appointments = responseData['data'] ?? [];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          hasError = true;
+          isLoading = false;
+        });
+        print('Response: ${response.body}');
+      }
+    } catch (error) {
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
+
   void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
     final addMessage = context.read<ChatStore>().addMessage;
 
@@ -122,8 +165,9 @@ class _DashboardPageState extends State<DashboardPage> {
       int? docId = (message['sender'] == chewId)
           ? message['receiver']
           : message['sender'];
-      if (docId != null) {//because some messages in backend had a missing sender or receiver
-      addMessage(message, docId);
+      if (docId != null) {
+        //because some messages in backend had a missing sender or receiver
+        addMessage(message, docId);
       }
     }
   }
@@ -307,7 +351,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const DoctorAppointmentPage()),
+                  builder: (context) => UpcomingAppointmentPage()),
             );
           },
         ),
@@ -354,22 +398,43 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildNextAppointmentSection() {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (hasError) {
+      return Center(child: Text("Error fetching appointments"));
+    }
+
+    final upcomingAppointments = appointments.take(2).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Next Appointment',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Text(
+              "Upcoming Appointments",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent, // White text for title
+              ),
             ),
             GestureDetector(
-              onTap: () {}, // Replace with your "See all" action
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpcomingAppointmentPage(),
+                  ),
+                );
+              },
               child: const Text(
                 'See all',
                 style: TextStyle(
-                  color: Color(0xFF4672ff),
+                  color: Colors.blueAccent, // Link color
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline,
                 ),
@@ -378,87 +443,65 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildSmallAppointmentCard(time: '02:00 PM', date: 'April 2, 2024'),
-            const SizedBox(width: 4),
-            Container(width: 70, height: 2, color: const Color(0xFF4672ff)),
-            const SizedBox(width: 4),
-            _buildSmallAppointmentCard(time: '02:00 PM', date: 'April 2, 2024'),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _buildLargeAppointmentCard(
-              label: 'Video Consultation',
-              doctorName: 'Dr. Goodness Usorah',
-              time: '02:00 PM',
-              date: 'April 2, 2024',
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // Card background color
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.5, // Adjust the aspect ratio as needed
             ),
-            const SizedBox(width: 16),
-            _buildLargeAppointmentCard(
-              label: 'Audio Consultation',
-              doctorName: 'Dr. John Ogundipe',
-              time: '02:00 PM',
-              date: 'April 2, 2024',
-            ),
-          ],
+            itemCount: upcomingAppointments.length,
+            itemBuilder: (context, index) {
+              final appointment = upcomingAppointments[index]['attributes'];
+              final patientAppointment =
+                  appointment['patient']['data']['attributes'];
+              return _buildAppointmentCard(appointment, patientAppointment);
+            },
+          ),
         ),
+        const SizedBox(height: 16), // Add spacing between sections
       ],
     );
   }
 
-  Widget _buildSmallAppointmentCard(
-      {required String time, required String date}) {
-    return Container(
-      width: 120,
-      height: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color(0xFF617DEF),
-      ),
-      padding: const EdgeInsets.all(5.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(time, style: const TextStyle(color: Colors.white, fontSize: 12)),
-          Text(date, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
-      ),
-    );
-  }
+  Widget _buildAppointmentCard(Map<String, dynamic> appointment,
+      Map<String, dynamic> patientAppointment) {
+    final String patientFullName =
+        "${patientAppointment['firstName']} ${patientAppointment['lastName']}"; // Full name
+    final String appointmentDate = appointment['appointment_date'];
+    final String appointmentTime = appointment['appointment_time'];
 
-  Widget _buildLargeAppointmentCard({
-    required String label,
-    required String doctorName,
-    required String time,
-    required String date,
-  }) {
-    return Container(
-      width: 170,
-      height: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color(0xFF617DEF),
-      ),
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(label,
-              style: const TextStyle(color: Colors.white, fontSize: 14)),
-          const SizedBox(height: 8),
-          Text(doctorName,
-              style: const TextStyle(color: Colors.white, fontSize: 12)),
-          const SizedBox(height: 4),
-          Text(time, style: const TextStyle(color: Colors.white, fontSize: 12)),
-          Text(date, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      color: Colors.blueAccent, // Card background color
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Time: $appointmentTime",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // White text for appointment time
+              ),
+            ),
+            Text(
+              "Patient: $patientFullName", // Show full name
+              style: TextStyle(
+                color: Colors.white, // White text for patient name
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
