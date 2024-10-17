@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -6,10 +6,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:provider/provider.dart';
 
 class DoctorsUploadCredentialsPage extends StatefulWidget {
@@ -24,6 +24,7 @@ class _DoctorsUploadCredentialsPageState
     extends State<DoctorsUploadCredentialsPage> {
   bool _isLoading = false; // To manage loading state
 
+  // Function to pick a file using file picker
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles();
@@ -45,13 +46,14 @@ class _DoctorsUploadCredentialsPageState
     }
   }
 
+  // Function to upload the file to Firebase and get its download URL
   Future<void> _uploadFileToFirebase(File file, String fileName) async {
     setState(() {
       _isLoading = true; // Set loading state
     });
 
     try {
-      // Reference to Firebase Storage in the 'certifying_docs' folder
+      // Reference to Firebase Storage folder 'certifying_docs'
       final storageRef =
           FirebaseStorage.instance.ref().child('certifying_docs/$fileName');
 
@@ -60,45 +62,56 @@ class _DoctorsUploadCredentialsPageState
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
       // Show success message
-      _showSnackBar('Your profile picture has been uploaded successfully!');
-      // Send the download URL to the server
+      _showSnackBar('Document uploaded successfully!');
+
+      // Send file URL to the backend
       await _sendFileUrlToServer(downloadURL);
     } catch (e) {
-      _showSnackBar(
-          'Oops! Something went wrong while uploading your picture. Please try again.');
+      _showSnackBar('Error during file upload. Please try again.');
     } finally {
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Reset loading state
       });
     }
   }
 
-  Future<void> _sendFileUrlToServer(String downloadURL) async {
+  Future<void> _sendFileUrlToServer(String fileUrl) async {
     final doctorData =
         Provider.of<DataStore>(context, listen: false).doctorData;
 
+    if (doctorData == null || doctorData['id'] == null) {
+      _showSnackBar('No doctor data available. Please log in again.');
+      return;
+    }
     try {
       final baseUrl = dotenv.env['API_URL'];
-      final url = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
+      final url = Uri.parse('$baseUrl/api/qualifications');
+      final body = jsonEncode({
+        "data": {
+          "name": "Certify document",
+          "file_url": fileUrl,
+          "user": doctorData['id'],
+        }
+      });
 
-      final response = await http.put(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'certify_url': downloadURL}),
+        body: body,
       );
 
       if (response.statusCode == 200) {
-        print('File URL sent successfully!');
+        _showSnackBar('File URL sent successfully!');
       } else {
         _showSnackBar(
-            'Oops! Something went wrong while uploading your picture. Please try again.');
+            'Failed to send file URL. Status: ${response.statusCode}');
       }
     } catch (e) {
-      _showSnackBar(
-          'Oops! Something went wrong while uploading your picture. Please try again.');
+      _showSnackBar('Error sending file URL: ${e.toString()}');
     }
   }
 
+  // Snackbar for displaying messages
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
@@ -114,8 +127,6 @@ class _DoctorsUploadCredentialsPageState
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 30),
                     const Text(
@@ -126,7 +137,7 @@ class _DoctorsUploadCredentialsPageState
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Regulation requires you to upload a certificating document as a doctor. Your data will stay safe and private with us.',
+                      'Upload a certifying document as a doctor. Your data will be kept safe and private.',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
