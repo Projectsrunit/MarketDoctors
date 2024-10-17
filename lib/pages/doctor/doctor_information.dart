@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
 
 class DoctorInformation extends StatefulWidget {
-  const DoctorInformation({Key? key}) : super(key: key);
+  const DoctorInformation({super.key});
 
   @override
   State<DoctorInformation> createState() => _DoctorInformationPageState();
