@@ -14,7 +14,8 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => ChatStore()),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-      ChangeNotifierProvider(create: (_) => DataStore())
+      ChangeNotifierProvider(create: (_) => DataStore()),
+      ChangeNotifierProvider(create: (_) => RealTimeDelivery()),
     ],
     child: const MyApp(),
   ));
@@ -132,8 +133,25 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
-class ChatStore extends ChangeNotifier {
+class RealTimeDelivery extends ChangeNotifier {
   Map<int, Map<int, Map<String, dynamic>>> latestsMap = {};
+
+  void addLatestsMessage(int doctorId, Map<String, dynamic> message) {
+    int messageId = message['id'];
+    if (!latestsMap.containsKey(doctorId)) {
+      latestsMap[doctorId] = {};
+    }
+    latestsMap[doctorId]?[messageId] = message;
+    notifyListeners();
+  }
+
+  void removeLatestsMessage(int doctorId) {
+    latestsMap.remove(doctorId);
+    notifyListeners();
+  }
+}
+
+class ChatStore extends ChangeNotifier {
   Map<int, Map<int, Map<String, dynamic>>> _messages = {};
   Map<String, dynamic>? _latestMessage;
   Map? _getOlderMessagesFor;
@@ -148,26 +166,11 @@ class ChatStore extends ChangeNotifier {
 
   void addMessage(Map<String, dynamic> message, int docId) {
     int messageId = message['id'];
-
+    // print('going to add for $message');
     if (!_messages.containsKey(docId)) {
       _messages[docId] = {};
     }
     _messages[docId]![messageId] = message;
-    notifyListeners();
-  }
-
-  void addLatestsMessage(int doctorId, Map<String, dynamic> message) {
-    int messageId = message['id'];
-
-    if (!latestsMap.containsKey(doctorId)) {
-      latestsMap[doctorId] = {};
-    }
-    latestsMap[doctorId]?[messageId] = message;
-    notifyListeners();
-  }
-
-  void removeLatestsMessage(int doctorId) {
-    latestsMap.remove(doctorId);
     notifyListeners();
   }
 

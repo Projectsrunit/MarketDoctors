@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/main.dart';
+import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/chatting_page.dart';
 import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
@@ -32,11 +34,14 @@ class DoctorsChatsState extends State<DoctorsChats> {
   }
 
   Future<void> fetchChews() async {
+    int doc = context.read<DataStore>().doctorData?['id'];
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url =
-        Uri.parse('$baseUrl/api/users?filters[role][\$eq]=4&populate=*');
+    final Uri url = Uri.parse('$baseUrl/api/getchatsfor');
     try {
-      final response = await http.get(url);
+      final response = await http.post(url, headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'id': doc, 'role': 4}));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -60,11 +65,14 @@ class DoctorsChatsState extends State<DoctorsChats> {
   }
 
   Future<void> fetchPatients() async {
+    int doc = context.read<DataStore>().doctorData?['id'];
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url =
-        Uri.parse('$baseUrl/api/users?filters[role][\$eq]=5&populate=*');
+    final Uri url = Uri.parse('$baseUrl/api/getchatsfor');
     try {
-      final response = await http.get(url);
+      final response = await http.post(url, headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'id': doc, 'role': 5}));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -86,6 +94,7 @@ class DoctorsChatsState extends State<DoctorsChats> {
       );
     }
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
