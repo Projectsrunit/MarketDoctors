@@ -180,6 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     // Accessing the doctorData from Provider
     final doctorData = Provider.of<DataStore>(context).doctorData;
+    // final String? userId = doctorData?['id']?.toString();
     final int? userId = doctorData?['id'];
     if (doctorData == null) {
       return PopScope(canPop: false, child: ChooseActionPage());

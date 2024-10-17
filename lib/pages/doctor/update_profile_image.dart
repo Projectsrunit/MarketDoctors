@@ -5,6 +5,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -62,7 +64,8 @@ class _DoctorUpdateProfileImagePageState
       // Send the download URL to the server
       await _sendFileUrlToServer(downloadURL);
     } catch (e) {
-      _showSnackBar('Oops! Something went wrong while uploading your picture. Please try again.');
+      _showSnackBar(
+          'Oops! Something went wrong while uploading your picture. Please try again.');
     } finally {
       setState(() {
         _isLoading = false; // Reset loading state
@@ -102,6 +105,7 @@ class _DoctorUpdateProfileImagePageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: DoctorApp(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -114,7 +118,7 @@ class _DoctorUpdateProfileImagePageState
                   children: [
                     const SizedBox(height: 30),
                     const Text(
-                      'Upload Credentials',
+                      'Upload Profile Picture',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
@@ -221,6 +225,7 @@ class _DoctorUpdateProfileImagePageState
           ],
         ),
       ),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }

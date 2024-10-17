@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:market_doctor/main.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ChattingPage extends StatefulWidget {
   final String guestName;
@@ -138,21 +143,25 @@ class ChattingPageState extends State<ChattingPage> {
         source: type == 'image' ? ImageSource.gallery : ImageSource.camera);
 
     if (pickedFile != null) {
+      // Upload the picked file to Firebase
       String mediaUrl = await _uploadToApi(pickedFile);
 
-      final chatStore = Provider.of<ChatStore>(context, listen: false);
-      int newMessageId = _getNextMessageId(chatStore.messages[widget.guestId]);
+      if (mediaUrl.isNotEmpty) {
+        final chatStore = Provider.of<ChatStore>(context, listen: false);
+        int newMessageId =
+            _getNextMessageId(chatStore.messages[widget.guestId]);
 
-      Map<String, dynamic> mess = {
-        'id': newMessageId,
-        'document_url': mediaUrl,
-        'sender': hostId,
-        'receiver': widget.guestId,
-        'delivery_status': false,
-        'read_status': false,
-      };
+        Map<String, dynamic> mess = {
+          'id': newMessageId,
+          'document_url': mediaUrl,
+          'sender': hostId,
+          'receiver': widget.guestId,
+          'delivery_status': false,
+          'read_status': false,
+        };
 
-      sendMessage(mess, widget.guestId);
+        sendMessage(mess, widget.guestId);
+      }
     }
   }
 
@@ -164,8 +173,28 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   Future<String> _uploadToApi(XFile file) async {
-    await Future.delayed(Duration(seconds: 2));
-    return 'https://example.com/uploads/${file.name}';
+    try {
+      // Get a reference to Firebase Storage
+      FirebaseStorage storage = FirebaseStorage.instance;
+
+      // Create a unique file name
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Upload the file to Firebase Storage
+      Reference ref = storage.ref().child('chat_uploads/$fileName');
+      UploadTask uploadTask = ref.putFile(File(file.path));
+
+      // Wait until the file is uploaded
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      // Get the download URL
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading to Firebase: $e');
+      return '';
+    }
   }
 
   Widget _buildMessageBubble(Map<String, dynamic>? message, int hostId) {

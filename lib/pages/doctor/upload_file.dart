@@ -1,15 +1,13 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/doctor/doctor_form.dart';
 import 'package:provider/provider.dart';
 
 class DoctorsUploadCredentialsPage extends StatefulWidget {
@@ -22,7 +20,9 @@ class DoctorsUploadCredentialsPage extends StatefulWidget {
 
 class _DoctorsUploadCredentialsPageState
     extends State<DoctorsUploadCredentialsPage> {
-  bool _isLoading = false; // To manage loading state
+  bool _isLoading = false;
+
+  String? _fileName; // To store the file name dynamically
 
   Future<void> _pickFile() async {
     try {
@@ -37,8 +37,12 @@ class _DoctorsUploadCredentialsPageState
       final filePath = file.path;
 
       if (filePath != null) {
-        _showSnackBar('File selected: ${file.name}');
-        await _uploadFileToFirebase(File(filePath), file.name);
+        setState(() {
+          _fileName = file.name; // Store the dynamic file name
+        });
+
+        _showSnackBar('File selected: $_fileName');
+        await _uploadFileToFirebase(File(filePath), _fileName!);
       }
     } catch (e) {
       _showSnackBar('Failed to pick file: ${e.toString()}');
@@ -47,11 +51,10 @@ class _DoctorsUploadCredentialsPageState
 
   Future<void> _uploadFileToFirebase(File file, String fileName) async {
     setState(() {
-      _isLoading = true; // Set loading state
+      _isLoading = true;
     });
 
     try {
-      // Reference to Firebase Storage in the 'certifying_docs' folder
       final storageRef =
           FirebaseStorage.instance.ref().child('certifying_docs/$fileName');
 
@@ -59,13 +62,10 @@ class _DoctorsUploadCredentialsPageState
       final taskSnapshot = await uploadTask.whenComplete(() {});
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
-      // Show success message
-      _showSnackBar('Your profile picture has been uploaded successfully!');
-      // Send the download URL to the server
-      await _sendFileUrlToServer(downloadURL);
+      _showSnackBar('Document uploaded successfully!');
+      await _sendFileUrlToServer(downloadURL, fileName); // Send file URL with dynamic name
     } catch (e) {
-      _showSnackBar(
-          'Oops! Something went wrong while uploading your picture. Please try again.');
+      _showSnackBar('Error during file upload. Please try again.');
     } finally {
       setState(() {
         _isLoading = false;
@@ -73,29 +73,39 @@ class _DoctorsUploadCredentialsPageState
     }
   }
 
-  Future<void> _sendFileUrlToServer(String downloadURL) async {
+  Future<void> _sendFileUrlToServer(String fileUrl, String fileName) async {
     final doctorData =
         Provider.of<DataStore>(context, listen: false).doctorData;
 
+    if (doctorData == null || doctorData['id'] == null) {
+      _showSnackBar('No doctor data available. Please log in again.');
+      return;
+    }
     try {
       final baseUrl = dotenv.env['API_URL'];
-      final url = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
+      final url = Uri.parse('$baseUrl/api/qualifications');
+      final body = jsonEncode({
+        "data": {
+          "name": fileName, 
+          "file_url": fileUrl,
+          "user": doctorData['id'],
+        }
+      });
 
-      final response = await http.put(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'certify_url': downloadURL}),
+        body: body,
       );
 
       if (response.statusCode == 200) {
-        print('File URL sent successfully!');
+        _showSnackBar('File URL sent successfully!');
       } else {
         _showSnackBar(
-            'Oops! Something went wrong while uploading your picture. Please try again.');
+            'Failed to send file URL. Status: ${response.statusCode}');
       }
     } catch (e) {
-      _showSnackBar(
-          'Oops! Something went wrong while uploading your picture. Please try again.');
+      _showSnackBar('Error sending file URL: ${e.toString()}');
     }
   }
 
@@ -114,8 +124,6 @@ class _DoctorsUploadCredentialsPageState
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 30),
                     const Text(
@@ -126,7 +134,7 @@ class _DoctorsUploadCredentialsPageState
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Regulation requires you to upload a certificating document as a doctor. Your data will stay safe and private with us.',
+                      'Upload a certifying document as a doctor. Your data will be kept safe and private.',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
@@ -201,7 +209,7 @@ class _DoctorsUploadCredentialsPageState
               ),
             ),
             if (_isLoading)
-              CircularProgressIndicator(), // Show loading indicator
+              CircularProgressIndicator(),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
