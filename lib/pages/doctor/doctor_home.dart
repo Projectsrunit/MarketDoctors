@@ -11,6 +11,7 @@ import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/pharmacy.dart';
+import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:provider/provider.dart';
@@ -350,7 +351,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const DoctorAppointmentPage()),
+                  builder: (context) => UpcomingAppointmentPage()),
             );
           },
         ),
@@ -405,26 +406,67 @@ class _DashboardPageState extends State<DashboardPage> {
       return Center(child: Text("Error fetching appointments"));
     }
 
+    final upcomingAppointments = appointments.take(2).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Upcoming Appointments",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Upcoming Appointments",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue, // White text for title
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpcomingAppointmentPage(),
+                  ),
+                );
+              },
+              child: const Text(
+                'See all',
+                style: TextStyle(
+                  color: Colors.blue, // Link color
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
-        // ListView.builder for appointments
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: appointments.length,
-          itemBuilder: (context, index) {
-            final appointment = appointments[index]['attributes'];
-            final patientAppointment =
-                appointment['patient']['data']['attributes']; // Correct access
-            return _buildAppointmentCard(appointment, patientAppointment);
-          },
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // Card background color
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.5, // Adjust the aspect ratio as needed
+            ),
+            itemCount: upcomingAppointments.length,
+            itemBuilder: (context, index) {
+              final appointment = upcomingAppointments[index]['attributes'];
+              final patientAppointment =
+                  appointment['patient']['data']['attributes'];
+              return _buildAppointmentCard(appointment, patientAppointment);
+            },
+          ),
         ),
+        const SizedBox(height: 16), // Add spacing between sections
       ],
     );
   }
@@ -435,23 +477,29 @@ class _DashboardPageState extends State<DashboardPage> {
         "${patientAppointment['firstName']} ${patientAppointment['lastName']}"; // Full name
     final String appointmentDate = appointment['appointment_date'];
     final String appointmentTime = appointment['appointment_time'];
-    final String status = appointment['status'];
-    final String? receiptUrl = appointment['receipt_url'];
 
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
+      color: Colors.blue, // Card background color
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Appointment Date: $appointmentDate",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              "Time: $appointmentTime",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // White text for appointment time
+              ),
             ),
-            Text("Time: $appointmentTime"),
-            Text("Patient: $patientFullName"), // Show full name
+            Text(
+              "Patient: $patientFullName", // Show full name
+              style: TextStyle(
+                color: Colors.white, // White text for patient name
+              ),
+            ),
           ],
         ),
       ),
