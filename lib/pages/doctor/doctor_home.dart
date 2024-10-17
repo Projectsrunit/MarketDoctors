@@ -234,7 +234,7 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Scaffold(
           appBar: DoctorApp(),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(6.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
