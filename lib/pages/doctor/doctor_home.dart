@@ -419,7 +419,7 @@ class _DashboardPageState extends State<DashboardPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue, // White text for title
+                color: Colors.blueAccent, // White text for title
               ),
             ),
             GestureDetector(
@@ -434,7 +434,7 @@ class _DashboardPageState extends State<DashboardPage> {
               child: const Text(
                 'See all',
                 style: TextStyle(
-                  color: Colors.blue, // Link color
+                  color: Colors.blueAccent, // Link color
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline,
                 ),
@@ -481,7 +481,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
-      color: Colors.blue, // Card background color
+      color: Colors.blueAccent, // Card background color
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
