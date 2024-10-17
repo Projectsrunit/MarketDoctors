@@ -12,6 +12,7 @@ import 'package:market_doctor/pages/doctor/payments_main_widget.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/update_profile_image.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:provider/provider.dart';
@@ -105,10 +106,12 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildArrowRow(Icons.medical_information_outlined, "Upload/ Update Profile Picture",
-            () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DoctorInformation()));
+        _buildArrowRow(Icons.medical_information_outlined,
+            "Upload/ Update Profile Picture", () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DoctorUpdateProfileImage()));
         }),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {

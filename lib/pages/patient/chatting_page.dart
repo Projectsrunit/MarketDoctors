@@ -5,16 +5,16 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChattingPage extends StatefulWidget {
-  final String doctorName;
-  final String doctorImage;
-  final String doctorPhoneNumber;
-  final int doctorId;
+  final String guestName;
+  final String guestImage;
+  final String guestPhoneNumber;
+  final int guestId;
 
   ChattingPage({
-    required this.doctorName,
-    required this.doctorImage,
-    required this.doctorPhoneNumber,
-    required this.doctorId,
+    required this.guestName,
+    required this.guestImage,
+    required this.guestPhoneNumber,
+    required this.guestId,
   });
 
   @override
@@ -43,12 +43,11 @@ class ChattingPageState extends State<ChattingPage> {
 
   void doDeliveryChecks() {
     final latestsMap = deliverer?.latestsMap;
-    if (latestsMap?[widget.doctorId] != null) {
-      latestsMap?[widget.doctorId]?.forEach((messageId, message) {
+    if (latestsMap?[widget.guestId] != null) {
+      latestsMap?[widget.guestId]?.forEach((messageId, message) {
         _handleMessageStatus(message, messageId);
-
       });
-      deliverer?.removeLatestsMessage(widget.doctorId);
+      deliverer?.removeLatestsMessage(widget.guestId);
     }
   }
 
@@ -66,10 +65,10 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   void _checkAndSendUnreadDeliveryStatuses() {
-    final messages = chatStore?.messages[widget.doctorId] ?? {};
+    final messages = chatStore?.messages[widget.guestId] ?? {};
 
     messages.forEach((messageId, message) {
-      if (message['sender'] == widget.doctorId) {
+      if (message['sender'] == widget.guestId) {
         if (message['delivery_status'] != true) {
           chatStore?.sendDeliveryStatus(messageId);
         }
@@ -81,26 +80,26 @@ class ChattingPageState extends State<ChattingPage> {
     });
   }
 
-  void _handleMessageStatus(Map<String, dynamic>? message, int messageId) {
+  void _handleMessageStatus(Map<String, dynamic> message, int messageId) {
     ChatStore chatStore = context.read<ChatStore>();
-    if (message?['delivery_status'] != true) {
+    if (message['delivery_status'] != true) {
       chatStore.sendDeliveryStatus(messageId);
     }
 
-    if (message?['read_status'] == false || message?['read_status'] == null) {
+    if (message['read_status'] == false || message['read_status'] == null) {
       chatStore.sendReadStatus(messageId);
     }
   }
 
   void _loadOlderMessages() {
-    int chewId = context.read<DataStore>().chewData?['id'];
+    int hostId = context.read<DataStore>().patientData?['id'];
 
     Map<String, dynamic> requestParams = {
-      'own_id': chewId,
-      'other_id': widget.doctorId,
+      'own_id': hostId,
+      'other_id': widget.guestId,
     };
 
-    final messages = chatStore?.messages[widget.doctorId] ?? {};
+    final messages = chatStore?.messages[widget.guestId] ?? {};
 
     if (messages.isNotEmpty) {
       int oldestMessageId = messages.keys.reduce((a, b) => a < b ? a : b);
@@ -114,27 +113,27 @@ class ChattingPageState extends State<ChattingPage> {
     loadedOlderMessages = true;
   }
 
-  void _sendMessage(String message, Function sendMessage, int chewId) {
+  void _sendMessage(String message, Function sendMessage, int hostId) {
     if (message.isNotEmpty) {
       final chatStore = Provider.of<ChatStore>(context, listen: false);
-      int newMessageId = _getNextMessageId(chatStore.messages[widget.doctorId]);
+      int newMessageId = _getNextMessageId(chatStore.messages[widget.guestId]);
 
       Map<String, dynamic> mess = {
         'id': newMessageId,
         'text_body': message,
-        'sender': chewId,
-        'receiver': widget.doctorId,
+        'sender': hostId,
+        'receiver': widget.guestId,
         'delivery_status': false,
         'read_status': false,
       };
 
-      sendMessage(mess, widget.doctorId);
+      sendMessage(mess, widget.guestId);
       _controller.clear();
     }
   }
 
   Future<void> _uploadMedia(
-      String type, Function sendMessage, int chewId) async {
+      String type, Function sendMessage, int hostId) async {
     final pickedFile = await _picker.pickImage(
         source: type == 'image' ? ImageSource.gallery : ImageSource.camera);
 
@@ -142,18 +141,18 @@ class ChattingPageState extends State<ChattingPage> {
       String mediaUrl = await _uploadToApi(pickedFile);
 
       final chatStore = Provider.of<ChatStore>(context, listen: false);
-      int newMessageId = _getNextMessageId(chatStore.messages[widget.doctorId]);
+      int newMessageId = _getNextMessageId(chatStore.messages[widget.guestId]);
 
       Map<String, dynamic> mess = {
         'id': newMessageId,
         'document_url': mediaUrl,
-        'sender': chewId,
-        'receiver': widget.doctorId,
+        'sender': hostId,
+        'receiver': widget.guestId,
         'delivery_status': false,
         'read_status': false,
       };
 
-      sendMessage(mess, widget.doctorId);
+      sendMessage(mess, widget.guestId);
     }
   }
 
@@ -169,9 +168,9 @@ class ChattingPageState extends State<ChattingPage> {
     return 'https://example.com/uploads/${file.name}';
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic>? message, int chewId) {
-    String? chewUrl = context.read<DataStore>().chewData?['picture_url'];
-    bool isSender = message?['sender'] == chewId;
+  Widget _buildMessageBubble(Map<String, dynamic>? message, int hostId) {
+    String? hostUrl = context.read<DataStore>().patientData?['picture_url'];
+    bool isSender = message?['sender'] == hostId;
     String status = message?['delivery_status'] == true ? '✓✓' : '✓';
 
     return Align(
@@ -201,7 +200,7 @@ class ChattingPageState extends State<ChattingPage> {
                     ),
                     child: ClipOval(
                         child: Image.network(
-                      widget.doctorImage,
+                      widget.guestImage,
                       width: 72,
                       height: 72,
                       fit: BoxFit.cover,
@@ -238,7 +237,7 @@ class ChattingPageState extends State<ChattingPage> {
                           height: 150,
                           fit: BoxFit.cover,
                         ),
-                      if (message?['sender'] == chewId)
+                      if (message?['sender'] == hostId)
                         Text(
                           status,
                           style: TextStyle(
@@ -267,9 +266,9 @@ class ChattingPageState extends State<ChattingPage> {
                       ),
                     ),
                     child: ClipOval(
-                      child: chewUrl != null
+                      child: hostUrl != null
                           ? Image.network(
-                              chewUrl,
+                              hostUrl,
                               width: 72,
                               height: 72,
                               fit: BoxFit.cover,
@@ -287,7 +286,7 @@ class ChattingPageState extends State<ChattingPage> {
 
   @override
   Widget build(BuildContext context) {
-    int chewId = context.read<DataStore>().chewData?['id'];
+    int hostId = context.read<DataStore>().patientData?['id'];
 
     return Scaffold(
       appBar: AppBar(
@@ -303,7 +302,7 @@ class ChattingPageState extends State<ChattingPage> {
             Row(
               children: [
                 Text(
-                  widget.doctorName,
+                  widget.guestName,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -330,14 +329,14 @@ class ChattingPageState extends State<ChattingPage> {
         actions: [
           CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage(widget.doctorImage),
+            backgroundImage: NetworkImage(widget.guestImage),
           ),
           IconButton(
             icon: Icon(Icons.phone),
             onPressed: () {
               final Uri launchUri = Uri(
                 scheme: 'tel',
-                path: widget.doctorPhoneNumber,
+                path: widget.guestPhoneNumber,
               );
               launchUrl(launchUri);
             },
@@ -350,7 +349,7 @@ class ChattingPageState extends State<ChattingPage> {
           Expanded(
             child: Consumer<ChatStore>(
               builder: (context, chatStore, _) {
-                final messages = chatStore.messages[widget.doctorId] ?? {};
+                final messages = chatStore.messages[widget.guestId] ?? {};
                 final sortedMessages = messages.entries.toList()
                   ..sort((a, b) => a.key.compareTo(b.key));
 
@@ -366,7 +365,7 @@ class ChattingPageState extends State<ChattingPage> {
                   itemCount: sortedMessages.length,
                   itemBuilder: (context, index) {
                     final message = sortedMessages[index].value;
-                    return _buildMessageBubble(message, chewId);
+                    return _buildMessageBubble(message, hostId);
                   },
                 );
               },
@@ -379,7 +378,7 @@ class ChattingPageState extends State<ChattingPage> {
                 IconButton(
                   icon: Icon(Icons.image),
                   onPressed: () => _uploadMedia(
-                      'image', context.read<ChatStore>().sendMessage, chewId),
+                      'image', context.read<ChatStore>().sendMessage, hostId),
                 ),
                 Expanded(
                   child: TextField(
@@ -395,7 +394,7 @@ class ChattingPageState extends State<ChattingPage> {
                 IconButton(
                   icon: Icon(Icons.send),
                   onPressed: () => _sendMessage(_controller.text,
-                      context.read<ChatStore>().sendMessage, chewId),
+                      context.read<ChatStore>().sendMessage, hostId),
                 ),
               ],
             ),

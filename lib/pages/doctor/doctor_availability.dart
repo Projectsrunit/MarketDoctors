@@ -1,12 +1,16 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/main.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class DoctorAvailability extends StatefulWidget {
   const DoctorAvailability({super.key});
@@ -26,11 +30,21 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
   final TextEditingController _awardsAndRecognitionController =
       TextEditingController();
   final TextEditingController _languageController = TextEditingController();
-
+  bool isLoading = true;
+  bool hasError = false;
+  List<dynamic> availabilities = [];
   @override
   void initState() {
     super.initState();
     _fetchUserData();
+    _fetchAvailabilities();
+    _fetchAvailabilities(); // Fetch every 5 minutes
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchAvailabilities();
   }
 
   Future<void> _fetchUserData() async {
@@ -47,6 +61,33 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
           doctorData['awardsAndRecognition'] ?? '';
     } else {
       _showSnackBar('No doctor data found.');
+    }
+  }
+
+  Future<void> _fetchAvailabilities() async {
+    String? baseUrl = dotenv.env['API_URL'];
+    final doctorData =
+        Provider.of<DataStore>(context, listen: false).doctorData;
+    try {
+      final url =
+          '$baseUrl/api/availabilities?filters[users_permissions_user][id]=${doctorData?['id']}&populate=*';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          availabilities = data['data'];
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load availabilities');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        hasError = true;
+      });
+      _showSnackBar('Error fetching availabilities: ${e.toString()}');
     }
   }
 
@@ -124,7 +165,8 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9, // Wider card
+                        width: MediaQuery.of(context).size.width *
+                            0.9, // Wider card
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),

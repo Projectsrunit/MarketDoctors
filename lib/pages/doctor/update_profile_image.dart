@@ -4,32 +4,32 @@ import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/doctor_form.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class DoctorsUploadCredentialsPage extends StatefulWidget {
-  const DoctorsUploadCredentialsPage({super.key});
+class DoctorUpdateProfileImage extends StatefulWidget {
+  const DoctorUpdateProfileImage({super.key});
 
   @override
-  _DoctorsUploadCredentialsPageState createState() =>
-      _DoctorsUploadCredentialsPageState();
+  _DoctorUpdateProfileImagePageState createState() =>
+      _DoctorUpdateProfileImagePageState();
 }
 
-class _DoctorsUploadCredentialsPageState
-    extends State<DoctorsUploadCredentialsPage> {
-  bool _isLoading = false;
-
-  String? _fileName; // To store the file name dynamically
+class _DoctorUpdateProfileImagePageState
+    extends State<DoctorUpdateProfileImage> {
+  bool _isLoading = false; // To manage loading state
 
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles();
 
       if (result == null || result.files.isEmpty) {
-        _showSnackBar('No file selected.');
+        _showSnackBar('No file selected. Please choose a file to upload.');
         return;
       }
 
@@ -37,75 +37,63 @@ class _DoctorsUploadCredentialsPageState
       final filePath = file.path;
 
       if (filePath != null) {
-        setState(() {
-          _fileName = file.name; // Store the dynamic file name
-        });
-
-        _showSnackBar('File selected: $_fileName');
-        await _uploadFileToFirebase(File(filePath), _fileName!);
+        _showSnackBar('File selected: ${file.name}');
+        await _uploadFileToFirebase(File(filePath), file.name);
       }
     } catch (e) {
-      _showSnackBar('Failed to pick file: ${e.toString()}');
+      _showSnackBar('Failed to pick file. Please try again.');
     }
   }
 
   Future<void> _uploadFileToFirebase(File file, String fileName) async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Set loading state
     });
 
     try {
       final storageRef =
-          FirebaseStorage.instance.ref().child('certifying_docs/$fileName');
+          FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
 
       final uploadTask = storageRef.putFile(file);
       final taskSnapshot = await uploadTask.whenComplete(() {});
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
-      _showSnackBar('Document uploaded successfully!');
-      await _sendFileUrlToServer(downloadURL, fileName); // Send file URL with dynamic name
+      // Show success message
+      _showSnackBar('Your profile picture has been uploaded successfully!');
+
+      // Send the download URL to the server
+      await _sendFileUrlToServer(downloadURL);
     } catch (e) {
-      _showSnackBar('Error during file upload. Please try again.');
+      _showSnackBar(
+          'Oops! Something went wrong while uploading your picture. Please try again.');
     } finally {
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Reset loading state
       });
     }
   }
 
-  Future<void> _sendFileUrlToServer(String fileUrl, String fileName) async {
+  Future<void> _sendFileUrlToServer(String downloadURL) async {
     final doctorData =
         Provider.of<DataStore>(context, listen: false).doctorData;
 
-    if (doctorData == null || doctorData['id'] == null) {
-      _showSnackBar('No doctor data available. Please log in again.');
-      return;
-    }
     try {
       final baseUrl = dotenv.env['API_URL'];
-      final url = Uri.parse('$baseUrl/api/qualifications');
-      final body = jsonEncode({
-        "data": {
-          "name": fileName, 
-          "file_url": fileUrl,
-          "user": doctorData['id'],
-        }
-      });
+      final url = Uri.parse('$baseUrl/api/users/${doctorData?['id']}');
 
-      final response = await http.post(
+      final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: body,
+        body: jsonEncode({'profile_picture': downloadURL}),
       );
 
       if (response.statusCode == 200) {
-        _showSnackBar('File URL sent successfully!');
+        print('File URL sent successfully!');
       } else {
-        _showSnackBar(
-            'Failed to send file URL. Status: ${response.statusCode}');
+        print('Failed to send file URL: ${response.body}');
       }
     } catch (e) {
-      _showSnackBar('Error sending file URL: ${e.toString()}');
+      print('Error sending file URL: ${e.toString()}');
     }
   }
 
@@ -117,6 +105,7 @@ class _DoctorsUploadCredentialsPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: DoctorApp(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -124,17 +113,19 @@ class _DoctorsUploadCredentialsPageState
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 30),
                     const Text(
-                      'Upload Credentials',
+                      'Upload Profile Picture',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Upload a certifying document as a doctor. Your data will be kept safe and private.',
+                      'Update Profile Image',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
@@ -209,13 +200,13 @@ class _DoctorsUploadCredentialsPageState
               ),
             ),
             if (_isLoading)
-              CircularProgressIndicator(),
+              CircularProgressIndicator(), // Show loading indicator
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const DoctorFormPage(),
+                    builder: (context) => DoctorProfilePage(),
                   ),
                 );
               },
@@ -234,6 +225,7 @@ class _DoctorsUploadCredentialsPageState
           ],
         ),
       ),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }

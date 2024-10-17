@@ -75,10 +75,12 @@ class ChewHomeState extends State<ChewHome> {
         });
 
         socket!.on('new_message', (message) {
+          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
           int docId = (message['sender'] == chewId)
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, docId);
+          deliverer(docId, message);
         });
 
         socket!.on('older_messages', (messages) {
@@ -120,10 +122,12 @@ class ChewHomeState extends State<ChewHome> {
     final addMessage = context.read<ChatStore>().addMessage;
 
     for (Map<String, dynamic> message in messages) {
-      int docId = (message['sender'] == chewId)
+      int? docId = (message['sender'] == chewId)
           ? message['receiver']
           : message['sender'];
+      if (docId != null) {//because some messages in backend had a missing sender or receiver
       addMessage(message, docId);
+      }
     }
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/chew/add_case_forms.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
-import 'package:market_doctor/pages/chew/doctor_view.dart';
+import 'package:market_doctor/pages/chew/chats_with_doc.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/payments_main_widget.dart';
 import 'package:market_doctor/pages/chew/profile_page.dart';
@@ -217,7 +217,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                           SizedBox(width: 10),
                           Icon(FontAwesomeIcons.whatsapp, color: Colors.orange),
                           SizedBox(width: 10),
-                          Text('Chat with a doctor'),
+                          Text('Chat History'),
                           SizedBox(width: 10),
                         ],
                       ),
@@ -225,7 +225,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DoctorView(),
+                            builder: (context) => ChatsWithDoc(),
                           ),
                         );
                       },

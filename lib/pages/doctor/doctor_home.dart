@@ -72,10 +72,12 @@ class _DashboardPageState extends State<DashboardPage> {
         });
 
         socket!.on('new_message', (message) {
+          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
           int docId = (message['sender'] == chewId)
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, docId);
+          deliverer(docId, message);
         });
 
         socket!.on('older_messages', (messages) {
@@ -117,10 +119,12 @@ class _DashboardPageState extends State<DashboardPage> {
     final addMessage = context.read<ChatStore>().addMessage;
 
     for (Map<String, dynamic> message in messages) {
-      int docId = (message['sender'] == chewId)
+      int? docId = (message['sender'] == chewId)
           ? message['receiver']
           : message['sender'];
+      if (docId != null) {//because some messages in backend had a missing sender or receiver
       addMessage(message, docId);
+      }
     }
   }
 
@@ -176,7 +180,8 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     // Accessing the doctorData from Provider
     final doctorData = Provider.of<DataStore>(context).doctorData;
-    final String? userId = doctorData?['user']?['id'];
+    // final String? userId = doctorData?['id']?.toString();
+    final int? userId = doctorData?['id'];
     if (doctorData == null) {
       return PopScope(canPop: false, child: ChooseActionPage());
     } else {
@@ -268,7 +273,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildDashboardCards(String? userId) {
+  Widget _buildDashboardCards(int? userId) {
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 3,
