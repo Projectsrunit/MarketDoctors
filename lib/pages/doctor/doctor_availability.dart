@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -110,7 +112,7 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
     String? baseUrl = dotenv.env['API_URL'];
 
     final String apiUrl =
-        "$baseUrl/api/availabilities/${appointmentId.toString()}"; 
+        "$baseUrl/api/availabilities/${appointmentId.toString()}";
     print('AppointmentId $appointmentId');
 
     try {
@@ -224,88 +226,151 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Doctor Availabilities')),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : hasError
-              ? Center(child: Text('Failed to load availabilities.'))
-              : availabilities.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: availabilities.length,
-                      itemBuilder: (context, index) {
-                        final availability = availabilities[index];
-                        final appointmentId = availability['id'];
-                        final date = availability['attributes']?['date'] ??
-                            'Unknown Date';
-                        final availableTime =
-                            availability['attributes']?['available_time'] ?? [];
-                        final startTime = availableTime.isNotEmpty
-                            ? availableTime[0]['start_time']
-                            : 'N/A';
-                        final endTime = availableTime.isNotEmpty
-                            ? availableTime[0]['end_time']
-                            : 'N/A';
+      appBar: DoctorApp(),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : hasError
+                          ? Center(
+                              child: Text('Failed to load availabilities.'))
+                          : availabilities.isNotEmpty
+                              ? ListView.builder(
+                                  physics:
+                                      NeverScrollableScrollPhysics(), // Prevent the ListView from scrolling
+                                  shrinkWrap: true, // Use only the space needed
+                                  itemCount: availabilities.length,
+                                  itemBuilder: (context, index) {
+                                    final availability = availabilities[index];
+                                    final appointmentId = availability['id'];
+                                    final date = availability['attributes']
+                                            ?['date'] ??
+                                        'Unknown Date';
+                                    final availableTime =
+                                        availability['attributes']
+                                                ?['available_time'] ??
+                                            [];
+                                    final startTime = availableTime.isNotEmpty
+                                        ? availableTime[0]['start_time']
+                                        : 'N/A';
+                                    final endTime = availableTime.isNotEmpty
+                                        ? availableTime[0]['end_time']
+                                        : 'N/A';
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          child: Card(
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Date: $date',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.0,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.0),
-                                  Text(
-                                    'Time: $startTime - $endTime',
-                                    style: TextStyle(fontSize: 14.0),
-                                  ),
-                                  SizedBox(height: 8.0),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          _showUpdateDialog(
-                                              appointmentId.toString(),
-                                              date,
-                                              startTime,
-                                              endTime);
-                                        },
-                                        child: Text('Edit Availability'),
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0, horizontal: 16.0),
+                                      child: Card(
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Date: $date',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.0,
+                                                ),
+                                              ),
+                                              SizedBox(height: 8.0),
+                                              Text(
+                                                'Time: $startTime - $endTime',
+                                                style:
+                                                    TextStyle(fontSize: 14.0),
+                                              ),
+                                              SizedBox(height: 14.0),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  IconButton(
+                                                    icon: Icon(Icons.edit,
+                                                        color:
+                                                            Colors.blueAccent),
+                                                    onPressed: () {
+                                                      _showUpdateDialog(
+                                                          appointmentId
+                                                              .toString(),
+                                                          date,
+                                                          startTime,
+                                                          endTime);
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.delete,
+                                                        color: Colors.red),
+                                                    onPressed: () {
+                                                      _confirmDelete(
+                                                          appointmentId
+                                                              .toString());
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                      IconButton(
-                                        icon: Icon(Icons.delete,
-                                            color: Colors.red),
-                                        onPressed: () {
-                                          _confirmDelete(
-                                              appointmentId.toString());
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(child: Text('No availabilities found.')),
+                                    );
+                                  },
+                                )
+                              : Center(child: Text('No availabilities found.')),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          _buildSaveButton(),
+          const SizedBox(height: 16.0),
+        ],
+      ),
+      bottomNavigationBar: DoctorBottomNavBar(),
+    );
+  }
+
+// Build Save Button
+  Widget _buildSaveButton() {
+    return Align(
+      alignment: Alignment.center,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AvailabilityCalendar(),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.blueAccent,
+          foregroundColor: Colors.white,
+        ),
+        child: const Text(
+          'Add Availability',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+          ),
+        ),
+      ),
     );
   }
 }
