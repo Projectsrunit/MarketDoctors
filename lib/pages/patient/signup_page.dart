@@ -508,54 +508,6 @@ Widget _buildDobField() {
   );
 }
 
-void _showTermsDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Terms and Conditions'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Please read these Terms of Use (“Terms”), which set forth the legally binding terms and conditions between you andMarketDoctors (“MarketDoctor”). It governs your access to and the use of its website (the “Site”), Mobile Application (the “App”) and all or any related services (collectively referred to as the “Service”) offered by MarketDoctors. ',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Paragraph 2: Your privacy is important to us. We collect ...',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Paragraph 3: By using this app, you agree to ...',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Paragraph 4: In case of disputes, ...',
-                style: TextStyle(fontSize: 16),
-              ),
-              // Add more paragraphs as needed
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Close'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-
 
  Widget _buildSignUpButton() {
   return ElevatedButton(

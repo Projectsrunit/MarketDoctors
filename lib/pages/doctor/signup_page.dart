@@ -11,6 +11,7 @@ import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/doctor/login_page.dart';
 import 'package:market_doctor/pages/doctor/verification_page.dart';
 import 'package:provider/provider.dart';
+import 'package:market_doctor/pages/terms.dart';
 
 class DoctorSignUpPage extends StatefulWidget {
   const DoctorSignUpPage({super.key});
@@ -483,25 +484,38 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   }
 
   Widget _buildTermsAndConditions() {
-    return Row(
-      children: [
-        Checkbox(
-          value: _termsAccepted,
-          onChanged: (value) {
-            setState(() {
-              _termsAccepted = value ?? false;
-            });
+  return Row(
+    children: [
+      Checkbox(
+        value: _termsAccepted,
+        onChanged: (value) {
+          setState(() {
+            _termsAccepted = value ?? false;
+          });
+        },
+      ),
+      Expanded(
+        child: GestureDetector(
+         onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TermsAndConditions(),
+              ),
+            );
           },
-        ),
-        const Expanded(
-          child: Text(
+          child: const Text(
             'I accept the terms and conditions',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF4672ff), // Make the text blue and clickable
+              decoration: TextDecoration.underline, // Add underline for emphasis
+            ),
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   Widget _buildSignUpButton() {
     return ElevatedButton(
