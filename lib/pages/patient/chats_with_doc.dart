@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
-import 'package:market_doctor/pages/chew/chatting_page.dart';
+import 'package:market_doctor/pages/patient/chatting_page.dart';
+import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -28,7 +28,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
   }
 
   Future<void> fetchDocs() async {
-    int chewId = context.read<DataStore>().chewData?['id'];
+    int patientId = context.read<DataStore>().patientData?['id'];
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/getchatsfor');
     try {
@@ -36,7 +36,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: json.encode({'id': chewId, 'role': 3}));
+          body: json.encode({'id': patientId, 'role': 3}));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
@@ -66,7 +66,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: PatientAppBar(),
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -93,12 +93,12 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChattingPage(
-                                    doctorId: doc['id'],
-                                    doctorName:
+                                    guestId: doc['id'],
+                                    guestName:
                                         '${doc['firstName']} ${doc['lastName']}',
-                                    doctorImage: doc['profile_picture'] ??
+                                    guestImage: doc['profile_picture'] ??
                                         'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                                    doctorPhoneNumber: doc['phone'],
+                                    guestPhoneNumber: doc['phone'],
                                   ))),
                     );
                   },
@@ -112,7 +112,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: PatientBottomNavBar(),
     );
   }
 }

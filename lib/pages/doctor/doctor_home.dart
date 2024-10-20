@@ -8,7 +8,6 @@ import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
-import 'package:market_doctor/pages/doctor/doctor_appointment.dart';
 import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/pharmacy.dart';
 import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
@@ -41,7 +40,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
     chatStore = context.read<ChatStore>();
     chatStore?.addListener(_sendPendingUpdates);
-    chatStore?.addListener(_sendPendingUpdates);
     _fetchAppointments();
   }
 
@@ -54,10 +52,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _initializeSocket() {
     ChatStore chatStore = context.read<ChatStore>();
-    int? chewId =
-        Provider.of<DataStore>(context, listen: false).chewData?['id'];
+    int? hostId = Provider.of<DataStore>(context, listen: false).doctorData?['id'];
 
-    if (chewId != null) {
+    if (hostId != null) {
       final String socketUrl = dotenv.env['API_URL']!;
 
       setState(() {
@@ -67,42 +64,41 @@ class _DashboardPageState extends State<DashboardPage> {
         });
 
         socket!.connect();
-        socket!.emit('authenticate', {'own_id': chewId});
+        socket!.emit('authenticate', {'own_id': hostId});
 
         socket!.on('connect', (_) {
-          print('Socket connected');
+          // print('Socket connected');
           _resendUnsentMessages();
         });
 
         socket!.on('unread_messages', (messages) {
-          _handleArrayOfMessages(messages, chewId);
+          _handleArrayOfMessages(messages, hostId);
         });
 
         socket!.on('new_message', (message) {
-          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.addMessage(message, docId);
-          deliverer(docId, message);
+          chatStore.addMessage(message, guestId);
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
         });
 
         socket!.on('older_messages', (messages) {
-          _handleArrayOfMessages(messages, chewId);
+          _handleArrayOfMessages(messages, hostId);
         });
 
         socket!.on('delivery_status_updated', (message) {
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.receiveDeliveryStatus(message, docId);
+          chatStore.receiveDeliveryStatus(message, guestId);
         });
 
         socket!.on('read_status_updated', (message) {
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.receiveReadStatus(message, docId);
+          chatStore.receiveReadStatus(message, guestId);
         });
       });
 
@@ -158,22 +154,28 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
+  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
     final addMessage = context.read<ChatStore>().addMessage;
-
+    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     for (Map<String, dynamic> message in messages) {
-      int? docId = (message['sender'] == chewId)
+      int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
-      if (docId != null) {
-        //because some messages in backend had a missing sender or receiver
-        addMessage(message, docId);
+      if (guestId != null) {//because some messages in backend had a missing sender or receiver
+        addMessage(message, guestId);        
+      }
+      if (message['delivery_status'] != true) {
+        socket!.emit('update_delivery_status', {'message_id': message['id']});
+      }
+      if (!unreadList.contains(message['id'])) {
+        unreadList.add(message['id']);
       }
     }
   }
 
   void _sendPendingUpdates() {
     ChatStore chatStore = context.read<ChatStore>();
+    int hostId = context.read<DataStore>().doctorData?['id'];
 
     if (chatStore.latestMessage.isNotEmpty) {
       int messageId = chatStore.latestMessage['id'];
@@ -184,10 +186,10 @@ class _DashboardPageState extends State<DashboardPage> {
           ack: (response) {
             if (response['success'] == true) {
               Map<String, dynamic> newMessage = response['message'];
-              int docId = newMessage['receiver'];
-              chatStore.addMessage(newMessage, docId);
+              int guestId = newMessage['receiver'];
+              chatStore.addMessage(newMessage, guestId);
               if (newMessage['id'] != messageId) {
-                chatStore.removeMessage(docId, messageId);
+                chatStore.removeMessage(guestId, messageId);
               }
             } else {
               print('Error: ${response['error']}');
@@ -202,21 +204,25 @@ class _DashboardPageState extends State<DashboardPage> {
       chatStore.resetNewMessageFlag();
     }
 
-    if (chatStore.readStatusForId != null) {
-      socket!.emit(
-          'update_read_status', {'message_id': chatStore.readStatusForId});
+    if (chatStore.tempData['readStatusAndOlderMessagesCall'] == true) {
+      for (int id in chatStore.tempData['readStatusFor']) {
+        socket!.emit('update_read_status', {'message_id': id});
+        // print('sending update for read status of message $id');
+      }
       chatStore.resetReadId();
     }
 
-    if (chatStore.deliveryStatusForId != null) {
-      socket!.emit('update_delivery_status',
-          {'message_id': chatStore.deliveryStatusForId});
-      chatStore.resetDeliveryId();
-    }
-
-    if (chatStore.getOlderMessagesFor != null) {
-      socket!.emit('get_older_messages', chatStore.getOlderMessagesFor);
-      chatStore.resetOlderMessages();
+    if (chatStore.tempData['getOlderMessagesFor'] != null) {
+      socket!.emit('get_older_messages', {
+        'own_id': hostId,
+        'other_id': chatStore.tempData['getOlderMessagesFor']
+      });
+      // print('emitting to get older messages for id ${chatStore.tempData['getOlderMessagesFor']} ======');
+      chatStore.tempData['loadedOlderMessages']
+          .add(chatStore.tempData['getOlderMessagesFor']);
+      // print('added new id to loadedoldermessages: ${chatStore.tempData['loadedOlderMessages']}');
+      chatStore.tempData['getOlderMessagesFor'] = null;
+      // print('now nullified getoldermessagesfor int: ${chatStore.tempData['getOlderMessagesFor']}');
     }
   }
 
@@ -475,7 +481,7 @@ class _DashboardPageState extends State<DashboardPage> {
       Map<String, dynamic> patientAppointment) {
     final String patientFullName =
         "${patientAppointment['firstName']} ${patientAppointment['lastName']}"; // Full name
-    final String appointmentDate = appointment['appointment_date'];
+    // final String appointmentDate = appointment['appointment_date'];
     final String appointmentTime = appointment['appointment_time'];
 
     return Card(

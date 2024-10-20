@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/main.dart';
+import 'package:provider/provider.dart';
 
 class DoctorCard extends StatelessWidget {
   final String imageUrl;
   final String name;
+  final int id;
   final String profession;
   final double rating;
   final VoidCallback onChatPressed;
@@ -10,6 +13,7 @@ class DoctorCard extends StatelessWidget {
   final VoidCallback onBookAppointmentPressed;
 
   DoctorCard({
+    required this.id,
     required this.imageUrl,
     required this.name,
     required this.profession,
@@ -21,6 +25,7 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     return Container(
       margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
       decoration: BoxDecoration(
@@ -113,18 +118,14 @@ class DoctorCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      if (unreadList.contains(id))
                       Container(
-                        width: 10,
-                        height: 10,
+                        width: 20,
+                        height: 20,
                         decoration: BoxDecoration(
                           color: Colors.green,
                           shape: BoxShape.circle,
                         ),
-                      ),
-                      SizedBox(width: 4.0),
-                      Text(
-                        'available',
-                        style: TextStyle(fontSize: 13),
                       ),
                     ],
                   ),

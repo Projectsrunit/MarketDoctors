@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
-import 'package:market_doctor/pages/doctor/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:market_doctor/pages/chew/success_page.dart';
 import 'dart:convert'; // For JSON encoding and decoding
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/chew/upload_file.dart'; // Import dotenv package

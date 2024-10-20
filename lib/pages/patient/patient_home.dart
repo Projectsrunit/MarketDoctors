@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
+import 'package:market_doctor/pages/patient/chats_with_doc.dart';
 import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
@@ -41,7 +43,6 @@ class _PatientHomeState extends State<PatientHome> {
     }
     chatStore = context.read<ChatStore>();
     chatStore?.addListener(_sendPendingUpdates);
-    chatStore?.addListener(_sendPendingUpdates);
   }
 
   @override
@@ -53,10 +54,10 @@ class _PatientHomeState extends State<PatientHome> {
 
   void _initializeSocket() {
     ChatStore chatStore = context.read<ChatStore>();
-    int? chewId =
-        Provider.of<DataStore>(context, listen: false).chewData?['id'];
+    int? hostId =
+        Provider.of<DataStore>(context, listen: false).patientData?['id'];
 
-    if (chewId != null) {
+    if (hostId != null) {
       final String socketUrl = dotenv.env['API_URL']!;
 
       setState(() {
@@ -66,42 +67,44 @@ class _PatientHomeState extends State<PatientHome> {
         });
 
         socket!.connect();
-        socket!.emit('authenticate', {'own_id': chewId});
+        socket!.emit('authenticate', {'own_id': hostId});
 
         socket!.on('connect', (_) {
-          print('Socket connected');
+          // print('Socket connected');
           _resendUnsentMessages();
         });
 
         socket!.on('unread_messages', (messages) {
-          _handleArrayOfMessages(messages, chewId);
+          _handleArrayOfMessages(messages, hostId);
         });
 
         socket!.on('new_message', (message) {
-          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.addMessage(message, docId);
-          deliverer(docId, message);
+          chatStore.addMessage(message, guestId);
+          // print('received new message newone with id ${message['id']}');
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
+          // print('updated delivery of new message of id ${message['id']}');
         });
 
         socket!.on('older_messages', (messages) {
-          _handleArrayOfMessages(messages, chewId);
+          // print('got older messages: $messages');
+          _handleArrayOfMessages(messages, hostId);
         });
 
         socket!.on('delivery_status_updated', (message) {
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.receiveDeliveryStatus(message, docId);
+          chatStore.receiveDeliveryStatus(message, guestId);
         });
 
         socket!.on('read_status_updated', (message) {
-          int docId = (message['sender'] == chewId)
+          int guestId = (message['sender'] == hostId)
               ? message['receiver']
               : message['sender'];
-          chatStore.receiveReadStatus(message, docId);
+          chatStore.receiveReadStatus(message, guestId);
         });
       });
 
@@ -121,21 +124,30 @@ class _PatientHomeState extends State<PatientHome> {
     }
   }
 
-  void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
+  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
     final addMessage = context.read<ChatStore>().addMessage;
-
+    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     for (Map<String, dynamic> message in messages) {
-      int? docId = (message['sender'] == chewId)
+      // print('received new message with id ${message['id']} ===========');
+      int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
-      if (docId != null) {
-      addMessage(message, docId);
+      if (guestId != null) {
+        addMessage(message, guestId);
+      }
+      if (message['delivery_status'] != true) {
+        socket!.emit('update_delivery_status', {'message_id': message['id']});
+        // print('updated delivery status for message ${message['id']}');
+      }
+      if (!unreadList.contains(message['id'])) {
+        unreadList.add(message['id']);
       }
     }
   }
 
   void _sendPendingUpdates() {
     ChatStore chatStore = context.read<ChatStore>();
+    int hostId = context.read<DataStore>().patientData?['id'];
 
     if (chatStore.latestMessage.isNotEmpty) {
       int messageId = chatStore.latestMessage['id'];
@@ -146,10 +158,10 @@ class _PatientHomeState extends State<PatientHome> {
           ack: (response) {
             if (response['success'] == true) {
               Map<String, dynamic> newMessage = response['message'];
-              int docId = newMessage['receiver'];
-              chatStore.addMessage(newMessage, docId);
+              int guestId = newMessage['receiver'];
+              chatStore.addMessage(newMessage, guestId);
               if (newMessage['id'] != messageId) {
-                chatStore.removeMessage(docId, messageId);
+                chatStore.removeMessage(guestId, messageId);
               }
             } else {
               print('Error: ${response['error']}');
@@ -164,21 +176,25 @@ class _PatientHomeState extends State<PatientHome> {
       chatStore.resetNewMessageFlag();
     }
 
-    if (chatStore.readStatusForId != null) {
-      socket!.emit(
-          'update_read_status', {'message_id': chatStore.readStatusForId});
+    if (chatStore.tempData['readStatusAndOlderMessagesCall'] == true) {
+      for (int id in chatStore.tempData['readStatusFor']) {
+        socket!.emit('update_read_status', {'message_id': id});
+        // print('sending update for read status of message $id');
+      }
       chatStore.resetReadId();
     }
 
-    if (chatStore.deliveryStatusForId != null) {
-      socket!.emit('update_delivery_status',
-          {'message_id': chatStore.deliveryStatusForId});
-      chatStore.resetDeliveryId();
-    }
-
-    if (chatStore.getOlderMessagesFor != null) {
-      socket!.emit('get_older_messages', chatStore.getOlderMessagesFor);
-      chatStore.resetOlderMessages();
+    if (chatStore.tempData['getOlderMessagesFor'] != null) {
+      socket!.emit('get_older_messages', {
+        'own_id': hostId,
+        'other_id': chatStore.tempData['getOlderMessagesFor']
+      });
+      // print('emitting to get older messages for id ${chatStore.tempData['getOlderMessagesFor']} ======');
+      chatStore.tempData['loadedOlderMessages']
+          .add(chatStore.tempData['getOlderMessagesFor']);
+      // print('added new id to loadedoldermessages: ${chatStore.tempData['loadedOlderMessages']}');
+      chatStore.tempData['getOlderMessagesFor'] = null;
+      // print('now nullified getoldermessagesfor int: ${chatStore.tempData['getOlderMessagesFor']}');
     }
   }
 
@@ -313,8 +329,12 @@ class PatientHomeBody extends StatelessWidget {
               // Doctors icon
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DoctorView()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatsWithDoc(),
+                    ),
+                  );
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -328,7 +348,7 @@ class PatientHomeBody extends StatelessWidget {
                         padding: EdgeInsets.all(28.0),
                         color: Colors.lightBlue[50], // Light blue background
                         child: Icon(
-                          FontAwesomeIcons.stethoscope,
+                          Icons.history,
                           size: 40,
                           color: Colors.blue, // Blue icon
                         ),
@@ -336,7 +356,7 @@ class PatientHomeBody extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      'Doctors',
+                      'Chat History',
                       style: GoogleFonts.nunito(
                         textStyle: TextStyle(
                           fontSize: 16,
@@ -471,12 +491,7 @@ class PopularsState extends State<Populars> {
           String fullImageUrl =
               'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
 
-          // Check if profile_picture is not null and has a valid URL
-          if (doctor['profile_picture'] != null
-              // && doctor['profile_picture']['formats'] != null &&
-              //     doctor['profile_picture']['formats']['thumbnail'] != null &&
-              //     doctor['profile_picture']['formats']['thumbnail']['url'] != null
-              ) {
+          if (doctor['profile_picture'] != null) {
             fullImageUrl = '${doctor['profile_picture']}';
           }
 
@@ -487,6 +502,14 @@ class PopularsState extends State<Populars> {
       });
     } else {
       print('Failed to load doctors');
+      Fluttertoast.showToast(
+        msg: 'Failed to load doctors',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red[200],
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
@@ -504,23 +527,29 @@ class PopularsState extends State<Populars> {
           ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
-            imageUrl: doctors[0]['full_image_url'], // Use full_image_url
+            id: doctors[0]['id'],
+            imageUrl: doctors[0]['profile_picture'], // Use full_image_url
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
             profession: doctors[0]['specialisation'] ?? 'General Practice',
             rating: doctors[0]['total_overall_rating'] != null
                 ? doctors[0]['total_overall_rating'] /
                     (doctors[0]['total_raters'] ?? 1)
                 : 0,
-            onChatPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ChattingPage(
-                                  guestId: doctors[0]['id'],
-                                  guestName: '${doctors[0]['firstName']} ${doctors[0]['lastName']}',
-                                  guestImage: doctors[0]['profile_picture'] ??
-                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                                  guestPhoneNumber: doctors[0]['phone'],
-                                ))),
+            onChatPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChattingPage(
+                    guestId: doctors[0]['id'],
+                    guestName:
+                        '${doctors[0]['firstName']} ${doctors[0]['lastName']}',
+                    guestImage: doctors[0]['profile_picture'] ??
+                        'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                    guestPhoneNumber: doctors[0]['phone'],
+                  ),
+                ),
+              );
+            },
             onViewProfilePressed: () {
               Navigator.push(
                 context,
@@ -530,10 +559,11 @@ class PopularsState extends State<Populars> {
               );
             },
             onBookAppointmentPressed: () {
-               Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DoctorAppointmentPag(doctorCard: doctors[0]),
+                  builder: (context) =>
+                      DoctorAppointmentPag(doctorCard: doctors[0]),
                 ),
               );
             },
@@ -541,6 +571,7 @@ class PopularsState extends State<Populars> {
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
+              id: doctors[1]['id'],
               imageUrl: doctors[1]['full_image_url'], // Use full_image_url
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
               profession: (doctors[1]['specialisation'] != null &&
@@ -548,16 +579,20 @@ class PopularsState extends State<Populars> {
                   ? doctors[1]['specialisation']
                   : 'General Practice',
               rating: 4.0,
-              onChatPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ChattingPage(
-                                  guestId: doctors[1]['id'],
-                                  guestName: '${doctors[1]['firstName']} ${doctors[1]['lastName']}',
-                                  guestImage: doctors[1]['profile_picture'] ??
-                                      'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                                  guestPhoneNumber: doctors[1]['phone'],
-                                ))),
+              onChatPressed: () {
+                // context.read<ChatStore>().setCurrentGuestId(doctors[1]['id']);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChattingPage(
+                              guestId: doctors[1]['id'],
+                              guestName:
+                                  '${doctors[1]['firstName']} ${doctors[1]['lastName']}',
+                              guestImage: doctors[1]['profile_picture'] ??
+                                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                              guestPhoneNumber: doctors[1]['phone'],
+                            )));
+              },
               onViewProfilePressed: () {
                 Navigator.push(
                   context,
@@ -568,7 +603,7 @@ class PopularsState extends State<Populars> {
                 );
               },
               onBookAppointmentPressed: () {
-                  Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>

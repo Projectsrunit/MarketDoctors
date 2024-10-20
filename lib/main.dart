@@ -15,7 +15,6 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ChatStore()),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ChangeNotifierProvider(create: (_) => DataStore()),
-      ChangeNotifierProvider(create: (_) => RealTimeDelivery()),
     ],
     child: const MyApp(),
   ));
@@ -133,40 +132,22 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
-class RealTimeDelivery extends ChangeNotifier {
-  Map<int, Map<int, Map<String, dynamic>>> latestsMap = {};
-
-  void addLatestsMessage(int doctorId, Map<String, dynamic> message) {
-    int messageId = message['id'];
-    if (!latestsMap.containsKey(doctorId)) {
-      latestsMap[doctorId] = {};
-    }
-    latestsMap[doctorId]?[messageId] = message;
-    notifyListeners();
-  }
-
-  void removeLatestsMessage(int doctorId) {
-    latestsMap.remove(doctorId);
-    notifyListeners();
-  }
-}
-
 class ChatStore extends ChangeNotifier {
   Map<int, Map<int, Map<String, dynamic>>> _messages = {};
   Map<String, dynamic>? _latestMessage;
-  Map? _getOlderMessagesFor;
-  int? _readStatusForId;
-  int? _deliveryStatusForId;
+  Map<String, dynamic> tempData = {
+    'loadedOlderMessages' : [],
+    'readStatusFor': [],
+    'idsWithUnreadMessages': [],
+    'getOlderMessagesFor': null,
+    'readStatusAndOlderMessagesCall': false
+  };
 
   Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
-  Map? get getOlderMessagesFor => _getOlderMessagesFor;
   Map<String, dynamic> get latestMessage => _latestMessage ?? {};
-  int? get readStatusForId => _readStatusForId;
-  int? get deliveryStatusForId => _deliveryStatusForId;
 
   void addMessage(Map<String, dynamic> message, int docId) {
     int messageId = message['id'];
-    // print('going to add for $message');
     if (!_messages.containsKey(docId)) {
       _messages[docId] = {};
     }
@@ -186,17 +167,8 @@ class ChatStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getOlderMessages(Map params) {
-    _getOlderMessagesFor = params;
-    notifyListeners();
-  }
-
   void resetNewMessageFlag() {
     _latestMessage = null;
-  }
-
-  void resetOlderMessages() {
-    _getOlderMessagesFor = null;
   }
 
   void receiveDeliveryStatus(Map<String, dynamic> updatedMessage, int docId) {
@@ -225,22 +197,22 @@ class ChatStore extends ChangeNotifier {
     }
   }
 
-  void sendDeliveryStatus(int id) {
-    _deliveryStatusForId = id;
-    notifyListeners();
-  }
-
-  void sendReadStatus(int id) {
-    _readStatusForId = id;
+  void sendReadStatusAndOlderMessagesCall() {
+    // print('sendReadStatusAndOlderMessagesCall from within chatstore ');
+    tempData['readStatusAndOlderMessagesCall'] = true;
     notifyListeners();
   }
 
   void resetReadId() {
-    _readStatusForId = null;
+    tempData['readStatusAndOlderMessagesCall'] = false;
+    // print('resetting readStatusAndOlderMessagesCall from within chatstore');
+    notifyListeners();
   }
 
-  void resetDeliveryId() {
-    _deliveryStatusForId = null;
+  void removeFromUnreadList(int id) {
+    tempData['idsWithUnreadMessages'].remove(id);
+    print('removing id $id from unreadList');
+    notifyListeners();
   }
 
   void removeMessage(int docId, int messageId) {
@@ -250,6 +222,7 @@ class ChatStore extends ChangeNotifier {
     }
   }
 }
+
 
 class DataStore with ChangeNotifier {
   Map? userData;

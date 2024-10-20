@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/doctor/chatting_page.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
 import 'package:market_doctor/pages/chew/doctor_like_card.dart';
@@ -173,15 +174,19 @@ class _ViewDocProfileState extends State<ViewDocProfile> {
                   widthFactor: 0.6,
                   child: ElevatedButton(
                     onPressed: () {
-                      // if (_formKey.currentState!.validate()) {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => AddCaseForm2(
-                      //             outreach: _outreachLocationController.text,
-                      //             partner: _choosePartnerController.text),
-                      //       ));
-                      // }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChattingPage(
+                            guestName:
+                                'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+                            guestImage: widget.doctorCard['profile_picture'] ??
+                                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
+                            guestPhoneNumber: widget.doctorCard['phone'],
+                            guestId: widget.doctorCard['id'],
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context)

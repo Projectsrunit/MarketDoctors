@@ -38,7 +38,6 @@ class ChewHomeState extends State<ChewHome> {
     }
     chatStore = context.read<ChatStore>();
     chatStore?.addListener(_sendPendingUpdates);
-    chatStore?.addListener(_sendPendingUpdates);
   }
 
   @override
@@ -66,7 +65,7 @@ class ChewHomeState extends State<ChewHome> {
         socket!.emit('authenticate', {'own_id': chewId});
 
         socket!.on('connect', (_) {
-          print('Socket connected');
+          // print('Socket connected');
           _resendUnsentMessages();
         });
 
@@ -75,12 +74,11 @@ class ChewHomeState extends State<ChewHome> {
         });
 
         socket!.on('new_message', (message) {
-          final deliverer = context.read<RealTimeDelivery>().addLatestsMessage;
           int docId = (message['sender'] == chewId)
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, docId);
-          deliverer(docId, message);
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
         });
 
         socket!.on('older_messages', (messages) {
@@ -118,21 +116,31 @@ class ChewHomeState extends State<ChewHome> {
     }
   }
 
-  void _handleArrayOfMessages(List<dynamic> messages, int chewId) {
+  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
     final addMessage = context.read<ChatStore>().addMessage;
+    final unreadList =
+        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
 
     for (Map<String, dynamic> message in messages) {
-      int? docId = (message['sender'] == chewId)
+      int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
-      if (docId != null) {//because some messages in backend had a missing sender or receiver
-      addMessage(message, docId);
+      if (guestId != null) {
+        //because some messages in backend had a missing sender or receiver
+        addMessage(message, guestId);
+      }
+      if (message['delivery_status'] != true) {
+        socket!.emit('update_delivery_status', {'message_id': message['id']});
+      }
+      if (!unreadList.contains(message['id'])) {
+        unreadList.add(message['id']);
       }
     }
   }
 
   void _sendPendingUpdates() {
     ChatStore chatStore = context.read<ChatStore>();
+    int chewId = context.read<DataStore>().chewData?['id'];
 
     if (chatStore.latestMessage.isNotEmpty) {
       int messageId = chatStore.latestMessage['id'];
@@ -161,21 +169,25 @@ class ChewHomeState extends State<ChewHome> {
       chatStore.resetNewMessageFlag();
     }
 
-    if (chatStore.readStatusForId != null) {
-      socket!.emit(
-          'update_read_status', {'message_id': chatStore.readStatusForId});
+    if (chatStore.tempData['readStatusAndOlderMessagesCall'] == true) {
+      for (int id in chatStore.tempData['readStatusFor']) {
+        socket!.emit('update_read_status', {'message_id': id});
+        // print('sending update for read status of message $id');
+      }
       chatStore.resetReadId();
     }
 
-    if (chatStore.deliveryStatusForId != null) {
-      socket!.emit('update_delivery_status',
-          {'message_id': chatStore.deliveryStatusForId});
-      chatStore.resetDeliveryId();
-    }
-
-    if (chatStore.getOlderMessagesFor != null) {
-      socket!.emit('get_older_messages', chatStore.getOlderMessagesFor);
-      chatStore.resetOlderMessages();
+    if (chatStore.tempData['getOlderMessagesFor'] != null) {
+      socket!.emit('get_older_messages', {
+        'own_id': chewId,
+        'other_id': chatStore.tempData['getOlderMessagesFor']
+      });
+      // print('emitting to get older messages for id ${chatStore.tempData['getOlderMessagesFor']} ======');
+      chatStore.tempData['loadedOlderMessages']
+          .add(chatStore.tempData['getOlderMessagesFor']);
+      // print('added new id to loadedoldermessages: ${chatStore.tempData['loadedOlderMessages']}');
+      chatStore.tempData['getOlderMessagesFor'] = null;
+      // print('now nullified getoldermessagesfor int: ${chatStore.tempData['getOlderMessagesFor']}');
     }
   }
 
@@ -459,6 +471,7 @@ class PopularsState extends State<Populars> {
           ),
         ] else if (doctors.isNotEmpty) ...[
           DoctorCard(
+            id: doctors[0]['id'],
             imageUrl: doctors[0]['profile_picture'] ??
                 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
             name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
@@ -490,6 +503,7 @@ class PopularsState extends State<Populars> {
           SizedBox(height: 16.0),
           if (doctors.length > 1) ...[
             DoctorCard(
+              id: doctors[0]['id'],
               imageUrl: doctors[1]['profile_picture'] ??
                   'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
               name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',

@@ -101,6 +101,7 @@ class _DoctorViewState extends State<DoctorView> {
                 itemBuilder: (context, index) {
                   final doc = doctors[index];
                   return DoctorCard(
+                    id: doc['id'],
                     imageUrl: doc['profile_picture'] ??
                         'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
