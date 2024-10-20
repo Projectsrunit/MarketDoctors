@@ -86,11 +86,7 @@ class DocLikeCard extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          SizedBox(width: 4.0),
-                          Text(
-                            'available',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
-                          ),
+                          SizedBox(width: 4.0), 
                         ],
                       ),
                       Spacer(),

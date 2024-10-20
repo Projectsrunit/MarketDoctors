@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:market_doctor/main.dart';
 import 'package:provider/provider.dart';
@@ -25,93 +29,7 @@ class ChattingPageState extends State<ChattingPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
-  bool loadedOlderMessages = false;
   ChatStore? chatStore;
-  RealTimeDelivery? deliverer;
-
-  @override
-  void initState() {
-    super.initState();
-    deliverer = context.read<RealTimeDelivery>();
-    deliverer?.addListener(doDeliveryChecks);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void doDeliveryChecks() {
-    final latestsMap = deliverer?.latestsMap;
-    if (latestsMap?[widget.guestId] != null) {
-      latestsMap?[widget.guestId]?.forEach((messageId, message) {
-        _handleMessageStatus(message, messageId);
-      });
-      deliverer?.removeLatestsMessage(widget.guestId);
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      if (!loadedOlderMessages) {
-        _loadOlderMessages();
-        _checkAndSendUnreadDeliveryStatuses();
-      }
-    });
-  }
-
-  void _checkAndSendUnreadDeliveryStatuses() {
-    final messages = chatStore?.messages[widget.guestId] ?? {};
-
-    messages.forEach((messageId, message) {
-      if (message['sender'] == widget.guestId) {
-        if (message['delivery_status'] != true) {
-          chatStore?.sendDeliveryStatus(messageId);
-        }
-
-        if (message['read_status'] == false || message['read_status'] == null) {
-          chatStore?.sendReadStatus(messageId);
-        }
-      }
-    });
-  }
-
-  void _handleMessageStatus(Map<String, dynamic> message, int messageId) {
-    ChatStore chatStore = context.read<ChatStore>();
-    if (message['delivery_status'] != true) {
-      chatStore.sendDeliveryStatus(messageId);
-    }
-
-    if (message['read_status'] == false || message['read_status'] == null) {
-      chatStore.sendReadStatus(messageId);
-    }
-  }
-
-  void _loadOlderMessages() {
-    int hostId = context.read<DataStore>().patientData?['id'];
-
-    Map<String, dynamic> requestParams = {
-      'own_id': hostId,
-      'other_id': widget.guestId,
-    };
-
-    final messages = chatStore?.messages[widget.guestId] ?? {};
-
-    if (messages.isNotEmpty) {
-      int oldestMessageId = messages.keys.reduce((a, b) => a < b ? a : b);
-      String? oldestMessageDate = messages[oldestMessageId]?['createdAt'];
-      if (oldestMessageDate != null) {
-        requestParams['oldest_message_date'] = oldestMessageDate;
-      }
-    }
-
-    chatStore?.getOlderMessages(requestParams);
-    loadedOlderMessages = true;
-  }
 
   void _sendMessage(String message, Function sendMessage, int hostId) {
     if (message.isNotEmpty) {
@@ -164,14 +82,53 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   Future<String> _uploadToApi(XFile file) async {
-    await Future.delayed(Duration(seconds: 2));
-    return 'https://example.com/uploads/${file.name}';
+    try {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference ref = storage.ref().child('chat_uploads/$fileName');
+      UploadTask uploadTask = ref.putFile(File(file.path));
+
+      Fluttertoast.showToast(
+        msg: 'Uploading media',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.grey[200],
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+      Fluttertoast.cancel();
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading to Firebase: $e');
+      Fluttertoast.showToast(
+        msg: 'Error uploading media',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red[200],
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return '';
+    }
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic>? message, int hostId) {
+  Widget _buildMessageBubble(Map<String, dynamic> message, int hostId) {
     String? hostUrl = context.read<DataStore>().patientData?['picture_url'];
-    bool isSender = message?['sender'] == hostId;
-    String status = message?['delivery_status'] == true ? '✓✓' : '✓';
+    bool isSender = message['sender'] == hostId;
+    Map tempData = context.read<ChatStore>().tempData;
+    String status = message['read_status'] == true
+        ? '✓✓'
+        : message['delivery_status'] == true
+            ? '✓✓'
+            : '✓';
+
+    if (message['read_status'] != true && message['sender'] != hostId) {
+      tempData['readStatusFor'].add(message['id']);
+      // print('adding to readstatusfor array for message id ${message['id']}');
+    }
 
     return Align(
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
@@ -199,16 +156,17 @@ class ChattingPageState extends State<ChattingPage> {
                       ),
                     ),
                     child: ClipOval(
-                        child: Image.network(
-                      widget.guestImage,
-                      width: 72,
-                      height: 72,
-                      fit: BoxFit.cover,
-                    )),
+                      child: Image.network(
+                        widget.guestImage,
+                        width: 72,
+                        height: 72,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
               if (!isSender) SizedBox(width: 8),
-              Expanded(
+              Flexible(
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                   decoration: BoxDecoration(
@@ -223,26 +181,56 @@ class ChattingPageState extends State<ChattingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (message?['text_body'] != null)
-                        Text(
-                          message?['text_body'],
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
+                      if (message['text_body'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: Text(
+                            message['text_body'],
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
                           ),
                         ),
-                      if (message?['document_url'] != null)
-                        Image.network(
-                          message?['document_url'],
-                          height: 150,
-                          fit: BoxFit.cover,
+                      if (message['document_url'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: SizedBox(
+                            height: 150,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Image.network(
+                                  message['document_url'],
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child,
+                                      ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    } else {
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.broken_image,
+                                        size: 100, color: Colors.grey);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      if (message?['sender'] == hostId)
+                      if (message['sender'] == hostId)
                         Text(
                           status,
                           style: TextStyle(
                             fontSize: 12,
-                            color: message?['read_status'] == true
+                            color: message['read_status'] == true
                                 ? Colors.blue
                                 : Colors.grey,
                           ),
@@ -255,14 +243,15 @@ class ChattingPageState extends State<ChattingPage> {
               if (isSender)
                 CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 14, // Adjust radius as needed
+                  radius: 14,
                   child: Container(
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.grey, width: 2, // Grey border
+                        color: Colors.grey,
+                        width: 2,
                       ),
                     ),
                     child: ClipOval(
@@ -287,6 +276,24 @@ class ChattingPageState extends State<ChattingPage> {
   @override
   Widget build(BuildContext context) {
     int hostId = context.read<DataStore>().patientData?['id'];
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.read<ChatStore>().tempData['idsWithUnreadMessages'].contains(widget.guestId)) {
+    context.read<ChatStore>().removeFromUnreadList(widget.guestId);
+    }
+      final sendReadStatusAndOlderMessagesCall =
+          context.read<ChatStore>().sendReadStatusAndOlderMessagesCall;
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        Map tempData = context.read<ChatStore>().tempData;
+        // print('this is the oldermessages ======== ${tempData['loadedOlderMessages']}');
+        if (!tempData['loadedOlderMessages'].contains(widget.guestId)) {
+          tempData['getOlderMessagesFor'] = widget.guestId;
+          // print('therefore sending to get older');
+        }
+        sendReadStatusAndOlderMessagesCall();
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -389,12 +396,20 @@ class ChattingPageState extends State<ChattingPage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
+                    minLines: 1,
+                    maxLines: 3,
                   ),
                 ),
                 IconButton(
                   icon: Icon(Icons.send),
-                  onPressed: () => _sendMessage(_controller.text,
-                      context.read<ChatStore>().sendMessage, hostId),
+                  onPressed: () {
+                    String trimmedMessage = _controller.text.trim();
+                    if (trimmedMessage.isNotEmpty) {
+                      _sendMessage(trimmedMessage,
+                          context.read<ChatStore>().sendMessage, hostId);
+                      _controller.clear();
+                    }
+                  },
                 ),
               ],
             ),

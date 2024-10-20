@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'dart:convert';
+// import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/patient/book_appointment.dart';
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 
@@ -101,6 +103,7 @@ class _DoctorViewState extends State<DoctorView> {
                 itemBuilder: (context, index) {
                   final doc = doctors[index];
                   return DoctorCard(
+                    id: doc['id'],
                     imageUrl:
                         doc['profile_picture'] ?? 'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: 'Dr. ${doc['firstName']} ${doc['lastName']}',
@@ -109,7 +112,9 @@ class _DoctorViewState extends State<DoctorView> {
                         ? doc['specialisation']
                         : 'General Practice',
                     rating: 4.5,
-                    onChatPressed: () => Navigator.push(
+                    onChatPressed: () {
+                      // context.read<ChatStore>().setCurrentGuestId(doc['id']);
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => ChattingPage(
@@ -118,7 +123,8 @@ class _DoctorViewState extends State<DoctorView> {
                                   guestImage: doc['profile_picture'] ??
                                       'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                                   guestPhoneNumber: doc['phone'],
-                                ))),
+                                )));
+                                },
                     onViewProfilePressed: () {
                       Navigator.push(
                           context,

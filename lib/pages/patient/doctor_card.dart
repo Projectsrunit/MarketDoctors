@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/main.dart';
 import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DoctorCardScreen extends StatefulWidget {
@@ -65,6 +67,7 @@ class _DoctorCardScreenState extends State<DoctorCardScreen> {
                 final imageUrl = '{{BASE_URL}}$profilePictureUrl';
 
                 return DoctorCard(
+                  id: -1,
                   imageUrl: imageUrl,
                   name: fullName,
                   profession: profession,
@@ -90,6 +93,7 @@ class DoctorCard extends StatelessWidget {
   final String imageUrl;
   final String name;
   final String profession;
+  final int id;
   final double rating;
   final VoidCallback onChatPressed;
   final VoidCallback onViewProfilePressed;
@@ -97,6 +101,7 @@ class DoctorCard extends StatelessWidget {
 
   DoctorCard({
     required this.imageUrl,
+    required this.id,
     required this.name,
     required this.profession,
     required this.rating,
@@ -107,6 +112,7 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     return Container(
       // margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
@@ -229,21 +235,13 @@ class DoctorCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        if (unreadList.contains(id))
                         Container(
-                          width: 10,
-                          height: 10,
+                          width: 20,
+                          height: 20,
                           decoration: BoxDecoration(
                             color: Colors.green,
                             shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: 4.0),
-                        Text(
-                          'available',
-                          style: GoogleFonts.nunito(
-                            textStyle: TextStyle(
-                              fontSize: 13,
-                            ),
                           ),
                         ),
                       ],
