@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
+import 'package:market_doctor/pages/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -41,6 +41,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
         final data = json.decode(response.body);
 
         setState(() {
+          print('this is the doctors: $data');
           if (data is List) {
             docs = data;
           }
@@ -86,6 +87,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
                   itemBuilder: (context, index) {
                     final doc = docs[index];
                     return ChewOrPatientCard(
+                      id: doc['id'],
                       imageUrl: doc['profile_picture'] ??
                           'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                       name: '${doc['firstName']} ${doc['lastName']}',
