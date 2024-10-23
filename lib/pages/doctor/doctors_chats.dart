@@ -6,7 +6,7 @@ import 'package:market_doctor/main.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/chatting_page.dart';
-import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
+import 'package:market_doctor/pages/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:http/http.dart' as http;
 
@@ -187,6 +187,7 @@ class ChewsWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final chew = chews[index];
                   return ChewOrPatientCard(
+                    id: chew['id'],
                     imageUrl: chew['profile_picture'] ??
                         'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: '${chew['firstName']} ${chew['lastName']}',
@@ -243,6 +244,7 @@ class PatientsWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final chew = patients[index];
                   return ChewOrPatientCard(
+                    id: chew['id'],
                     imageUrl: chew['profile_picture'] ??
                         'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                     name: '${chew['firstName']} ${chew['lastName']}',

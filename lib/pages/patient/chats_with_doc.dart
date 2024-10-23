@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/doctor/chew_or_patient_card.dart';
+import 'package:market_doctor/pages/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/patient/patient_app_bar.dart';
@@ -86,6 +86,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
                   itemBuilder: (context, index) {
                     final doc = docs[index];
                     return ChewOrPatientCard(
+                      id: doc['id'],
                       imageUrl: doc['profile_picture'] ??
                           'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
                       name: '${doc['firstName']} ${doc['lastName']}',
