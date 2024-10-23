@@ -38,6 +38,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
           },
           body: json.encode({'id': chewId, 'role': 3}));
       if (response.statusCode == 200) {
+        print('this is the data $chewId, ${response.headers}');
         final data = json.decode(response.body);
 
         setState(() {
