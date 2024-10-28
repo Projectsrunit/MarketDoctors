@@ -279,6 +279,7 @@ class ChattingPageState extends State<ChattingPage> {
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.read<ChatStore>().tempData['idsWithUnreadMessages'].contains(widget.guestId)) {
+        print('calling remove on idswithunreadmessages for id ${widget.guestId}');
     context.read<ChatStore>().removeFromUnreadList(widget.guestId);
     }
       final sendReadStatusAndOlderMessagesCall =

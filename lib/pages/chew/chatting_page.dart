@@ -278,9 +278,13 @@ class ChattingPageState extends State<ChattingPage> {
     int chewId = context.read<DataStore>().chewData?['id'];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.read<ChatStore>().tempData['idsWithUnreadMessages'].contains(widget.doctorId)) {
-    context.read<ChatStore>().removeFromUnreadList(widget.doctorId);
-    }
+      if (context
+          .read<ChatStore>()
+          .tempData['idsWithUnreadMessages']
+          .contains(widget.doctorId)) {
+            print('calling remove on idswithunreadmessages for id ${widget.doctorId}');
+        context.read<ChatStore>().removeFromUnreadList(widget.doctorId);
+      }
       final sendReadStatusAndOlderMessagesCall =
           context.read<ChatStore>().sendReadStatusAndOlderMessagesCall;
       if (ModalRoute.of(context)?.isCurrent ?? false) {

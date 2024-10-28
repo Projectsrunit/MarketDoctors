@@ -198,7 +198,7 @@ class ChatStore extends ChangeNotifier {
   }
 
   void sendReadStatusAndOlderMessagesCall() {
-    // print('sendReadStatusAndOlderMessagesCall from within chatstore ');
+    print('sendReadStatusAndOlderMessagesCall from within chatstore ');
     tempData['readStatusAndOlderMessagesCall'] = true;
     notifyListeners();
   }
@@ -211,7 +211,12 @@ class ChatStore extends ChangeNotifier {
 
   void removeFromUnreadList(int id) {
     tempData['idsWithUnreadMessages'].remove(id);
-    print('removing id $id from unreadList');
+    print('removing id $id from unreadList ================');
+    notifyListeners();
+  }
+
+  void notifyForIdsWithUnreadMessages() {
+    print('received instruction to set green lights on cards');
     notifyListeners();
   }
 
@@ -222,7 +227,6 @@ class ChatStore extends ChangeNotifier {
     }
   }
 }
-
 
 class DataStore with ChangeNotifier {
   Map? userData;

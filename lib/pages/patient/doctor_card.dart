@@ -51,7 +51,6 @@ class _DoctorCardScreenState extends State<DoctorCardScreen> {
                     '';
                 final fullName = '${doctor['firstName']} ${doctor['lastName']}';
 
-
                 // Access the specialisation field
                 final profession = doctor['specialisation'] != null &&
                         doctor['specialisation'].isNotEmpty
@@ -112,7 +111,8 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+    final unreadList =
+        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     return Container(
       // margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
@@ -232,23 +232,31 @@ class DoctorCard extends StatelessWidget {
                   direction: Axis.vertical,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (unreadList.contains(id))
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ),
+                    Consumer<ChatStore>(builder: (context, chatStore, child) {
+                      print(
+                          'Consumer builder called! this is the list: ${chatStore.tempData['idsWithUnreadMessages']}');
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (unreadList.contains(id))
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 3.0, right: 3.0),
+                              child: Container(
+                                width: 15,
+                                height: 15,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            )
+                        ],
+                      );
+                    }),
                     Spacer(),
                     GestureDetector(
-                       onTap: onBookAppointmentPressed,
+                      onTap: onBookAppointmentPressed,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             vertical: 6.0, horizontal: 8.0),
