@@ -83,7 +83,14 @@ class _PatientHomeState extends State<PatientHome> {
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, guestId);
-          // print('received new message newone with id ${message['id']}');
+          print(
+              'now going to set one green light for message from id ${message['sender']} ==========');
+          final unreadList =
+              context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+          if (message['read_status'] != true && !unreadList.contains(guestId)) {
+            unreadList.add(guestId);
+          }
+          chatStore.notifyForIdsWithUnreadMessages();
           socket!.emit('update_delivery_status', {'message_id': message['id']});
           // print('updated delivery of new message of id ${message['id']}');
         });
@@ -128,7 +135,6 @@ class _PatientHomeState extends State<PatientHome> {
     final addMessage = context.read<ChatStore>().addMessage;
     final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     for (Map<String, dynamic> message in messages) {
-      // print('received new message with id ${message['id']} ===========');
       int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
@@ -139,8 +145,8 @@ class _PatientHomeState extends State<PatientHome> {
         socket!.emit('update_delivery_status', {'message_id': message['id']});
         // print('updated delivery status for message ${message['id']}');
       }
-      if (!unreadList.contains(message['id'])) {
-        unreadList.add(message['id']);
+     if (message['read_status'] != true && !unreadList.contains(guestId)) {
+        unreadList.add(guestId);
       }
     }
   }

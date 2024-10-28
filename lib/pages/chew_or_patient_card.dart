@@ -17,8 +17,6 @@ class ChewOrPatientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unreadList =
-        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     return Container(
         margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
         decoration: BoxDecoration(
@@ -57,31 +55,42 @@ class ChewOrPatientCard extends StatelessWidget {
               ),
               SizedBox(width: 4),
               Expanded(
-                // Ensure this section fills available space
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Spacer(), // Fills remaining space
-                        if (unreadList.contains(id))
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
+                    Consumer<ChatStore>(
+                      builder: (context, chatStore, child) {
+                        print(
+                            'Consumer builder called! this is the list: ${chatStore.tempData['idsWithUnreadMessages']}');
+                        return Row(
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                      ],
+                            Spacer(),
+                            if (chatStore.tempData['idsWithUnreadMessages']
+                                    ?.contains(id) ??
+                                false)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 3.0, right: 3.0),
+                                child: Container(
+                                  width: 15,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              )
+                          ],
+                        );
+                      },
                     ),
                     GestureDetector(
                       onTap: onChatPressed,

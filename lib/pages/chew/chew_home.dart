@@ -78,6 +78,14 @@ class ChewHomeState extends State<ChewHome> {
               ? message['receiver']
               : message['sender'];
           chatStore.addMessage(message, docId);
+          print(
+              'now going to set one green light for message from id ${message['sender']} ==========');
+          final unreadList =
+              context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+          if (message['read_status'] != true && !unreadList.contains(docId)) {
+            unreadList.add(docId);
+          }
+          chatStore.notifyForIdsWithUnreadMessages();
           socket!.emit('update_delivery_status', {'message_id': message['id']});
         });
 
@@ -132,10 +140,12 @@ class ChewHomeState extends State<ChewHome> {
       if (message['delivery_status'] != true) {
         socket!.emit('update_delivery_status', {'message_id': message['id']});
       }
-      if (!unreadList.contains(message['id'])) {
-        unreadList.add(message['id']);
+      if (message['read_status'] != true && !unreadList.contains(guestId)) {
+        unreadList.add(guestId);
       }
     }
+    print('now going to set those green lights ==========');
+    context.read<ChatStore>().notifyForIdsWithUnreadMessages();
   }
 
   void _sendPendingUpdates() {
