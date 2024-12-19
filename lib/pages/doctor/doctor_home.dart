@@ -52,7 +52,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _initializeSocket() {
     ChatStore chatStore = context.read<ChatStore>();
-    int? hostId = Provider.of<DataStore>(context, listen: false).doctorData?['id'];
+    int? hostId =
+        Provider.of<DataStore>(context, listen: false).doctorData?['id'];
 
     if (hostId != null) {
       final String socketUrl = dotenv.env['API_URL']!;
@@ -164,19 +165,23 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
     final addMessage = context.read<ChatStore>().addMessage;
-    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+    final unreadList =
+        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     for (Map<String, dynamic> message in messages) {
       int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
-      if (guestId != null) {//because some messages in backend had a missing sender or receiver
-        addMessage(message, guestId);        
+      if (guestId != null) {
+        //because some messages in backend had a missing sender or receiver
+        addMessage(message, guestId);
       }
-      if (message['delivery_status'] != true) {
-        socket!.emit('update_delivery_status', {'message_id': message['id']});
-      }
-      if (message['read_status'] != true && !unreadList.contains(guestId)) {
-        unreadList.add(guestId);
+      if (message['sender'] == guestId) {
+        if (message['delivery_status'] != true) {
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
+        }
+        if (message['read_status'] != true && !unreadList.contains(guestId)) {
+          unreadList.add(guestId);
+        }
       }
     }
     print('now going to set those green lights ==========');
