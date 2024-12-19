@@ -1,23 +1,67 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
-  await dotenv.load(fileName: "assets/.env");
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "assets/.env");
   await Firebase.initializeApp();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => ChatStore()),
-      ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-      ChangeNotifierProvider(create: (_) => DataStore()),
-    ],
-    child: const MyApp(),
-  ));
+  await initializeNotifications();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ChatStore()),
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+        ChangeNotifierProvider(create: (_) => DataStore()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await requestNotificationPermission();
+}
+
+Future<void> requestNotificationPermission() async {
+  if (Platform.isAndroid && await _isAndroid13OrAbove()) {
+    var status = await Permission.notification.status;
+    if (status.isDenied) {
+      status = await Permission.notification.request();
+    }
+
+    if (status.isGranted) {
+      print("Notification permission granted.");
+    } else {
+      print("Notification permission denied.");
+    }
+  }
+}
+
+Future<bool> _isAndroid13OrAbove() async {
+  final androidInfo = await DeviceInfoPlugin().androidInfo;
+  return androidInfo.version.sdkInt >= 33;
 }
 
 class MyApp extends StatelessWidget {
@@ -136,7 +180,7 @@ class ChatStore extends ChangeNotifier {
   Map<int, Map<int, Map<String, dynamic>>> _messages = {};
   Map<String, dynamic>? _latestMessage;
   Map<String, dynamic> tempData = {
-    'loadedOlderMessages' : [],
+    'loadedOlderMessages': [],
     'readStatusFor': [],
     'idsWithUnreadMessages': [],
     'getOlderMessagesFor': null,
@@ -226,6 +270,52 @@ class ChatStore extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> initDB(int personId) async {
+    String dbName = 'person$personId.db';
+
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String dbPath = join(documentsDirectory.path, dbName);
+    bool dbExists = await File(dbPath).exists();
+
+    Database db =
+        await openDatabase(dbPath, version: 1, onCreate: (db, version) async {
+      print('Database $dbName created.');
+    });
+
+    if (!dbExists) {
+      print('Database $dbName did not exist and has been created.');
+      return;
+    }
+
+    List<Map<String, dynamic>> tables =
+        await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
+
+    for (var table in tables) {
+      String tableName = table['name'];
+
+      if (tableName.startsWith('user')) {
+        int docId = int.parse(tableName.replaceFirst('user', ''));
+        List<Map<String, dynamic>> rows = await db.query(tableName);
+
+        _messages[docId] = {
+          for (var row in rows)
+            row['id']: {
+              'text_body': row['text_body'],
+              'sender': row['sender'],
+              'delivery_status': row['delivery_status'],
+              'read_status': row['read_status'],
+              'id': row['id'],
+              'document_url': row['document_url'],
+            }
+        };
+      }
+    }
+
+    print('Database $dbName loaded with messages.');
+    print('here are the messages: $_messages');
+    // notifyListeners();
+  }
 }
 
 class DataStore with ChangeNotifier {
@@ -236,6 +326,81 @@ class DataStore with ChangeNotifier {
   Map? get chewData => userData;
   Map? get patientData => userData;
   Map? get doctorData => userData;
+
+  Map<String, dynamic> addCaseData = {
+    'maleOrFemale': null,
+    'stage1Tap': null,
+    'headings': {
+      'Neck': {
+        'whiteButtons': ['Anterior Neck', 'Posterior Neck']
+      },
+      'Anterior Neck': {
+        'greyList': [
+          "Neck Pain",
+          "Arthritis",
+          "Swollen Neck",
+          "Torticollis",
+          "Thyroid Disorders",
+          "Muscle Strain",
+          "Meningitis",
+          "Influenza",
+          "Lung Infection"
+        ],
+      },
+      'Posterior Neck': {
+        'greyList': [
+          "Neck Pain",
+          "Arthritis",
+          "Swollen Neck",
+          "Torticollis",
+          "Thyroid Disorders",
+          "Muscle Strain",
+          "Meningitis",
+          "Influenza",
+          "Lung Infection"
+        ],
+      },
+      'Head': {
+        'whiteButtons': ['Forehead', 'Eye', 'Mouth', 'Nose', 'Ear']
+      },
+      'Eye': {
+        'greyList': [
+          'Cataracts',
+          'Colour blindness',
+          'Dry Eye',
+          'Glaucoma',
+          'Eye Infection'
+        ]
+      },
+      'Forehead': {
+        'greyList': ['Headache', 'Tension Headache', 'Migraine Headache', 'Cluster Headache', 'Sinus Headache', 'Posttraumatic Headache' ]
+      },
+      'Mouth': {
+        'greyList': ['Lip Crack', 'Ulcer', 'Toothache', 'Bad Breath'],
+      },
+      'Nose': {
+        'greyList': ['Runny Nose', 'Nasal Congestion', 'Nosebleed', 'Sinus Pain']
+      },
+      'Ear': {
+        'greyList': ['Earwax Build-up', 'Ear Infection', 'Hearing Loss', 'Tinnitus']
+      },
+      'Chest': {
+        'greyList': ['Stomach Pain', 'Abdominal Pain', 'Stomach Ulcer', 'Gastroparesis', 'Diabetic']
+      },
+      'Leg': {
+        'greyList': ['Numbness', 'Cramps', 'Sprains', 'Pain', 'Swelling', 'Joint Dislocation', 'Cracked skin', 'Callus', 'Foot Complications']
+      },
+      'Hand': {
+        'greyList': ['Fracture', 'Muscle Strain', 'Sprains', 'Inflamed tendor', 'Swelling', 'Joint dislocation']
+      },
+      'Shoulder': {
+        'greyList': ['Fracture', 'Dislocation', 'Sprains', 'Impengement', 'Separation']
+      },
+      'Dorsum': {
+        'greyList': ['Back Pain', 'Acute Back Pain', 'Arthritis', 'Low Back Pain']
+      },
+    }
+  };
 
   void updateChewData(Map? newValue) {
     userData = newValue;
@@ -391,7 +556,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         curve: Curves.easeInOut,
                       );
                     } else {
-                      _completeOnboarding();
+                      _completeOnboarding(context);
                     }
                   },
                   child: Text(_currentIndex < _pages.length - 1
@@ -406,7 +571,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Future<void> _completeOnboarding() async {
+  //this change made due to a sudden error. Functionality untested
+  Future<void> _completeOnboarding(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isFirstTimeUser', false);
     // ignore: use_build_context_synchronously

@@ -133,7 +133,8 @@ class _PatientHomeState extends State<PatientHome> {
 
   void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
     final addMessage = context.read<ChatStore>().addMessage;
-    final unreadList = context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+    final unreadList =
+        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
     for (Map<String, dynamic> message in messages) {
       int? guestId = (message['sender'] == hostId)
           ? message['receiver']
@@ -141,12 +142,14 @@ class _PatientHomeState extends State<PatientHome> {
       if (guestId != null) {
         addMessage(message, guestId);
       }
-      if (message['delivery_status'] != true) {
-        socket!.emit('update_delivery_status', {'message_id': message['id']});
-        // print('updated delivery status for message ${message['id']}');
-      }
-     if (message['read_status'] != true && !unreadList.contains(guestId)) {
-        unreadList.add(guestId);
+      if (message['sender'] == guestId) {
+        if (message['delivery_status'] != true) {
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
+          // print('updated delivery status for message ${message['id']}');
+        }
+        if (message['read_status'] != true && !unreadList.contains(guestId)) {
+          unreadList.add(guestId);
+        }
       }
     }
   }

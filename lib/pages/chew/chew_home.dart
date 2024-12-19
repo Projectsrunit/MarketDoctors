@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/main.dart';
@@ -73,7 +74,21 @@ class ChewHomeState extends State<ChewHome> {
           _handleArrayOfMessages(messages, chewId);
         });
 
-        socket!.on('new_message', (message) {
+        socket!.on('new_message', (message) async {
+          await flutterLocalNotificationsPlugin.show(
+            message['id'], // Notification ID
+            'New Message', // Title
+            message['text_body'] ?? 'Object', // Body
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                'message_channel_id', // Channel ID
+                'Incoming messages', // Channel name
+                channelDescription: 'Channel for new message notifications',
+                importance: Importance.high,
+                priority: Priority.high,
+              ),
+            ),
+          );
           int docId = (message['sender'] == chewId)
               ? message['receiver']
               : message['sender'];
@@ -124,7 +139,7 @@ class ChewHomeState extends State<ChewHome> {
     }
   }
 
-  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
+  void _handleArrayOfMessages(List<dynamic> messages, int hostId) async {
     final addMessage = context.read<ChatStore>().addMessage;
     final unreadList =
         context.read<ChatStore>().tempData['idsWithUnreadMessages'];
@@ -137,11 +152,27 @@ class ChewHomeState extends State<ChewHome> {
         //because some messages in backend had a missing sender or receiver
         addMessage(message, guestId);
       }
-      if (message['delivery_status'] != true) {
-        socket!.emit('update_delivery_status', {'message_id': message['id']});
-      }
-      if (message['read_status'] != true && !unreadList.contains(guestId)) {
-        unreadList.add(guestId);
+      if (message['sender'] == guestId) {
+        if (message['delivery_status'] != true) {
+          await flutterLocalNotificationsPlugin.show(
+            message['id'], // Notification ID
+            'New Message', // Title
+            message['text_body'] ?? 'Object', // Body
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                'message_channel_id', // Channel ID
+                'Incoming messages', // Channel name
+                channelDescription: 'Channel for new message notifications',
+                importance: Importance.high,
+                priority: Priority.high,
+              ),
+            ),
+          );
+          socket!.emit('update_delivery_status', {'message_id': message['id']});
+        }
+        if (message['read_status'] != true && !unreadList.contains(guestId)) {
+          unreadList.add(guestId);
+        }
       }
     }
     print('now going to set those green lights ==========');

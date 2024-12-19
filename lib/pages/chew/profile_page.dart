@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -94,7 +94,15 @@ class ProfilePage extends StatelessWidget {
         _buildNoArrowRow(
             context, Icons.pin, "Change transaction pin", _showPinPopup),
         Divider(color: Colors.grey[300], thickness: 1),
-        _buildNotifToggleRow(Icons.notifications, "Allow notifications", () {}),
+        NotificationToggleRow(
+  icon: Icons.notifications,
+  label: "Allow notifications",
+  initialStatus: false, // Set based on actual permission status
+  onToggle: (isAllowed) {
+    print(isAllowed ? "Notifications allowed" : "Notifications denied");
+    // Handle logic based on the new permission status
+  },
+),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateChewData(null);
@@ -122,34 +130,6 @@ class ProfilePage extends StatelessWidget {
               scale: 0.8,
               child: Switch(
                 value: Theme.of(context).brightness == Brightness.dark,
-                onChanged: (value) {
-                  onToggle();
-                },
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotifToggleRow(
-      IconData icon, String label, VoidCallback onToggle) {
-    return InkWell(
-      onTap: onToggle,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
-        child: Row(
-          children: [
-            Icon(icon, size: 20),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(label),
-            ),
-            Transform.scale(
-              scale: 0.8,
-              child: Switch(
-                value: true,
                 onChanged: (value) {
                   onToggle();
                 },
@@ -203,6 +183,71 @@ class ProfilePage extends StatelessWidget {
 
   void _showPinPopup() {
     // Show dialog for changing transaction pin
+  }
+}
+
+class NotificationToggleRow extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final bool initialStatus;
+  final Function(bool) onToggle;
+
+  const NotificationToggleRow({
+    required this.icon,
+    required this.label,
+    required this.initialStatus,
+    required this.onToggle,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _NotificationToggleRowState createState() => _NotificationToggleRowState();
+}
+
+class _NotificationToggleRowState extends State<NotificationToggleRow> {
+  late bool _isNotificationAllowed = widget.initialStatus; // Initialize here
+
+  Future<void> _handleToggle(bool value) async {
+    if (value) {
+      var status = await Permission.notification.status;
+      if (status.isDenied) {
+        status = await Permission.notification.request();
+      }
+
+      setState(() {
+        _isNotificationAllowed = status.isGranted;
+      });
+    } else {
+      // Toggle off
+      setState(() {
+        _isNotificationAllowed = false;
+      });
+    }
+    widget.onToggle(_isNotificationAllowed); // Notify parent of change
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => _handleToggle(!_isNotificationAllowed),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(widget.icon, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(widget.label)),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: _isNotificationAllowed,
+                onChanged: _handleToggle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
