@@ -91,8 +91,8 @@ class AddCaseForm1State extends State<AddCaseForm1> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   context.read<DataStore>().addCaseData['maleOrFemale'] = 'female';
-                                            //                   Navigator.push(
-                                            // context, MaterialPageRoute(builder: (context) => ChewHome()));
+                                    Navigator.push( 
+                                            context, MaterialPageRoute(builder: (context) => AddCasePage1()));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,

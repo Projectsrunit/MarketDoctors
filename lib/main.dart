@@ -373,32 +373,157 @@ class DataStore with ChangeNotifier {
         ]
       },
       'Forehead': {
-        'greyList': ['Headache', 'Tension Headache', 'Migraine Headache', 'Cluster Headache', 'Sinus Headache', 'Posttraumatic Headache' ]
+        'greyList': [
+          'Headache',
+          'Tension Headache',
+          'Migraine Headache',
+          'Cluster Headache',
+          'Sinus Headache',
+          'Posttraumatic Headache'
+        ]
       },
       'Mouth': {
         'greyList': ['Lip Crack', 'Ulcer', 'Toothache', 'Bad Breath'],
       },
       'Nose': {
-        'greyList': ['Runny Nose', 'Nasal Congestion', 'Nosebleed', 'Sinus Pain']
+        'greyList': [
+          'Runny Nose',
+          'Nasal Congestion',
+          'Nosebleed',
+          'Sinus Pain'
+        ]
       },
       'Ear': {
-        'greyList': ['Earwax Build-up', 'Ear Infection', 'Hearing Loss', 'Tinnitus']
+        'greyList': [
+          'Earwax Build-up',
+          'Ear Infection',
+          'Hearing Loss',
+          'Tinnitus'
+        ]
       },
       'Chest': {
-        'greyList': ['Stomach Pain', 'Abdominal Pain', 'Stomach Ulcer', 'Gastroparesis', 'Diabetic']
+        'greyList': [
+          'Stomach Pain',
+          'Abdominal Pain',
+          'Stomach Ulcer',
+          'Gastroparesis',
+          'Diabetic',
+          'Chest Pain'
+        ]
       },
       'Leg': {
-        'greyList': ['Numbness', 'Cramps', 'Sprains', 'Pain', 'Swelling', 'Joint Dislocation', 'Cracked skin', 'Callus', 'Foot Complications']
+        'greyList': [
+          'Numbness',
+          'Cramps',
+          'Sprains',
+          'Pain',
+          'Swelling',
+          'Joint Dislocation',
+          'Cracked skin',
+          'Callus',
+          'Foot Complications'
+        ]
       },
       'Hand': {
-        'greyList': ['Fracture', 'Muscle Strain', 'Sprains', 'Inflamed tendor', 'Swelling', 'Joint dislocation']
+        'greyList': [
+          'Fracture',
+          'Muscle Strain',
+          'Sprains',
+          'Inflamed tendor',
+          'Swelling',
+          'Joint dislocation'
+        ]
       },
       'Shoulder': {
-        'greyList': ['Fracture', 'Dislocation', 'Sprains', 'Impengement', 'Separation']
+        'greyList': [
+          'Fracture',
+          'Dislocation',
+          'Sprains',
+          'Impengement',
+          'Separation'
+        ]
       },
       'Dorsum': {
-        'greyList': ['Back Pain', 'Acute Back Pain', 'Arthritis', 'Low Back Pain']
+        'greyList': [
+          'Back Pain',
+          'Acute Back Pain',
+          'Arthritis',
+          'Low Back Pain'
+        ]
       },
+    },
+    'questionnaire': {
+      'Chest Pain': {
+        "Have you been told you have an abnormal ECG?": ["Yes", "No"],
+        "Do you have chest pain with walking/normal activity or exercise?": [
+          "Yes",
+          "No"
+        ],
+        "Are you been treated for high blood pressure?": ["Yes", "No"],
+        "Do you have a cardiologist?": ["Yes", "No"],
+        "If yes, do they know about your current circumstance?": ["Yes", "No"],
+        "Do you have pulmonary hypertension?": ["Yes", "No"],
+        "Do you have a heart murmur, mitral valve prolapse?": ["Yes", "No"],
+        "Have you had a heart attack before?": ["Yes", "No"],
+        "Have you ever had a stress test before?": ["Yes", "No"]
+      },
+      'Eye Infection': {
+        "Do you Wear Glasses?": ["Yes", "No"],
+        "Do you Wear Contact lens?": ["Yes", "No"],
+        "Do you have difficulty, even with Glasses with the following activities? Reading small prints?":
+            ["Yes", "No"],
+        "If yes, how much difficulty do you currently have?": [
+          "A little",
+          "A great deal",
+          "Unable to do any activity",
+          "A moderate amount"
+        ],
+        "Are you using any regular eye drops?": ["Yes", "No"],
+        "For How long?": ["Over a Week", "Over a Month"],
+        "Do you smoke": ["Yes", "No"],
+        "Do you take alcohol": ["Yes", "No"]
+      },
+      'Migraine Headache': {
+        "When did your Migraine begin?": [
+          "Same days ago",
+          "Few weeks ago",
+          "Months",
+          "Been Years"
+        ],
+        "Have you had a head injury before?": ["Yes", "No"],
+        "How painful is your Migraine?": ["Mild", "Severe"],
+        "How would you describe your Migraine headache?": [
+          "Throbbing/Pounding",
+          "Aching/Pounding"
+        ],
+        "Did the Botox treatment work?": ["Yes", "No"],
+        "For How long?": ["Over a Week", "Over a Month"],
+        "Are you taking any prescription drugs to treat your Migraine?": [
+          "Yes",
+          "No"
+        ],
+        "Are you taking any Over the counter drugs to treat your Migraine?": [
+          "Yes",
+          "No"
+        ]
+      },
+      'Stomach Pain': {
+        "Are you experiencing stomach pain?": ["Yes", "No"],
+        "Do you have abdominal pain?": ["Yes", "No"],
+        "Are you experiencing heart burn?": ["Yes", "No"],
+        "Do you excrete black poop?": ["Yes", "No"],
+        "Are you stooling?": ["Yes", "No"],
+        "Does one of your family have history of Ulcer?": ["Yes", "No"],
+        "How many meals can you cover a day?": ["Over a Week", "Over a Month"],
+        "Are you taking any prescription drugs to treat your Ulcer?": [
+          "Yes",
+          "No"
+        ],
+        "Are you taking any Over the counter drugs to treat your Ulcer?": [
+          "Yes",
+          "No"
+        ]
+      }
     }
   };
 
