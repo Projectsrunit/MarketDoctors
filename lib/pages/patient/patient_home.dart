@@ -16,10 +16,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/pages/choose_action.dart';
+import 'package:market_doctor/chat_store.dart';
 
 class PatientHome extends StatefulWidget {
   @override
@@ -27,184 +27,26 @@ class PatientHome extends StatefulWidget {
 }
 
 class _PatientHomeState extends State<PatientHome> {
-  final int doctorsOnline = 0;
-  final int users = 0;
-  IO.Socket? socket;
-  List<Map<String, dynamic>> unsentMessages = [];
-  bool _isSocketInitialized = false;
-  ChatStore? chatStore;
-
   @override
   void initState() {
     super.initState();
-    if (!_isSocketInitialized) {
-      _initializeSocket();
-      _isSocketInitialized = true;
-    }
-    chatStore = context.read<ChatStore>();
-    chatStore?.addListener(_sendPendingUpdates);
-  }
+    
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      int? hostId = context.read<DataStore>().patientData?['id'];
+      print(
+          'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
+          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
+      if (hostId != null) {
+        final chatStore = context.read<ChatStore>();
 
-  @override
-  void dispose() {
-    super.dispose();
-    socket?.disconnect();
-    _isSocketInitialized = false;
-  }
-
-  void _initializeSocket() {
-    ChatStore chatStore = context.read<ChatStore>();
-    int? hostId =
-        Provider.of<DataStore>(context, listen: false).patientData?['id'];
-
-    if (hostId != null) {
-      final String socketUrl = dotenv.env['API_URL']!;
-
-      setState(() {
-        socket = IO.io(socketUrl, <String, dynamic>{
-          'transports': ['websocket'],
-          'autoConnect': false,
-        });
-
-        socket!.connect();
-        socket!.emit('authenticate', {'own_id': hostId});
-
-        socket!.on('connect', (_) {
-          // print('Socket connected');
-          _resendUnsentMessages();
-        });
-
-        socket!.on('unread_messages', (messages) {
-          _handleArrayOfMessages(messages, hostId);
-        });
-
-        socket!.on('new_message', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.addMessage(message, guestId);
-          print(
-              'now going to set one green light for message from id ${message['sender']} ==========');
-          final unreadList =
-              context.read<ChatStore>().tempData['idsWithUnreadMessages'];
-          if (message['read_status'] != true && !unreadList.contains(guestId)) {
-            unreadList.add(guestId);
-          }
-          chatStore.notifyForIdsWithUnreadMessages();
-          socket!.emit('update_delivery_status', {'message_id': message['id']});
-          // print('updated delivery of new message of id ${message['id']}');
-        });
-
-        socket!.on('older_messages', (messages) {
-          // print('got older messages: $messages');
-          _handleArrayOfMessages(messages, hostId);
-        });
-
-        socket!.on('delivery_status_updated', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.receiveDeliveryStatus(message, guestId);
-        });
-
-        socket!.on('read_status_updated', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.receiveReadStatus(message, guestId);
-        });
-      });
-
-      socket!.on('disconnect', (_) {
-        print('Socket disconnected');
-        _isSocketInitialized = false;
-      });
-    }
-  }
-
-  void _resendUnsentMessages() {
-    if (unsentMessages.isNotEmpty) {
-      for (Map<String, dynamic> message in unsentMessages) {
-        socket!.emit('new_message', message);
-      }
-      unsentMessages.clear();
-    }
-  }
-
-  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
-    final addMessage = context.read<ChatStore>().addMessage;
-    final unreadList =
-        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
-    for (Map<String, dynamic> message in messages) {
-      int? guestId = (message['sender'] == hostId)
-          ? message['receiver']
-          : message['sender'];
-      if (guestId != null) {
-        addMessage(message, guestId);
-      }
-      if (message['sender'] == guestId) {
-        if (message['delivery_status'] != true) {
-          socket!.emit('update_delivery_status', {'message_id': message['id']});
-          // print('updated delivery status for message ${message['id']}');
+        if (!chatStore.dbInitialised) {
+          chatStore.initDB(hostId);
         }
-        if (message['read_status'] != true && !unreadList.contains(guestId)) {
-          unreadList.add(guestId);
+        if (!chatStore.isSocketInitialized) {
+          chatStore.initializeSocket(hostId);
         }
       }
-    }
-  }
-
-  void _sendPendingUpdates() {
-    ChatStore chatStore = context.read<ChatStore>();
-    int hostId = context.read<DataStore>().patientData?['id'];
-
-    if (chatStore.latestMessage.isNotEmpty) {
-      int messageId = chatStore.latestMessage['id'];
-      if (socket!.connected) {
-        socket!.emitWithAck(
-          'new_message',
-          chatStore.latestMessage,
-          ack: (response) {
-            if (response['success'] == true) {
-              Map<String, dynamic> newMessage = response['message'];
-              int guestId = newMessage['receiver'];
-              chatStore.addMessage(newMessage, guestId);
-              if (newMessage['id'] != messageId) {
-                chatStore.removeMessage(guestId, messageId);
-              }
-            } else {
-              print('Error: ${response['error']}');
-            }
-          },
-        );
-      } else {
-        setState(() {
-          unsentMessages.add(chatStore.latestMessage);
-        });
-      }
-      chatStore.resetNewMessageFlag();
-    }
-
-    if (chatStore.tempData['readStatusAndOlderMessagesCall'] == true) {
-      for (int id in chatStore.tempData['readStatusFor']) {
-        socket!.emit('update_read_status', {'message_id': id});
-        // print('sending update for read status of message $id');
-      }
-      chatStore.resetReadId();
-    }
-
-    if (chatStore.tempData['getOlderMessagesFor'] != null) {
-      socket!.emit('get_older_messages', {
-        'own_id': hostId,
-        'other_id': chatStore.tempData['getOlderMessagesFor']
-      });
-      // print('emitting to get older messages for id ${chatStore.tempData['getOlderMessagesFor']} ======');
-      chatStore.tempData['loadedOlderMessages']
-          .add(chatStore.tempData['getOlderMessagesFor']);
-      // print('added new id to loadedoldermessages: ${chatStore.tempData['loadedOlderMessages']}');
-      chatStore.tempData['getOlderMessagesFor'] = null;
-      // print('now nullified getoldermessagesfor int: ${chatStore.tempData['getOlderMessagesFor']}');
-    }
+    });
   }
 
   @override
@@ -484,9 +326,9 @@ class PopularsState extends State<Populars> {
     fetchDoctors();
   }
 
-  Future<void> fetchDoctors() async {
-    final String baseUrl =
-        dotenv.env['API_URL']!; // Ensure this is correctly set
+Future<void> fetchDoctors() async {
+  try {
+    final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse(
         '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
 
@@ -520,7 +362,22 @@ class PopularsState extends State<Populars> {
         fontSize: 16.0,
       );
     }
+  } catch (e) {
+    print('Error fetching doctors: $e');
+    Fluttertoast.showToast(
+      msg: 'Network error during fetch',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.red[200],
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+    setState(() {
+      isLoading = false; // Ensure to update loading state even if there's an error
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {

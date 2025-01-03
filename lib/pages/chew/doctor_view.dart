@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/chew/doctor_card.dart';
 import 'dart:convert';
-
 import 'package:market_doctor/pages/chew/view_doc_profile.dart';
 
 class DoctorView extends StatefulWidget {

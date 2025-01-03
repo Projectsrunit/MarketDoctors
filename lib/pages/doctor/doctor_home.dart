@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_string_interpolations, unused_field
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/main.dart';
@@ -12,7 +11,7 @@ import 'package:market_doctor/pages/doctor/doctor_cases.dart';
 import 'package:market_doctor/pages/doctor/pharmacy.dart';
 import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:market_doctor/chat_store.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,108 +23,34 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  IO.Socket? socket;
-  List<Map<String, dynamic>> unsentMessages = [];
-  bool _isSocketInitialized = false;
-  ChatStore? chatStore;
+
   bool isLoading = true;
   bool hasError = false;
   List<dynamic> appointments = [];
+
   @override
   void initState() {
-    super.initState();
-    if (!_isSocketInitialized) {
-      _initializeSocket();
-      _isSocketInitialized = true;
-    }
-    chatStore = context.read<ChatStore>();
-    chatStore?.addListener(_sendPendingUpdates);
+    super.initState(); 
     _fetchAppointments();
-  }
 
-  @override
-  void dispose() {
-    super.dispose();
-    socket?.disconnect();
-    _isSocketInitialized = false;
-  }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      int? hostId = context.read<DataStore>().doctorData?['id'];
+      print(
+          'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
+          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
+      if (hostId != null) {
+        final chatStore = context.read<ChatStore>();
 
-  void _initializeSocket() {
-    ChatStore chatStore = context.read<ChatStore>();
-    int? hostId =
-        Provider.of<DataStore>(context, listen: false).doctorData?['id'];
-
-    if (hostId != null) {
-      final String socketUrl = dotenv.env['API_URL']!;
-
-      setState(() {
-        socket = IO.io(socketUrl, <String, dynamic>{
-          'transports': ['websocket'],
-          'autoConnect': false,
-        });
-
-        socket!.connect();
-        socket!.emit('authenticate', {'own_id': hostId});
-
-        socket!.on('connect', (_) {
-          // print('Socket connected');
-          _resendUnsentMessages();
-        });
-
-        socket!.on('unread_messages', (messages) {
-          _handleArrayOfMessages(messages, hostId);
-        });
-
-        socket!.on('new_message', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.addMessage(message, guestId);
-          print(
-              'now going to set one green light for message from id ${message['sender']} ==========');
-          final unreadList =
-              context.read<ChatStore>().tempData['idsWithUnreadMessages'];
-          if (message['read_status'] != true && !unreadList.contains(guestId)) {
-            unreadList.add(guestId);
-          }
-          chatStore.notifyForIdsWithUnreadMessages();
-          socket!.emit('update_delivery_status', {'message_id': message['id']});
-        });
-
-        socket!.on('older_messages', (messages) {
-          _handleArrayOfMessages(messages, hostId);
-        });
-
-        socket!.on('delivery_status_updated', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.receiveDeliveryStatus(message, guestId);
-        });
-
-        socket!.on('read_status_updated', (message) {
-          int guestId = (message['sender'] == hostId)
-              ? message['receiver']
-              : message['sender'];
-          chatStore.receiveReadStatus(message, guestId);
-        });
-      });
-
-      socket!.on('disconnect', (_) {
-        print('Socket disconnected');
-        _isSocketInitialized = false;
-      });
-    }
-  }
-
-  void _resendUnsentMessages() {
-    if (unsentMessages.isNotEmpty) {
-      for (Map<String, dynamic> message in unsentMessages) {
-        socket!.emit('new_message', message);
+        if (!chatStore.dbInitialised) {
+          chatStore.initDB(hostId);
+        }
+        if (!chatStore.isSocketInitialized) {
+          chatStore.initializeSocket(hostId);
+        }
       }
-      unsentMessages.clear();
-    }
+    });
   }
+
 
   Future<void> _fetchAppointments() async {
     setState(() {
@@ -160,84 +85,6 @@ class _DashboardPageState extends State<DashboardPage> {
         hasError = true;
         isLoading = false;
       });
-    }
-  }
-
-  void _handleArrayOfMessages(List<dynamic> messages, int hostId) {
-    final addMessage = context.read<ChatStore>().addMessage;
-    final unreadList =
-        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
-    for (Map<String, dynamic> message in messages) {
-      int? guestId = (message['sender'] == hostId)
-          ? message['receiver']
-          : message['sender'];
-      if (guestId != null) {
-        //because some messages in backend had a missing sender or receiver
-        addMessage(message, guestId);
-      }
-      if (message['sender'] == guestId) {
-        if (message['delivery_status'] != true) {
-          socket!.emit('update_delivery_status', {'message_id': message['id']});
-        }
-        if (message['read_status'] != true && !unreadList.contains(guestId)) {
-          unreadList.add(guestId);
-        }
-      }
-    }
-    print('now going to set those green lights ==========');
-    context.read<ChatStore>().notifyForIdsWithUnreadMessages();
-  }
-
-  void _sendPendingUpdates() {
-    ChatStore chatStore = context.read<ChatStore>();
-    int hostId = context.read<DataStore>().doctorData?['id'];
-
-    if (chatStore.latestMessage.isNotEmpty) {
-      int messageId = chatStore.latestMessage['id'];
-      if (socket!.connected) {
-        socket!.emitWithAck(
-          'new_message',
-          chatStore.latestMessage,
-          ack: (response) {
-            if (response['success'] == true) {
-              Map<String, dynamic> newMessage = response['message'];
-              int guestId = newMessage['receiver'];
-              chatStore.addMessage(newMessage, guestId);
-              if (newMessage['id'] != messageId) {
-                chatStore.removeMessage(guestId, messageId);
-              }
-            } else {
-              print('Error: ${response['error']}');
-            }
-          },
-        );
-      } else {
-        setState(() {
-          unsentMessages.add(chatStore.latestMessage);
-        });
-      }
-      chatStore.resetNewMessageFlag();
-    }
-
-    if (chatStore.tempData['readStatusAndOlderMessagesCall'] == true) {
-      for (int id in chatStore.tempData['readStatusFor']) {
-        socket!.emit('update_read_status', {'message_id': id});
-        // print('sending update for read status of message $id');
-      }
-      chatStore.resetReadId();
-    }
-
-    if (chatStore.tempData['getOlderMessagesFor'] != null) {
-      socket!.emit('get_older_messages', {
-        'own_id': hostId,
-        'other_id': chatStore.tempData['getOlderMessagesFor']
-      });
-      // print('emitting to get older messages for id ${chatStore.tempData['getOlderMessagesFor']} ======');
-      chatStore.tempData['loadedOlderMessages']
-          .add(chatStore.tempData['getOlderMessagesFor']);
-      // print('added new id to loadedoldermessages: ${chatStore.tempData['loadedOlderMessages']}');
-      chatStore.tempData['getOlderMessagesFor'] = null;
-      // print('now nullified getoldermessagesfor int: ${chatStore.tempData['getOlderMessagesFor']}');
     }
   }
 
