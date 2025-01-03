@@ -1,6 +1,7 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -9,9 +10,6 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -173,148 +171,6 @@ class ThemeNotifier extends ChangeNotifier {
     _themeMode =
         _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     notifyListeners();
-  }
-}
-
-class ChatStore extends ChangeNotifier {
-  Map<int, Map<int, Map<String, dynamic>>> _messages = {};
-  Map<String, dynamic>? _latestMessage;
-  Map<String, dynamic> tempData = {
-    'loadedOlderMessages': [],
-    'readStatusFor': [],
-    'idsWithUnreadMessages': [],
-    'getOlderMessagesFor': null,
-    'readStatusAndOlderMessagesCall': false
-  };
-
-  Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
-  Map<String, dynamic> get latestMessage => _latestMessage ?? {};
-
-  void addMessage(Map<String, dynamic> message, int docId) {
-    int messageId = message['id'];
-    if (!_messages.containsKey(docId)) {
-      _messages[docId] = {};
-    }
-    _messages[docId]![messageId] = message;
-    notifyListeners();
-  }
-
-  void sendMessage(Map<String, dynamic> message, int docId) {
-    int messageId = message['id'];
-
-    if (!_messages.containsKey(docId)) {
-      _messages[docId] = {};
-    }
-
-    _messages[docId]![messageId] = message;
-    _latestMessage = message;
-    notifyListeners();
-  }
-
-  void resetNewMessageFlag() {
-    _latestMessage = null;
-  }
-
-  void receiveDeliveryStatus(Map<String, dynamic> updatedMessage, int docId) {
-    int messageId = updatedMessage['id'];
-
-    if (_messages.containsKey(docId) &&
-        _messages[docId]!.containsKey(messageId)) {
-      _messages[docId]![messageId] = {
-        ..._messages[docId]![messageId]!,
-        'delivery_status': updatedMessage['delivery_status']
-      };
-      notifyListeners();
-    }
-  }
-
-  void receiveReadStatus(Map<String, dynamic> updatedMessage, int docId) {
-    int messageId = updatedMessage['id'];
-
-    if (_messages.containsKey(docId) &&
-        _messages[docId]!.containsKey(messageId)) {
-      _messages[docId]![messageId] = {
-        ..._messages[docId]![messageId]!,
-        'read_status': updatedMessage['read_status']
-      };
-      notifyListeners();
-    }
-  }
-
-  void sendReadStatusAndOlderMessagesCall() {
-    print('sendReadStatusAndOlderMessagesCall from within chatstore ');
-    tempData['readStatusAndOlderMessagesCall'] = true;
-    notifyListeners();
-  }
-
-  void resetReadId() {
-    tempData['readStatusAndOlderMessagesCall'] = false;
-    // print('resetting readStatusAndOlderMessagesCall from within chatstore');
-    notifyListeners();
-  }
-
-  void removeFromUnreadList(int id) {
-    tempData['idsWithUnreadMessages'].remove(id);
-    print('removing id $id from unreadList ================');
-    notifyListeners();
-  }
-
-  void notifyForIdsWithUnreadMessages() {
-    print('received instruction to set green lights on cards');
-    notifyListeners();
-  }
-
-  void removeMessage(int docId, int messageId) {
-    if (_messages.containsKey(docId)) {
-      _messages[docId]?.remove(messageId);
-      notifyListeners();
-    }
-  }
-
-  Future<void> initDB(int personId) async {
-    String dbName = 'person$personId.db';
-
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String dbPath = join(documentsDirectory.path, dbName);
-    bool dbExists = await File(dbPath).exists();
-
-    Database db =
-        await openDatabase(dbPath, version: 1, onCreate: (db, version) async {
-      print('Database $dbName created.');
-    });
-
-    if (!dbExists) {
-      print('Database $dbName did not exist and has been created.');
-      return;
-    }
-
-    List<Map<String, dynamic>> tables =
-        await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
-
-    for (var table in tables) {
-      String tableName = table['name'];
-
-      if (tableName.startsWith('user')) {
-        int docId = int.parse(tableName.replaceFirst('user', ''));
-        List<Map<String, dynamic>> rows = await db.query(tableName);
-
-        _messages[docId] = {
-          for (var row in rows)
-            row['id']: {
-              'text_body': row['text_body'],
-              'sender': row['sender'],
-              'delivery_status': row['delivery_status'],
-              'read_status': row['read_status'],
-              'id': row['id'],
-              'document_url': row['document_url'],
-            }
-        };
-      }
-    }
-
-    print('Database $dbName loaded with messages.');
-    print('here are the messages: $_messages');
-    // notifyListeners();
   }
 }
 

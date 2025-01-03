@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/update_profile_image.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
 import 'package:provider/provider.dart';
 
@@ -116,6 +117,7 @@ class DoctorProfilePage extends StatelessWidget {
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateDoctorData(null);
+          context.read<ChatStore>().switchOffSocket();
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => DashboardPage()));
         }),
