@@ -22,7 +22,7 @@ class ChewHomeState extends State<ChewHome> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       int? hostId = context.read<DataStore>().chewData?['id'];
       print(
           'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
@@ -31,10 +31,10 @@ class ChewHomeState extends State<ChewHome> {
         final chatStore = context.read<ChatStore>();
 
         if (!chatStore.dbInitialised) {
-          chatStore.initDB(hostId);
+          await chatStore.initDB(hostId);
         }
         if (!chatStore.isSocketInitialized) {
-          chatStore.initializeSocket(hostId);
+          await chatStore.initializeSocket(hostId);
         }
       }
     });

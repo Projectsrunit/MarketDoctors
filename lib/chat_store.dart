@@ -12,23 +12,23 @@ import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatStore extends ChangeNotifier {
+
   Map<int, Map<int, Map<String, dynamic>>> _messages = {};
-  List<int> idsWithUnreadMessages = [];
   Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
+  Map<int, String> latestMessageDates = {};
+  List<int> idsWithUnreadMessages = [];
   Database? db;
+  int? storedHost;
   IO.Socket? socket;
   bool dbInitialised = false;
-
-  bool isSocketInitialized = false;
-  final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult>? conn;
-
   bool _isReconnecting = false;
-  int? storedHost;
+  bool isSocketInitialized = false;
+  StreamSubscription<ConnectivityResult>? conn;
+  final Connectivity _connectivity = Connectivity();
 
-    @override
+  @override
   void dispose() {
-    conn?.cancel(); 
+    conn?.cancel();
     socket?.disconnect();
     super.dispose();
   }
@@ -55,7 +55,7 @@ class ChatStore extends ChangeNotifier {
     }
   }
 
-  void initializeSocket(int hostId) {
+  Future<void> initializeSocket(int hostId) async {
     print('going to initialise socket with host $hostId');
 
     conn?.cancel();
@@ -69,7 +69,7 @@ class ChatStore extends ChangeNotifier {
       });
     }
     socket!.connect();
-    socket!.emit('authenticate', {'own_id': hostId});
+    socket!.emit('authenticate', {'own_id': hostId, 'message_dates': latestMessageDates});
     isSocketInitialized = true;
 
     socket!.on('connect', (_) {
@@ -133,6 +133,10 @@ class ChatStore extends ChangeNotifier {
       updateDbRead(message['id'], guestId);
       receiveReadStatus(message, guestId);
       notifyListeners();
+    });
+
+    socket!.on('catch_up_db', (messages) {
+      _handleArrayOfMessages(messages, hostId);
     });
 
     socket!.on('disconnect', (_) {
@@ -330,7 +334,7 @@ class ChatStore extends ChangeNotifier {
           print('completer shall not say true but waited');
           completer.complete(false);
         }
-      }); 
+      });
       print('completer halfway step ============== ');
       return completer.future;
     } else {
@@ -360,9 +364,10 @@ class ChatStore extends ChangeNotifier {
 
   void sendReadStatus(int messageId, int guestId) {
     emitWithRetry('update_read_status', {'message_id': messageId}, 10, 100);
-        if (!_messages.containsKey(guestId)) {
+    if (!_messages.containsKey(guestId)) {
       _messages[guestId] = {};
-      print('THIS IS VERY UNUSUAL. SENDING READ STATUS OF A MESSAGE THAT CAME FROM WHERE?');
+      print(
+          'This is very unusual. Readstatus sending of a message that came from where?');
     }
     _messages[guestId]![messageId]!['read_status'] = true;
     //we arent notifying listeners here because descendant is still  building
@@ -440,41 +445,52 @@ class ChatStore extends ChangeNotifier {
         'Tables retrieved from database: ${tables.map((t) => t['name']).toList()}');
 
     for (var table in tables) {
-      String tableName = table['name'];
-      print('Processing table: $tableName');
+  String tableName = table['name'];
+  print('Processing table: $tableName');
 
-      if (tableName.startsWith('user')) {
-        int guestId = int.parse(tableName.replaceFirst('user', ''));
-        print('Detected user table for guest ID: $guestId');
-        List<Map<String, dynamic>> rows = await db!.query(tableName);
-        print('Rows retrieved from table $tableName');
-        // print('$rows');
+  if (tableName.startsWith('user')) {
+    int guestId = int.parse(tableName.replaceFirst('user', ''));
+    print('Detected user table for guest ID: $guestId');
+    List<Map<String, dynamic>> rows = await db!.query(tableName);
+    print('Rows retrieved from table $tableName');
 
-        _messages[guestId] = {
-          for (var row in rows)
-            row['id']: {
-              'text_body': row['text_body'],
-              'sender': row['sender'],
-              'delivery_status': row['delivery_status'] == '1' ? true : false,
-              'read_status': row['read_status'] == '1' ? true : false,
-              'id': row['id'],
-              'document_url': row['document_url'],
-              'createdAt': row['createdAt'],
-            }
-        };
-        print('Messages for guest ID $guestId loaded into memory.');
-
-        for (var row in rows) {
-          if (row['read_status'] != 1 &&
-              row['sender'] == guestId &&
-              !idsWithUnreadMessages.contains(guestId)) {
-            idsWithUnreadMessages.add(guestId);
-          }
+    _messages[guestId] = {
+      for (var row in rows)
+        row['id']: {
+          'text_body': row['text_body'],
+          'sender': row['sender'],
+          'delivery_status': row['delivery_status'] == '1' ? true : false,
+          'read_status': row['read_status'] == '1' ? true : false,
+          'id': row['id'],
+          'document_url': row['document_url'],
+          'createdAt': row['createdAt'],
         }
-      } else {
-        print('Skipping non-user table: $tableName');
+    };
+    print('Messages for guest ID $guestId loaded into memory.');
+
+    String? mostRecentDate;
+
+    for (var row in rows) {
+      if (row['read_status'] != 1 &&
+          row['sender'] == guestId &&
+          !idsWithUnreadMessages.contains(guestId)) {
+        idsWithUnreadMessages.add(guestId);
+      }
+
+      if (mostRecentDate == null || row['createdAt'].compareTo(mostRecentDate) > 0) {
+        mostRecentDate = row['createdAt'];
       }
     }
+
+    if (mostRecentDate != null) {
+      latestMessageDates[guestId] = mostRecentDate;
+      // print('Latest message date for guest ID $guestId: $mostRecentDate');
+    }
+  } else {
+    print('Skipping non-user table: $tableName');
+  }
+}
+
 
     // print('Database $dbName fully loaded. Messages: $_messages');
     print('Temporary data (IDs with unread messages): $idsWithUnreadMessages');
