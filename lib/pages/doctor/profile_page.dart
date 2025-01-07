@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/doctor/doctor_availability.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';

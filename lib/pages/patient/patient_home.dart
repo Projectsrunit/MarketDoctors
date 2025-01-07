@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/patient/chats_with_doc.dart';
 import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/advertisement_carousel.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:provider/provider.dart';
 
 class ChewAppBar extends StatelessWidget implements PreferredSizeWidget {

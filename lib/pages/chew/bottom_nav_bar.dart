@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:market_doctor/pages/chew/add_case_forms.dart';
+import 'package:market_doctor/pages/chew/add_case_form1.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/chats_with_doc.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
@@ -134,7 +134,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddCaseForms()));
+                                builder: (context) => AddCaseFormOne()));
                       },
                     ),
                     PopupMenuItem(

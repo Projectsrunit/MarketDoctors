@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
 import 'package:provider/provider.dart';
