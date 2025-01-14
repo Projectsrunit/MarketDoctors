@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:provider/provider.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -26,7 +26,7 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unreadList =
-        context.read<ChatStore>().tempData['idsWithUnreadMessages'];
+        context.read<ChatStore>().idsWithUnreadMessages;
     return Container(
         margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
         decoration: BoxDecoration(
@@ -134,7 +134,7 @@ class DoctorCard extends StatelessWidget {
                     children: [
                       Consumer<ChatStore>(builder: (context, chatStore, child) {
                         print(
-                            'Consumer builder called! this is the list: ${chatStore.tempData['idsWithUnreadMessages']}');
+                            'Consumer builder called! this is the list: ${chatStore.idsWithUnreadMessages}');
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [

@@ -1,6 +1,7 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -9,9 +10,6 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -176,148 +174,6 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
-class ChatStore extends ChangeNotifier {
-  Map<int, Map<int, Map<String, dynamic>>> _messages = {};
-  Map<String, dynamic>? _latestMessage;
-  Map<String, dynamic> tempData = {
-    'loadedOlderMessages': [],
-    'readStatusFor': [],
-    'idsWithUnreadMessages': [],
-    'getOlderMessagesFor': null,
-    'readStatusAndOlderMessagesCall': false
-  };
-
-  Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
-  Map<String, dynamic> get latestMessage => _latestMessage ?? {};
-
-  void addMessage(Map<String, dynamic> message, int docId) {
-    int messageId = message['id'];
-    if (!_messages.containsKey(docId)) {
-      _messages[docId] = {};
-    }
-    _messages[docId]![messageId] = message;
-    notifyListeners();
-  }
-
-  void sendMessage(Map<String, dynamic> message, int docId) {
-    int messageId = message['id'];
-
-    if (!_messages.containsKey(docId)) {
-      _messages[docId] = {};
-    }
-
-    _messages[docId]![messageId] = message;
-    _latestMessage = message;
-    notifyListeners();
-  }
-
-  void resetNewMessageFlag() {
-    _latestMessage = null;
-  }
-
-  void receiveDeliveryStatus(Map<String, dynamic> updatedMessage, int docId) {
-    int messageId = updatedMessage['id'];
-
-    if (_messages.containsKey(docId) &&
-        _messages[docId]!.containsKey(messageId)) {
-      _messages[docId]![messageId] = {
-        ..._messages[docId]![messageId]!,
-        'delivery_status': updatedMessage['delivery_status']
-      };
-      notifyListeners();
-    }
-  }
-
-  void receiveReadStatus(Map<String, dynamic> updatedMessage, int docId) {
-    int messageId = updatedMessage['id'];
-
-    if (_messages.containsKey(docId) &&
-        _messages[docId]!.containsKey(messageId)) {
-      _messages[docId]![messageId] = {
-        ..._messages[docId]![messageId]!,
-        'read_status': updatedMessage['read_status']
-      };
-      notifyListeners();
-    }
-  }
-
-  void sendReadStatusAndOlderMessagesCall() {
-    print('sendReadStatusAndOlderMessagesCall from within chatstore ');
-    tempData['readStatusAndOlderMessagesCall'] = true;
-    notifyListeners();
-  }
-
-  void resetReadId() {
-    tempData['readStatusAndOlderMessagesCall'] = false;
-    // print('resetting readStatusAndOlderMessagesCall from within chatstore');
-    notifyListeners();
-  }
-
-  void removeFromUnreadList(int id) {
-    tempData['idsWithUnreadMessages'].remove(id);
-    print('removing id $id from unreadList ================');
-    notifyListeners();
-  }
-
-  void notifyForIdsWithUnreadMessages() {
-    print('received instruction to set green lights on cards');
-    notifyListeners();
-  }
-
-  void removeMessage(int docId, int messageId) {
-    if (_messages.containsKey(docId)) {
-      _messages[docId]?.remove(messageId);
-      notifyListeners();
-    }
-  }
-
-  Future<void> initDB(int personId) async {
-    String dbName = 'person$personId.db';
-
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String dbPath = join(documentsDirectory.path, dbName);
-    bool dbExists = await File(dbPath).exists();
-
-    Database db =
-        await openDatabase(dbPath, version: 1, onCreate: (db, version) async {
-      print('Database $dbName created.');
-    });
-
-    if (!dbExists) {
-      print('Database $dbName did not exist and has been created.');
-      return;
-    }
-
-    List<Map<String, dynamic>> tables =
-        await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
-
-    for (var table in tables) {
-      String tableName = table['name'];
-
-      if (tableName.startsWith('user')) {
-        int docId = int.parse(tableName.replaceFirst('user', ''));
-        List<Map<String, dynamic>> rows = await db.query(tableName);
-
-        _messages[docId] = {
-          for (var row in rows)
-            row['id']: {
-              'text_body': row['text_body'],
-              'sender': row['sender'],
-              'delivery_status': row['delivery_status'],
-              'read_status': row['read_status'],
-              'id': row['id'],
-              'document_url': row['document_url'],
-            }
-        };
-      }
-    }
-
-    print('Database $dbName loaded with messages.');
-    print('here are the messages: $_messages');
-    // notifyListeners();
-  }
-}
-
 class DataStore with ChangeNotifier {
   Map? userData;
 
@@ -373,32 +229,157 @@ class DataStore with ChangeNotifier {
         ]
       },
       'Forehead': {
-        'greyList': ['Headache', 'Tension Headache', 'Migraine Headache', 'Cluster Headache', 'Sinus Headache', 'Posttraumatic Headache' ]
+        'greyList': [
+          'Headache',
+          'Tension Headache',
+          'Migraine Headache',
+          'Cluster Headache',
+          'Sinus Headache',
+          'Posttraumatic Headache'
+        ]
       },
       'Mouth': {
         'greyList': ['Lip Crack', 'Ulcer', 'Toothache', 'Bad Breath'],
       },
       'Nose': {
-        'greyList': ['Runny Nose', 'Nasal Congestion', 'Nosebleed', 'Sinus Pain']
+        'greyList': [
+          'Runny Nose',
+          'Nasal Congestion',
+          'Nosebleed',
+          'Sinus Pain'
+        ]
       },
       'Ear': {
-        'greyList': ['Earwax Build-up', 'Ear Infection', 'Hearing Loss', 'Tinnitus']
+        'greyList': [
+          'Earwax Build-up',
+          'Ear Infection',
+          'Hearing Loss',
+          'Tinnitus'
+        ]
       },
       'Chest': {
-        'greyList': ['Stomach Pain', 'Abdominal Pain', 'Stomach Ulcer', 'Gastroparesis', 'Diabetic']
+        'greyList': [
+          'Stomach Pain',
+          'Abdominal Pain',
+          'Stomach Ulcer',
+          'Gastroparesis',
+          'Diabetic',
+          'Chest Pain'
+        ]
       },
       'Leg': {
-        'greyList': ['Numbness', 'Cramps', 'Sprains', 'Pain', 'Swelling', 'Joint Dislocation', 'Cracked skin', 'Callus', 'Foot Complications']
+        'greyList': [
+          'Numbness',
+          'Cramps',
+          'Sprains',
+          'Pain',
+          'Swelling',
+          'Joint Dislocation',
+          'Cracked skin',
+          'Callus',
+          'Foot Complications'
+        ]
       },
       'Hand': {
-        'greyList': ['Fracture', 'Muscle Strain', 'Sprains', 'Inflamed tendor', 'Swelling', 'Joint dislocation']
+        'greyList': [
+          'Fracture',
+          'Muscle Strain',
+          'Sprains',
+          'Inflamed tendor',
+          'Swelling',
+          'Joint dislocation'
+        ]
       },
       'Shoulder': {
-        'greyList': ['Fracture', 'Dislocation', 'Sprains', 'Impengement', 'Separation']
+        'greyList': [
+          'Fracture',
+          'Dislocation',
+          'Sprains',
+          'Impengement',
+          'Separation'
+        ]
       },
       'Dorsum': {
-        'greyList': ['Back Pain', 'Acute Back Pain', 'Arthritis', 'Low Back Pain']
+        'greyList': [
+          'Back Pain',
+          'Acute Back Pain',
+          'Arthritis',
+          'Low Back Pain'
+        ]
       },
+    },
+    'questionnaire': {
+      'Chest Pain': {
+        "Have you been told you have an abnormal ECG?": ["Yes", "No"],
+        "Do you have chest pain with walking/normal activity or exercise?": [
+          "Yes",
+          "No"
+        ],
+        "Are you been treated for high blood pressure?": ["Yes", "No"],
+        "Do you have a cardiologist?": ["Yes", "No"],
+        "If yes, do they know about your current circumstance?": ["Yes", "No"],
+        "Do you have pulmonary hypertension?": ["Yes", "No"],
+        "Do you have a heart murmur, mitral valve prolapse?": ["Yes", "No"],
+        "Have you had a heart attack before?": ["Yes", "No"],
+        "Have you ever had a stress test before?": ["Yes", "No"]
+      },
+      'Eye Infection': {
+        "Do you Wear Glasses?": ["Yes", "No"],
+        "Do you Wear Contact lens?": ["Yes", "No"],
+        "Do you have difficulty, even with Glasses with the following activities? Reading small prints?":
+            ["Yes", "No"],
+        "If yes, how much difficulty do you currently have?": [
+          "A little",
+          "A great deal",
+          "Unable to do any activity",
+          "A moderate amount"
+        ],
+        "Are you using any regular eye drops?": ["Yes", "No"],
+        "For How long?": ["Over a Week", "Over a Month"],
+        "Do you smoke": ["Yes", "No"],
+        "Do you take alcohol": ["Yes", "No"]
+      },
+      'Migraine Headache': {
+        "When did your Migraine begin?": [
+          "Same days ago",
+          "Few weeks ago",
+          "Months",
+          "Been Years"
+        ],
+        "Have you had a head injury before?": ["Yes", "No"],
+        "How painful is your Migraine?": ["Mild", "Severe"],
+        "How would you describe your Migraine headache?": [
+          "Throbbing/Pounding",
+          "Aching/Pounding"
+        ],
+        "Did the Botox treatment work?": ["Yes", "No"],
+        "For How long?": ["Over a Week", "Over a Month"],
+        "Are you taking any prescription drugs to treat your Migraine?": [
+          "Yes",
+          "No"
+        ],
+        "Are you taking any Over the counter drugs to treat your Migraine?": [
+          "Yes",
+          "No"
+        ]
+      },
+      'Stomach Pain': {
+        "Are you experiencing stomach pain?": ["Yes", "No"],
+        "Do you have abdominal pain?": ["Yes", "No"],
+        "Are you experiencing heart burn?": ["Yes", "No"],
+        "Do you excrete black poop?": ["Yes", "No"],
+        "Are you stooling?": ["Yes", "No"],
+        "Does one of your family have history of Ulcer?": ["Yes", "No"],
+        "How many meals can you cover a day?": ["Over a Week", "Over a Month"],
+        "Are you taking any prescription drugs to treat your Ulcer?": [
+          "Yes",
+          "No"
+        ],
+        "Are you taking any Over the counter drugs to treat your Ulcer?": [
+          "Yes",
+          "No"
+        ]
+      }
     }
   };
 

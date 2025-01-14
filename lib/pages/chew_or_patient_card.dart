@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:provider/provider.dart';
 
 class ChewOrPatientCard extends StatelessWidget {
@@ -46,12 +46,23 @@ class ChewOrPatientCard extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(2.0),
-                child: Image.network(
-                  imageUrl,
-                  width: 62,
-                  height: 66,
-                  fit: BoxFit.cover,
-                ),
+                child: (imageUrl.isEmpty)
+                    ? Icon(
+                        Icons.person,
+                        size: 66,
+                      )
+                    : Image.network(
+                        imageUrl,
+                        width: 62,
+                        height: 66,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.person,
+                            size: 66,
+                          );
+                        },
+                      ),
               ),
               SizedBox(width: 4),
               Expanded(
@@ -62,7 +73,7 @@ class ChewOrPatientCard extends StatelessWidget {
                     Consumer<ChatStore>(
                       builder: (context, chatStore, child) {
                         print(
-                            'Consumer builder called! this is the list: ${chatStore.tempData['idsWithUnreadMessages']}');
+                            'Consumer builder called! this is the list: ${chatStore.idsWithUnreadMessages}');
                         return Row(
                           children: [
                             Text(
@@ -73,9 +84,8 @@ class ChewOrPatientCard extends StatelessWidget {
                               ),
                             ),
                             Spacer(),
-                            if (chatStore.tempData['idsWithUnreadMessages']
-                                    ?.contains(id) ??
-                                false)
+                            if (chatStore.idsWithUnreadMessages
+                                  .contains(id))
                               Padding(
                                 padding:
                                     const EdgeInsets.only(top: 3.0, right: 3.0),

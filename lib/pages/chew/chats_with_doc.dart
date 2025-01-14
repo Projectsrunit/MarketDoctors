@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:market_doctor/main.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
@@ -9,6 +10,7 @@ import 'package:market_doctor/pages/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/chew/chatting_page.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:sqflite/sqflite.dart';
 
 class ChatsWithDoc extends StatefulWidget {
   @override
@@ -25,6 +27,46 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
     if (docs.isEmpty) {
       fetchDocs();
     }
+  }
+
+  Future<void> insertIntoChatHistoryDb(List<dynamic> data) async {
+    final db = context.read<ChatStore>().db;
+    // await db!.execute('DROP TABLE IF EXISTS chatHistory');
+
+    await db!.execute('''CREATE TABLE IF NOT EXISTS chatHistory (
+            id INTEGER PRIMARY KEY,
+            firstName TEXT,
+            lastName TEXT,
+            image TEXT,
+            phone TEXT
+          )''');
+
+    final batch = db.batch();
+    for (final doc in data) {
+      batch.insert(
+        'chatHistory',
+        {
+          'id': doc['id'],
+          'firstName': doc['firstName'],
+          'lastName': doc['lastName'],
+          'image': doc['profile_picture'],
+          'phone': doc['phone']
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(
+        noResult:
+            true); // Use noResult: true for better performance if you don't need the result
+  }
+
+  Future<void> docsFromChatHistory() async {
+    final db = context.read<ChatStore>().db;
+    final List<Map<String, dynamic>> data = await db!.query('chatHistory');
+    setState(() {
+      docs = data;
+      isDocLoading = false;
+    });
   }
 
   Future<void> fetchDocs() async {
@@ -45,6 +87,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
             docs = data;
           }
           isDocLoading = false;
+          insertIntoChatHistoryDb(data);
         });
       } else {
         throw Exception('Failed to load chats');
@@ -52,14 +95,15 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
     } catch (e) {
       print('this is the error $e');
       Fluttertoast.showToast(
-        msg: 'Failed to load chats',
+        msg: 'Failed to load chats. Checking offline data',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.grey[800],
         textColor: Colors.white,
         fontSize: 16.0,
       );
+      docsFromChatHistory();
     }
   }
 

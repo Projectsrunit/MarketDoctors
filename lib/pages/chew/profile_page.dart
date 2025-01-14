@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:market_doctor/chat_store.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -95,17 +96,18 @@ class ProfilePage extends StatelessWidget {
             context, Icons.pin, "Change transaction pin", _showPinPopup),
         Divider(color: Colors.grey[300], thickness: 1),
         NotificationToggleRow(
-  icon: Icons.notifications,
-  label: "Allow notifications",
-  initialStatus: false, // Set based on actual permission status
-  onToggle: (isAllowed) {
-    print(isAllowed ? "Notifications allowed" : "Notifications denied");
-    // Handle logic based on the new permission status
-  },
-),
+          icon: Icons.notifications,
+          label: "Allow notifications",
+          initialStatus: false, // Set based on actual permission status
+          onToggle: (isAllowed) {
+            print(isAllowed ? "Notifications allowed" : "Notifications denied");
+            // Handle logic based on the new permission status
+          },
+        ),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
           context.read<DataStore>().updateChewData(null);
+          context.read<ChatStore>().switchOffSocket();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => ChewHome()));
         }),
@@ -328,7 +330,10 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
 
                   if (response.statusCode == 200) {
                     var jsoned = jsonDecode(response.body);
-                    context.read<DataStore>().addPayment({'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+                    context.read<DataStore>().addPayment({
+                      'id': jsoned['data']['id'],
+                      ...jsoned['data']['attributes']
+                    });
 
                     Fluttertoast.showToast(
                       msg: 'Saved successfully',
@@ -524,9 +529,11 @@ class ManagePaymentsChewState extends State<ManagePaymentsChew> {
                                                     Brightness.dark
                                                 ? Colors.white
                                                 : Colors.black,
-                                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                       ),
                                       onPressed: () =>
@@ -772,7 +779,7 @@ class UpdateProfileChewState extends State<UpdateProfileChew> {
                                 'email': emailController.text,
                                 'phone': phoneNumberController.text
                               });
-        
+
                               Navigator.pop(context);
                             }
                           },

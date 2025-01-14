@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:market_doctor/chat_store.dart';
 import 'package:market_doctor/main.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,23 +29,40 @@ class ChattingPageState extends State<ChattingPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
-  ChatStore? chatStore;
 
-  void _sendMessage(String message, Function sendMessage, int chewId) {
-    if (message.isNotEmpty) {
-      final chatStore = Provider.of<ChatStore>(context, listen: false);
-      int newMessageId = _getNextMessageId(chatStore.messages[widget.doctorId]);
+  @override
+  void initState() {
+    super.initState();
+    final chatStore = Provider.of<ChatStore>(context, listen: false);
+    final messages = chatStore.messages[widget.doctorId] ?? {};
+    final sortedMessages = messages.entries.toList()
+      ..sort((a, b) => DateTime.parse(a.value['createdAt'])
+          .compareTo(DateTime.parse(b.value['createdAt'])));
 
-      Map<String, dynamic> mess = {
-        'id': newMessageId,
-        'text_body': message,
-        'sender': chewId,
-        'receiver': widget.doctorId,
-        'delivery_status': false,
-        'read_status': false,
-      };
+    chatStore.getOlderMessages(
+        context.read<DataStore>().chewData?['id'],
+        widget.doctorId,
+        sortedMessages.isNotEmpty
+            ? sortedMessages.first.value['createdAt']
+            : null);
+    print(
+        'therefore sending to get older messages older than ${sortedMessages.isNotEmpty ? sortedMessages.first.value['createdAt'] : null} instead of ${sortedMessages.isNotEmpty ? sortedMessages.last.value['createdAt'] : null}');
+  }
 
-      sendMessage(mess, widget.doctorId);
+  void _sendMessage(String message, int chewId) async {
+    Map<String, dynamic> mess = {
+      'text_body': message,
+      'sender': chewId,
+      'receiver': widget.doctorId,
+      'delivery_status': false,
+      'read_status': false,
+      'createdAt': DateTime.now().toUtc().toIso8601String(),
+    };
+
+    final bool didSend =
+        await context.read<ChatStore>().sendMessage(mess, widget.doctorId);
+    print('this is the state of the didSend: $didSend');
+    if (didSend) {
       _controller.clear();
     }
   }
@@ -58,11 +75,7 @@ class ChattingPageState extends State<ChattingPage> {
     if (pickedFile != null) {
       String mediaUrl = await _uploadToApi(pickedFile);
 
-      final chatStore = Provider.of<ChatStore>(context, listen: false);
-      int newMessageId = _getNextMessageId(chatStore.messages[widget.doctorId]);
-
       Map<String, dynamic> mess = {
-        'id': newMessageId,
         'document_url': mediaUrl,
         'sender': chewId,
         'receiver': widget.doctorId,
@@ -72,13 +85,6 @@ class ChattingPageState extends State<ChattingPage> {
 
       sendMessage(mess, widget.doctorId);
     }
-  }
-
-  int _getNextMessageId(Map<int, Map<String, dynamic>>? messages) {
-    if (messages == null || messages.isEmpty) {
-      return 1;
-    }
-    return messages.keys.reduce((a, b) => a > b ? a : b) + 1;
   }
 
   Future<String> _uploadToApi(XFile file) async {
@@ -116,9 +122,9 @@ class ChattingPageState extends State<ChattingPage> {
   }
 
   Widget _buildMessageBubble(Map<String, dynamic> message, int hostId) {
-    String? hostUrl = context.read<DataStore>().patientData?['picture_url'];
+    String? hostUrl = context.read<DataStore>().chewData?['picture_url'];
     bool isSender = message['sender'] == hostId;
-    Map tempData = context.read<ChatStore>().tempData;
+    final chatStore = context.read<ChatStore>();
     String status = message['read_status'] == true
         ? '✓✓'
         : message['delivery_status'] == true
@@ -126,8 +132,9 @@ class ChattingPageState extends State<ChattingPage> {
             : '✓';
 
     if (message['read_status'] != true && message['sender'] != hostId) {
-      tempData['readStatusFor'].add(message['id']);
-      // print('adding to readstatusfor array for message id ${message['id']}');
+      chatStore.sendReadStatus(message['id'], message['sender']);
+      chatStore.updateDbRead(message['id'], message['sender']);
+      //this line above is ideally supposed to only call after sendreadstatus returns the ack of yes we sent. but that requires an emitwithack on this socket call
     }
 
     return Align(
@@ -158,9 +165,22 @@ class ChattingPageState extends State<ChattingPage> {
                     child: ClipOval(
                       child: Image.network(
                         widget.doctorImage,
-                        width: 72,
-                        height: 72,
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback for network errors or invalid URLs
+                          return Icon(Icons.person, size: 40);
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -209,7 +229,7 @@ class ChattingPageState extends State<ChattingPage> {
                                   loadingBuilder: (context, child,
                                       ImageChunkEvent? loadingProgress) {
                                     if (loadingProgress == null) {
-                                      return child;
+                                      return child; // Image loaded successfully
                                     } else {
                                       return Center(
                                         child: CircularProgressIndicator(),
@@ -217,8 +237,14 @@ class ChattingPageState extends State<ChattingPage> {
                                     }
                                   },
                                   errorBuilder: (context, error, stackTrace) {
-                                    return Icon(Icons.broken_image,
-                                        size: 100, color: Colors.grey);
+                                    // Show a broken image icon if the image fails to load
+                                    return Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        size: 100,
+                                        color: Colors.grey,
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -261,8 +287,22 @@ class ChattingPageState extends State<ChattingPage> {
                               width: 72,
                               height: 72,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback for network errors or invalid URLs
+                                return Icon(Icons.person, size: 72);
+                              },
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
                             )
-                          : Icon(Icons.person),
+                          : null, // No fallback for null hostUrl
                     ),
                   ),
                 ),
@@ -277,27 +317,6 @@ class ChattingPageState extends State<ChattingPage> {
   Widget build(BuildContext context) {
     int chewId = context.read<DataStore>().chewData?['id'];
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context
-          .read<ChatStore>()
-          .tempData['idsWithUnreadMessages']
-          .contains(widget.doctorId)) {
-            print('calling remove on idswithunreadmessages for id ${widget.doctorId}');
-        context.read<ChatStore>().removeFromUnreadList(widget.doctorId);
-      }
-      final sendReadStatusAndOlderMessagesCall =
-          context.read<ChatStore>().sendReadStatusAndOlderMessagesCall;
-      if (ModalRoute.of(context)?.isCurrent ?? false) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        Map tempData = context.read<ChatStore>().tempData;
-        // print('this is the oldermessages ======== ${tempData['loadedOlderMessages']}');
-        if (!tempData['loadedOlderMessages'].contains(widget.doctorId)) {
-          tempData['getOlderMessagesFor'] = widget.doctorId;
-          // print('therefore sending to get older');
-        }
-        sendReadStatusAndOlderMessagesCall();
-      }
-    });
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -339,7 +358,27 @@ class ChattingPageState extends State<ChattingPage> {
         actions: [
           CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage(widget.doctorImage),
+            child: ClipOval(
+              child: Image.network(
+                widget.doctorImage,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback for network errors or invalid URLs
+                  return Icon(Icons.person, size: 40);
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            ),
           ),
           IconButton(
             icon: Icon(Icons.phone),
@@ -361,10 +400,26 @@ class ChattingPageState extends State<ChattingPage> {
               builder: (context, chatStore, _) {
                 final messages = chatStore.messages[widget.doctorId] ?? {};
                 final sortedMessages = messages.entries.toList()
-                  ..sort((a, b) => a.key.compareTo(b.key));
+                  ..sort((a, b) => DateTime.parse(a.value['createdAt'])
+                      .compareTo(DateTime.parse(b.value['createdAt'])));
 
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (_scrollController.hasClients) {
+                    _scrollController
+                        .jumpTo(_scrollController.position.maxScrollExtent);
+                  }
+                  if (context
+                      .read<ChatStore>()
+                      .idsWithUnreadMessages
+                      .contains(widget.doctorId)) {
+                    print(
+                        'calling remove on idswithunread for id ${widget.doctorId}');
+                    context
+                        .read<ChatStore>()
+                        .removeFromUnreadList(widget.doctorId);
+                  }
+
+                  if (ModalRoute.of(context)?.isCurrent ?? false) {
                     _scrollController
                         .jumpTo(_scrollController.position.maxScrollExtent);
                   }
@@ -393,6 +448,8 @@ class ChattingPageState extends State<ChattingPage> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
+                    minLines: 1,
+                    maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'Type a message',
                       border: OutlineInputBorder(
@@ -406,9 +463,7 @@ class ChattingPageState extends State<ChattingPage> {
                   onPressed: () {
                     String trimmedMessage = _controller.text.trim();
                     if (trimmedMessage.isNotEmpty) {
-                      _sendMessage(trimmedMessage,
-                          context.read<ChatStore>().sendMessage, chewId);
-                      _controller.clear();
+                      _sendMessage(trimmedMessage, chewId);
                     }
                   },
                 ),
