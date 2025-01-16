@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew_or_patient_card.dart';
 import 'package:market_doctor/pages/patient/chatting_page.dart';
 import 'package:market_doctor/pages/patient/bottom_nav_bar.dart';
