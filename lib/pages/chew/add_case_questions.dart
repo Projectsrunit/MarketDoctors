@@ -8,9 +8,9 @@ class AddCaseQuestions extends StatefulWidget {
   final String selectedKey;
 
   const AddCaseQuestions({
-    Key? key,
+    super.key,
     required this.selectedKey,
-  }) : super(key: key);
+  });
 
   @override
   _AddCaseQuestionsState createState() => _AddCaseQuestionsState();
