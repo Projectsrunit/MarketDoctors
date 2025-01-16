@@ -13,7 +13,7 @@ class AddCaseFormOne extends StatefulWidget {
 
 class AddCaseFormOneState extends State<AddCaseFormOne> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedGender;
+  String _selectedGender = 'Male';
   final TextEditingController _prescriptionController = TextEditingController();
   final TextEditingController _chewsNotesController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
@@ -230,7 +230,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                             }).toList(),
                             onChanged: (String? newValue) {
                               setState(() {
-                                _selectedGender = newValue;
+                                _selectedGender = newValue!;
                               });
                             },
                             hint: Text('Gender'),
@@ -281,17 +281,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     labelText: 'Enter note of a patient\'s health challenge',
                     border: OutlineInputBorder(),
                   ),
-                ),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Save button functionality
-                    },
-                    child: Text('Save'),
-                  ),
-                ),
+                ),                
                 SizedBox(height: 20),
                 Center(
                   child: FractionallySizedBox(
@@ -360,7 +350,8 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       };
 
       context.read<DataStore>().addCaseData['caseData'] = caseData;
-      AddCaseFormTwo();
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormTwo()));
   }
 
   double? _parseNumber(String text) {

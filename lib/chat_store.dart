@@ -425,6 +425,9 @@ class ChatStore extends ChangeNotifier {
     String dbPath = path.join(documentsDirectory.path, dbName);
     print('Database path resolved: $dbPath');
 
+    // await deleteDatabase(dbPath); //for when resetting things
+    // print('Database $dbName deleted');
+
     bool dbExists = await File(dbPath).exists();
     print('Database exists: $dbExists');
 

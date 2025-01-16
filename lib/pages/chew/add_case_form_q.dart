@@ -179,7 +179,7 @@ class AddCaseFormQueState extends State<AddCaseFormQue> {
                               ),
                             ),
                           ),
-                          // Answers in a Wrap (no background)
+
                           Wrap(
                             spacing: 8.0,
                             runSpacing: 8.0,
@@ -200,10 +200,13 @@ class AddCaseFormQueState extends State<AddCaseFormQue> {
                                   children: [
                                     Radio<String>(
                                       value: answer,
-                                      groupValue: selectedAnswers[questionText],
+                                      groupValue: selectedAnswers[questionText] != null ? answers[selectedAnswers[questionText]![1]] : null,
                                       onChanged: (String? value) {
                                         setState(() {
-                                          selectedAnswers[questionText] = value;
+                                          selectedAnswers[questionText] = [
+                                      answers,
+                                      ind
+                                    ];
                                         });
                                       },
                                     ),
