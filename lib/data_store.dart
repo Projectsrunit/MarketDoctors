@@ -168,7 +168,7 @@ class DataStore with ChangeNotifier {
       },
       'Migraine Headache': {
         "When did your Migraine begin?": [
-          "Same days ago",
+          "Some days ago",
           "Few weeks ago",
           "Months",
           "Been Years"

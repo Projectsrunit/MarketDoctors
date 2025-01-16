@@ -179,7 +179,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                           .map((entry) {
                         final questionText = entry.key;
                         final answerData = entry.value;
-                        final List<String> answers =
+                        final List<dynamic> answers =
                             answerData[0]; // All possible answers
                         final int selectedIndex =
                             answerData[1]; // Index of the selected answer
