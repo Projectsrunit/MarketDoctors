@@ -12,7 +12,6 @@ import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatStore extends ChangeNotifier {
-
   Map<int, Map<int, Map<String, dynamic>>> _messages = {};
   Map<int, Map<int, Map<String, dynamic>>> get messages => _messages;
   Map<int, String> latestMessageDates = {};
@@ -69,7 +68,8 @@ class ChatStore extends ChangeNotifier {
       });
     }
     socket!.connect();
-    socket!.emit('authenticate', {'own_id': hostId, 'message_dates': latestMessageDates});
+    socket!.emit('authenticate',
+        {'own_id': hostId, 'message_dates': latestMessageDates});
     isSocketInitialized = true;
 
     socket!.on('connect', (_) {
@@ -261,6 +261,7 @@ class ChatStore extends ChangeNotifier {
   }
 
   void _handleArrayOfMessages(List<dynamic> messages, int hostId) async {
+    print('handleArrayofMessages called with messages as $messages');
     for (Map<String, dynamic> message in messages) {
       int? guestId = (message['sender'] == hostId)
           ? message['receiver']
@@ -448,52 +449,52 @@ class ChatStore extends ChangeNotifier {
         'Tables retrieved from database: ${tables.map((t) => t['name']).toList()}');
 
     for (var table in tables) {
-  String tableName = table['name'];
-  print('Processing table: $tableName');
+      String tableName = table['name'];
+      print('Processing table: $tableName');
 
-  if (tableName.startsWith('user')) {
-    int guestId = int.parse(tableName.replaceFirst('user', ''));
-    print('Detected user table for guest ID: $guestId');
-    List<Map<String, dynamic>> rows = await db!.query(tableName);
-    print('Rows retrieved from table $tableName');
+      if (tableName.startsWith('user')) {
+        int guestId = int.parse(tableName.replaceFirst('user', ''));
+        print('Detected user table for guest ID: $guestId');
+        List<Map<String, dynamic>> rows = await db!.query(tableName);
+        print('Rows retrieved from table $tableName');
 
-    _messages[guestId] = {
-      for (var row in rows)
-        row['id']: {
-          'text_body': row['text_body'],
-          'sender': row['sender'],
-          'delivery_status': row['delivery_status'] == '1' ? true : false,
-          'read_status': row['read_status'] == '1' ? true : false,
-          'id': row['id'],
-          'document_url': row['document_url'],
-          'createdAt': row['createdAt'],
+        _messages[guestId] = {
+          for (var row in rows)
+            row['id']: {
+              'text_body': row['text_body'],
+              'sender': row['sender'],
+              'delivery_status': row['delivery_status'] == '1' ? true : false,
+              'read_status': row['read_status'] == '1' ? true : false,
+              'id': row['id'],
+              'document_url': row['document_url'],
+              'createdAt': row['createdAt'],
+            }
+        };
+        print('Messages for guest ID $guestId loaded into memory.');
+
+        String? mostRecentDate;
+
+        for (var row in rows) {
+          if (row['read_status'] != 1 &&
+              row['sender'] == guestId &&
+              !idsWithUnreadMessages.contains(guestId)) {
+            idsWithUnreadMessages.add(guestId);
+          }
+
+          if (mostRecentDate == null ||
+              row['createdAt'].compareTo(mostRecentDate) > 0) {
+            mostRecentDate = row['createdAt'];
+          }
         }
-    };
-    print('Messages for guest ID $guestId loaded into memory.');
 
-    String? mostRecentDate;
-
-    for (var row in rows) {
-      if (row['read_status'] != 1 &&
-          row['sender'] == guestId &&
-          !idsWithUnreadMessages.contains(guestId)) {
-        idsWithUnreadMessages.add(guestId);
-      }
-
-      if (mostRecentDate == null || row['createdAt'].compareTo(mostRecentDate) > 0) {
-        mostRecentDate = row['createdAt'];
+        if (mostRecentDate != null) {
+          latestMessageDates[guestId] = mostRecentDate;
+          // print('Latest message date for guest ID $guestId: $mostRecentDate');
+        }
+      } else {
+        print('Skipping non-user table: $tableName');
       }
     }
-
-    if (mostRecentDate != null) {
-      latestMessageDates[guestId] = mostRecentDate;
-      // print('Latest message date for guest ID $guestId: $mostRecentDate');
-    }
-  } else {
-    print('Skipping non-user table: $tableName');
-  }
-}
-
 
     // print('Database $dbName fully loaded. Messages: $_messages');
     print('Temporary data (IDs with unread messages): $idsWithUnreadMessages');
