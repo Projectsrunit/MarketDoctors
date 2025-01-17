@@ -74,6 +74,9 @@ class AdvertisementCarouselState extends State<AdvertisementCarousel> {
                             ),
                             image: DecorationImage(
                               image: NetworkImage(advert['image_url']),
+                              onError: (Object error, StackTrace? stackTrace) {
+                                debugPrint('Error loading ad image: $error');
+                              },
                               fit: BoxFit.cover,
                             ),
                           ),
