@@ -30,25 +30,6 @@ class ChattingPageState extends State<ChattingPage> {
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    final chatStore = Provider.of<ChatStore>(context, listen: false);
-    final messages = chatStore.messages[widget.doctorId] ?? {};
-    final sortedMessages = messages.entries.toList()
-      ..sort((a, b) => DateTime.parse(a.value['createdAt'])
-          .compareTo(DateTime.parse(b.value['createdAt'])));
-
-    chatStore.getOlderMessages(
-        context.read<DataStore>().chewData?['id'],
-        widget.doctorId,
-        sortedMessages.isNotEmpty
-            ? sortedMessages.first.value['createdAt']
-            : null);
-    print(
-        'therefore sending to get older messages older than ${sortedMessages.isNotEmpty ? sortedMessages.first.value['createdAt'] : null} instead of ${sortedMessages.isNotEmpty ? sortedMessages.last.value['createdAt'] : null}');
-  }
-
   void _sendMessage(String message, int chewId) async {
     Map<String, dynamic> mess = {
       'text_body': message,

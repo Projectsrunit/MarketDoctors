@@ -55,6 +55,8 @@ class ChatStore extends ChangeNotifier {
   }
 
   Future<void> initializeSocket(int hostId) async {
+    socket?.clearListeners();
+    storedHost = hostId;
     print('going to initialise socket with host $hostId');
 
     conn?.cancel();
@@ -68,8 +70,12 @@ class ChatStore extends ChangeNotifier {
       });
     }
     socket!.connect();
-    socket!.emit('authenticate',
-        {'own_id': hostId, 'message_dates': latestMessageDates});
+    socket!.emit('authenticate', {
+      'own_id': hostId,
+      'message_dates': Map<String, String>.fromEntries(latestMessageDates
+          .entries
+          .map((e) => MapEntry(e.key.toString(), e.value)))
+    });
     isSocketInitialized = true;
 
     socket!.on('connect', (_) {
@@ -79,6 +85,7 @@ class ChatStore extends ChangeNotifier {
     });
 
     socket!.on('new_message', (message) async {
+      print('socket new-message event: online to online');
       //check here if we are in the chattingpage of the conversation
 
       await flutterLocalNotificationsPlugin.show(
@@ -112,11 +119,6 @@ class ChatStore extends ChangeNotifier {
           'update_delivery_status', {'message_id': message['id']}, 10, 100);
     });
 
-    socket!.on('older_messages', (messages) {
-      _handleArrayOfMessages(messages, hostId);
-      notifyListeners();
-    });
-
     socket!.on('delivery_status_updated', (message) {
       int guestId = (message['sender'] == hostId)
           ? message['receiver']
@@ -136,6 +138,7 @@ class ChatStore extends ChangeNotifier {
     });
 
     socket!.on('catch_up_db', (messages) {
+      print('messages that catch up the db arriving');
       _handleArrayOfMessages(messages, hostId);
     });
 
@@ -225,11 +228,6 @@ class ChatStore extends ChangeNotifier {
   }
 
   void insertIntoDb(Map<String, dynamic> message, int guestId) async {
-    while (!dbInitialised) {
-      await Future.delayed(
-          Duration(milliseconds: 100)); // Wait until DB is initialized
-    }
-
     print('inserting into db of id $guestId: $message');
     String tableName = 'user$guestId';
     int messageId = message['id'];
@@ -261,11 +259,13 @@ class ChatStore extends ChangeNotifier {
   }
 
   void _handleArrayOfMessages(List<dynamic> messages, int hostId) async {
-    print('handleArrayofMessages called with messages as $messages');
+    final ids = messages.map((m) => m['id']).toList();
+    print('handleArrayofMessages called with message ids: $ids');
     for (Map<String, dynamic> message in messages) {
       int? guestId = (message['sender'] == hostId)
           ? message['receiver']
           : message['sender'];
+        print('guestid for message ${message['id']} is $guestId and hostId is $hostId');
       if (guestId != null) {
         //because some messages in backend had a missing sender or receiver
         addMessage(message, guestId);
@@ -405,19 +405,6 @@ class ChatStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getOlderMessages(int hostId, int guestId, String? createdAt) {
-    emitWithRetry(
-        'get_older_messages',
-        {
-          'own_id': hostId,
-          'other_id': guestId,
-          'oldest_message_date': createdAt
-        },
-        10,
-        100);
-    print('emitting to get older messages for id $guestId of date $createdAt');
-  }
-
   Future<void> initDB(int personId) async {
     String dbName = 'person$personId.db';
     print('Initializing database: $dbName');
@@ -463,8 +450,8 @@ class ChatStore extends ChangeNotifier {
             row['id']: {
               'text_body': row['text_body'],
               'sender': row['sender'],
-              'delivery_status': row['delivery_status'] == '1' ? true : false,
-              'read_status': row['read_status'] == '1' ? true : false,
+              'delivery_status': row['delivery_status'] == 1 ? true : false,
+              'read_status': row['read_status'] == 1 ? true : false,
               'id': row['id'],
               'document_url': row['document_url'],
               'createdAt': row['createdAt'],
