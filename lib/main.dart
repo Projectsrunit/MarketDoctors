@@ -82,6 +82,20 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      home: FutureBuilder<bool>(
+        future: _checkFirstTimeUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.data == true) {
+            return OnboardingScreen();
+          } else {
+            return const ChooseActionPage();
+          }
+        },
+      ),
+      themeMode: themeNotifier.themeMode,
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
@@ -139,20 +153,6 @@ class MyApp extends StatelessWidget {
           selectedItemColor: Colors.red,
           unselectedItemColor: Colors.grey,
         ),
-      ),
-      themeMode: themeNotifier.themeMode,
-      home: FutureBuilder<bool>(
-        future: _checkFirstTimeUser(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.data == true) {
-            return OnboardingScreen();
-          } else {
-            return const ChooseActionPage();
-          }
-        },
       ),
     );
   }

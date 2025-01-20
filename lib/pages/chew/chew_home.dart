@@ -34,6 +34,7 @@ class ChewHomeState extends State<ChewHome> {
           await chatStore.initDB(hostId);
         }
         if (!chatStore.isSocketInitialized) {
+          print('giving the hostId an id of $hostId===============');
           await chatStore.initializeSocket(hostId);
         }
       }
