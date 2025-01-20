@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/chat_store.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/doctor_view.dart';

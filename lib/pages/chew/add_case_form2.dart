@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
-import 'package:market_doctor/pages/chew/add_case_questions.dart';
+import 'package:market_doctor/data_store.dart';
+import 'package:market_doctor/pages/chew/add_case_form_q.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
 
-class AddCasePage1 extends StatelessWidget {
+class AddCaseFormTwo extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -413,7 +414,6 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                     ),
                   if (whiteButtons != null) SizedBox(height: 24),
 
-                  // Grey area (if any)
                   if (greyList != null)
                     Container(
                         color: Colors.grey[300],
@@ -440,7 +440,7 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                                     setState(() {
                                       selectedItem = item;
                                     });
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseQuestions(selectedKey: selectedItem!)));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormQue(selectedKey: selectedItem!)));
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For handling JSON
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/signup_page.dart';
 import 'package:provider/provider.dart';
 
-import '../../main.dart';
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
 

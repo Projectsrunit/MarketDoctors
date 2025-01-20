@@ -1,26 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:market_doctor/pages/chew/add_case_form1.dart';
 
-class AddCaseQuestions extends StatefulWidget {
+class AddCaseFormQue extends StatefulWidget {
   final String selectedKey;
 
-  const AddCaseQuestions({
+  const AddCaseFormQue({
     super.key,
     required this.selectedKey,
   });
 
   @override
-  _AddCaseQuestionsState createState() => _AddCaseQuestionsState();
+  AddCaseFormQueState createState() => AddCaseFormQueState();
 }
 
-class _AddCaseQuestionsState extends State<AddCaseQuestions> {
-  final Map<String, String?> selectedAnswers = {};
+class AddCaseFormQueState extends State<AddCaseFormQue> {
+  final Map<String, dynamic> selectedAnswers = {};
+
+  Future<void> _uploadData(selectedAnswers) async {
+    final caseData = context.read<DataStore>().addCaseData['caseData'];
+    caseData['questionnaire'] = selectedAnswers;
+
+    Fluttertoast.showToast(
+      msg: 'Saving...',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url = Uri.parse('$baseUrl/api/cases');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'data': caseData}),
+      );
+
+      if (response.statusCode == 200) {
+        var jsoned = jsonDecode(response.body);
+        context.read<DataStore>().addCase(
+            {'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+
+        Fluttertoast.showToast(
+          msg: 'Case added successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  PopScope(canPop: false, child: AddCaseFormOne())),
+        );
+      } else {
+        print('this is the response ${response.body}');
+        throw Exception('Something went wrong');
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed. Please try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    selectedAnswers['title'] = widget.selectedKey;
     final Map<String, List<String>>? questions = context
         .read<DataStore>()
         .addCaseData['questionnaire']?[widget.selectedKey];
@@ -71,6 +139,7 @@ class _AddCaseQuestionsState extends State<AddCaseQuestions> {
                               ElevatedButton(
                                 onPressed: () {
                                   print('Selected Answers: $selectedAnswers');
+                                  _uploadData(selectedAnswers);
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,
@@ -110,15 +179,20 @@ class _AddCaseQuestionsState extends State<AddCaseQuestions> {
                               ),
                             ),
                           ),
-                          // Answers in a Wrap (no background)
+
                           Wrap(
                             spacing: 8.0,
                             runSpacing: 8.0,
-                            children: answers.map((answer) {
+                            children: answers.asMap().entries.map((entry) {
+                              int ind = entry.key;
+                              var answer = entry.value;
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    selectedAnswers[questionText] = answer;
+                                    selectedAnswers[questionText] = [
+                                      answers,
+                                      ind
+                                    ];
                                   });
                                 },
                                 child: Row(
@@ -126,10 +200,13 @@ class _AddCaseQuestionsState extends State<AddCaseQuestions> {
                                   children: [
                                     Radio<String>(
                                       value: answer,
-                                      groupValue: selectedAnswers[questionText],
+                                      groupValue: selectedAnswers[questionText] != null ? answers[selectedAnswers[questionText]![1]] : null,
                                       onChanged: (String? value) {
                                         setState(() {
-                                          selectedAnswers[questionText] = value;
+                                          selectedAnswers[questionText] = [
+                                      answers,
+                                      ind
+                                    ];
                                         });
                                       },
                                     ),

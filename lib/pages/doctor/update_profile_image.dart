@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:market_doctor/pages/doctor/profile_page.dart';

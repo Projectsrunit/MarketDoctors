@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'package:market_doctor/main.dart';
 
 // Main Appointments Page with Tabs for Upcoming and Pending Appointments
 class UpcomingAppointmentPage extends StatelessWidget {

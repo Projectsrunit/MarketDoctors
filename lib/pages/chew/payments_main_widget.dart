@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/main.dart';
+import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
