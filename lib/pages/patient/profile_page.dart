@@ -88,7 +88,7 @@ Widget _buildSystemList(BuildContext context) {
       Divider(color: Colors.grey[300], thickness: 1),
       _buildNoArrowRow(context, Icons.logout, "Log out", () {
         context.read<DataStore>().updatePatientData(null);
-          context.read<ChatStore>().switchOffSocket();
+          context.read<ChatStore>().resetStore();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ChooseActionPage()), // Replace with your login or welcome page

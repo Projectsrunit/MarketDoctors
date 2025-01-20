@@ -32,10 +32,15 @@ class ChatStore extends ChangeNotifier {
     super.dispose();
   }
 
-  void switchOffSocket() {
+  void resetStore() {
+    _messages = {};
+    latestMessageDates = {};
+    idsWithUnreadMessages = [];
+    dbInitialised = false;
+    _isReconnecting = false;
+    isSocketInitialized = false;
     conn?.cancel();
     socket?.disconnect();
-    dbInitialised = false;
     notifyListeners();
   }
 
