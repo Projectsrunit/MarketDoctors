@@ -45,6 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
           chatStore.initDB(hostId);
         }
         if (!chatStore.isSocketInitialized) {
+          print('giving the hostId an id of $hostId===============');
           chatStore.initializeSocket(hostId);
         }
       }

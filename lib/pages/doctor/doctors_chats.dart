@@ -266,7 +266,7 @@ class PatientsWidget extends StatelessWidget {
           else
             SizedBox(
               height: 100,
-              child: Center(child: Text('No CHEWs available')),
+              child: Center(child: Text('No patients available')),
             ),
         ],
       ),
