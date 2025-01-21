@@ -256,7 +256,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Current Prescriptions',
+                  'Prescriptions',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
@@ -310,7 +310,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Text("Go to Questionnaire"),
+                      child: Text("Proceed to Symptoms"),
                     ),
                   ),
                 ),

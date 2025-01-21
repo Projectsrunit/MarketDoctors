@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.market_doctor"
+    namespace = "com.market_doctor"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.market_doctor"
+        applicationId = "com.market_doctor"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = 1
@@ -28,14 +28,15 @@ android {
     }
 
     // Signing configuration
-    signingConfigs {
-        release {
-            keyAlias 'key'
-            keyPassword 'marketdoctor24'
-            storeFile file('release-key.jks')
-            storePassword 'marketdoctor24'
-        }
+   signingConfigs {
+    release {
+        keyAlias = "key"
+        keyPassword = "marketdoctor24"
+        storeFile file('release-key.jks')
+        storePassword = "marketdoctor24"
     }
+}
+
 
     buildTypes {
         release {

@@ -200,8 +200,8 @@ class NotificationToggleRow extends StatefulWidget {
     required this.label,
     required this.initialStatus,
     required this.onToggle,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _NotificationToggleRowState createState() => _NotificationToggleRowState();
