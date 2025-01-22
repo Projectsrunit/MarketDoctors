@@ -8,10 +8,6 @@ import 'package:market_doctor/pages/patient/payments_main_widget.dart';
 import 'package:market_doctor/pages/patient/update_profile_patient_state.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/pages/choose_action.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/chat_store.dart';
 
 

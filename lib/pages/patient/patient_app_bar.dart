@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
