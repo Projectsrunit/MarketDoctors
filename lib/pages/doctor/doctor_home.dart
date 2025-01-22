@@ -1,6 +1,3 @@
-// ignore_for_file: unnecessary_string_interpolations, unused_field
-
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/data_store.dart';
@@ -14,6 +11,7 @@ import 'package:market_doctor/pages/patient/advertisement_carousel.dart';
 import 'package:market_doctor/chat_store.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -23,35 +21,29 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
   bool isLoading = true;
   bool hasError = false;
   List<dynamic> appointments = [];
 
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
     _fetchAppointments();
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       int? hostId = context.read<DataStore>().doctorData?['id'];
-      print(
-          'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
-          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
-      if (hostId != null) {
-        final chatStore = context.read<ChatStore>();
+      final chatStore = context.read<ChatStore>();
 
+      if (hostId != null) {
         if (!chatStore.dbInitialised) {
           chatStore.initDB(hostId);
         }
         if (!chatStore.isSocketInitialized) {
-          print('giving the hostId an id of $hostId===============');
           chatStore.initializeSocket(hostId);
         }
       }
     });
   }
-
 
   Future<void> _fetchAppointments() async {
     setState(() {
@@ -79,7 +71,6 @@ class _DashboardPageState extends State<DashboardPage> {
           hasError = true;
           isLoading = false;
         });
-        print('Response: ${response.body}');
       }
     } catch (error) {
       setState(() {
@@ -91,10 +82,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Accessing the doctorData from Provider
     final doctorData = Provider.of<DataStore>(context).doctorData;
-    // final String? userId = doctorData?['id']?.toString();
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final int? userId = doctorData?['id'];
+
     if (doctorData == null) {
       return PopScope(canPop: false, child: ChooseActionPage());
     } else {
@@ -107,9 +98,9 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSearchbar(),
+                _buildSearchbar(isDarkMode),
                 const SizedBox(height: 16),
-                _buildDashboardCards(userId),
+                _buildDashboardCards(userId, isDarkMode),
                 const SizedBox(height: 16),
                 AdvertisementCarousel(),
                 const SizedBox(height: 16),
@@ -123,14 +114,14 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Widget _buildSearchbar() {
+  Widget _buildSearchbar(bool isDarkMode) {
     return Row(
       children: [
         Expanded(
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkMode ? Colors.grey[800] : Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -145,7 +136,8 @@ class _DashboardPageState extends State<DashboardPage> {
               decoration: InputDecoration(
                 hintText: 'Search Cases, Appointment, Pharmacy',
                 hintStyle: TextStyle(color: Colors.grey[500]),
-                prefixIcon: const Icon(Icons.search, color: Colors.black),
+                prefixIcon: Icon(Icons.search,
+                    color: isDarkMode ? Colors.white : Colors.black),
                 contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
                 border: InputBorder.none,
               ),
@@ -155,38 +147,25 @@ class _DashboardPageState extends State<DashboardPage> {
         const SizedBox(width: 10),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[800] : Colors.white,
             borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: TextButton.icon(
             onPressed: () {
               // Handle filter action
             },
-            icon: const Icon(Icons.filter_list, color: Colors.black),
-            label: const Text('Filter', style: TextStyle(color: Colors.black)),
-            style: TextButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+            icon: Icon(Icons.filter_list,
+                color: isDarkMode ? Colors.white : Colors.black),
+            label: Text('Filter',
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDashboardCards(int? userId) {
+  Widget _buildDashboardCards(int? userId, bool isDarkMode) {
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 3,
@@ -196,6 +175,7 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           image: const AssetImage('assets/images/cases-image.png'),
           label: 'Cases',
+          isDarkMode: isDarkMode,
           onTap: () {
             Navigator.push(
               context,
@@ -206,6 +186,7 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           image: const AssetImage('assets/images/pills-image.png'),
           label: 'Pharmacy',
+          isDarkMode: isDarkMode,
           onTap: () {
             Navigator.push(
               context,
@@ -216,6 +197,7 @@ class _DashboardPageState extends State<DashboardPage> {
         _buildDashboardCardWithLabel(
           icon: Icons.person_add_alt_1_outlined,
           label: 'Appointment',
+          isDarkMode: isDarkMode,
           onTap: () {
             Navigator.push(
               context,
@@ -233,6 +215,7 @@ class _DashboardPageState extends State<DashboardPage> {
     IconData? icon,
     required String label,
     required VoidCallback onTap,
+    required bool isDarkMode,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -242,23 +225,25 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF617DEF).withOpacity(0.2),
+                color: isDarkMode
+                    ? Colors.blueGrey[700]
+                    : const Color(0xFF617DEF).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: image != null
                     ? Image(image: image, fit: BoxFit.contain)
-                    : Icon(icon, size: 40, color: const Color(0xFF617DEF)),
+                    : const Icon(Icons.dashboard, size: 40),
               ),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -339,8 +324,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ],
     );
   }
-
-  Widget _buildAppointmentCard(Map<String, dynamic> appointment,
+    Widget _buildAppointmentCard(Map<String, dynamic> appointment,
       Map<String, dynamic> patientAppointment) {
     final String patientFullName =
         "${patientAppointment['firstName']} ${patientAppointment['lastName']}"; // Full name
