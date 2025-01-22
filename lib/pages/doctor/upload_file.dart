@@ -63,7 +63,8 @@ class _DoctorsUploadCredentialsPageState
       final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
       _showSnackBar('Document uploaded successfully!');
-      await _sendFileUrlToServer(downloadURL, fileName); // Send file URL with dynamic name
+      await _sendFileUrlToServer(
+          downloadURL, fileName); // Send file URL with dynamic name
     } catch (e) {
       _showSnackBar('Error during file upload. Please try again.');
     } finally {
@@ -86,7 +87,7 @@ class _DoctorsUploadCredentialsPageState
       final url = Uri.parse('$baseUrl/api/qualifications');
       final body = jsonEncode({
         "data": {
-          "name": fileName, 
+          "name": fileName,
           "file_url": fileUrl,
           "user": doctorData['id'],
         }
@@ -208,8 +209,19 @@ class _DoctorsUploadCredentialsPageState
                 ),
               ),
             ),
-            if (_isLoading)
-              CircularProgressIndicator(),
+            if (_isLoading) ...[
+              const SizedBox(height: 10),
+              Column(
+                children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 10),
+                  Text(
+                    'Uploading... Please wait',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
