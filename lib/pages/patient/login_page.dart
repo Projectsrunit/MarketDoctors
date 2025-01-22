@@ -20,6 +20,7 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _role = 5;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   void _showMessage(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -223,7 +224,7 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -238,6 +239,18 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
                           prefixIcon: const Icon(Icons.lock),
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.bold, // Make label text bold
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {
