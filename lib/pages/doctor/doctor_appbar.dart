@@ -47,7 +47,7 @@ class DoctorApp extends StatelessWidget implements PreferredSizeWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.blueAccent
+                      ? Colors.white
                       : Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,

@@ -90,6 +90,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
   @override
   Widget build(BuildContext context) {
     final doctorData = Provider.of<DataStore>(context).doctorData;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: DoctorApp(),
@@ -98,10 +99,11 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileContainer(doctorData?.cast<String, dynamic>()),
+            _buildProfileContainer(
+                doctorData?.cast<String, dynamic>(), isDarkMode),
             const SizedBox(height: 30),
             _buildActionButton(),
-            if (_isLoading) Center(child: CircularProgressIndicator()),
+            if (_isLoading) Center(child: const CircularProgressIndicator()),
           ],
         ),
       ),
@@ -109,26 +111,30 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     );
   }
 
-  Widget _buildProfileContainer(Map<String, dynamic>? doctorData) {
+  Widget _buildProfileContainer(
+      Map<String, dynamic>? doctorData, bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildProfileHeader(doctorData),
+          _buildProfileHeader(doctorData, isDarkMode),
           const SizedBox(height: 20),
-          _isEditing ? _buildEditableFields() : _buildStaticFields(doctorData),
+          _isEditing
+              ? _buildEditableFields(isDarkMode)
+              : _buildStaticFields(doctorData),
         ],
       ),
     );
   }
 
-  Widget _buildProfileHeader(Map<String, dynamic>? doctorData) {
+  Widget _buildProfileHeader(
+      Map<String, dynamic>? doctorData, bool isDarkMode) {
     return Row(
       children: [
         GestureDetector(
@@ -146,13 +152,19 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         const SizedBox(width: 10),
         Text(
           'Dr. ${doctorData?['firstName'] ?? ''} ${doctorData?['lastName'] ?? ''}',
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
         ),
       ],
     );
   }
 
   Widget _buildStaticFields(Map<String, dynamic>? doctorData) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         _buildInfoRow('Email', doctorData?['email'] ?? ''),
@@ -164,8 +176,11 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
         _buildInfoRow('Awards & Recognition', doctorData?['awards'] ?? ''),
         Row(
           children: [
-            const Text('Overall Rating: ',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Overall Rating: ',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(width: 5),
             Row(
                 children: List.generate(4,
@@ -178,7 +193,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     );
   }
 
-  Widget _buildEditableFields() {
+  Widget _buildEditableFields(bool isDarkMode) {
     return Form(
       key: _formKey,
       child: Column(
