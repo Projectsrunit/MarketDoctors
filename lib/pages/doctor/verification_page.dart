@@ -7,7 +7,7 @@ import 'dart:convert'; // For JSON encoding and decoding
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 
 class DoctorVerificationPage extends StatefulWidget {
-  final String reference;  
+  final String reference;
 
   const DoctorVerificationPage({super.key, required this.reference});
 
@@ -17,18 +17,21 @@ class DoctorVerificationPage extends StatefulWidget {
 
 class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
   final _otpControllers = List.generate(4, (index) => TextEditingController());
-  final _focusNodes = List.generate(4, (index) => FocusNode()); // Create FocusNodes
-  bool _isLoading = false;  
+  final _focusNodes =
+      List.generate(4, (index) => FocusNode()); // Create FocusNodes
+  bool _isLoading = false;
   String baseUrl = dotenv.env['API_URL']!;
 
   // This function will make a POST request to verify the OTP
   Future<void> _verifyOtp() async {
-    final otp = _otpControllers.map((controller) => controller.text).join(); 
+    final otp = _otpControllers.map((controller) => controller.text).join();
 
     if (otp.length != 4) {
       // Show error if OTP is not 4 digits long
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 4-digit OTP sent to your Email.')),
+        const SnackBar(
+            content:
+                Text('Please enter a valid 4-digit OTP sent to your Email.')),
       );
       return;
     }
@@ -65,7 +68,8 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
       } else {
         // Show an error message if the verification failed
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verification failed. Please try again.')),
+          const SnackBar(
+              content: Text('OTP verification failed. Please try again.')),
         );
       }
     } catch (error) {
@@ -103,6 +107,8 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -114,12 +120,16 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                 'Verification',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Enter the OTP sent to your email',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -132,7 +142,7 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
                     width: 50,
                     child: TextField(
                       controller: _otpControllers[index],
-                      focusNode: _focusNodes[index],  // Assign FocusNode
+                      focusNode: _focusNodes[index], // Assign FocusNode
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1, // Only 1 digit per field
@@ -159,7 +169,9 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
 
               // Continue Button
               TextButton(
-                onPressed: _isLoading ? null : _verifyOtp,  // Disable button when loading
+                onPressed: _isLoading
+                    ? null
+                    : _verifyOtp, // Disable button when loading
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -176,11 +188,11 @@ class _DoctorVerificationPageState extends State<DoctorVerificationPage> {
 
               // Resend OTP
               GestureDetector(
-                onTap: _isLoading ? null : _resendOtp,  // Disable if loading
-                child: const Text(
+                onTap: _isLoading ? null : _resendOtp, // Disable if loading
+                child: Text(
                   'Check your Inbox / Spam folder for the code',
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: isDarkMode ? Colors.white : Colors.blue,
                     decoration: TextDecoration.underline,
                   ),
                 ),

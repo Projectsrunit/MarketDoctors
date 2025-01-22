@@ -321,6 +321,8 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   }
 
   Widget _buildPhoneField() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Expanded(
@@ -358,7 +360,11 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('(${country['code']})'),
+                      Text('(${country['code']})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )),
                     ],
                   ),
                 );

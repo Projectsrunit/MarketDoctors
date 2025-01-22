@@ -33,6 +33,8 @@ class _VerificationPageState extends State<VerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -44,12 +46,16 @@ class _VerificationPageState extends State<VerificationPage> {
                 'Verification',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Enter the OTP sent to your mail and phone number',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -85,10 +91,10 @@ class _VerificationPageState extends State<VerificationPage> {
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: _resendOtp,
-                child: const Text(
+                child: Text(
                   'Did not receive Code? Ask for Resend',
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: isDarkMode ? Colors.white : Colors.blue,
                     decoration: TextDecoration.underline,
                   ),
                 ),

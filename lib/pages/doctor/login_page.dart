@@ -122,12 +122,13 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Login to your account',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text('Login to your account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
