@@ -30,12 +30,13 @@ class _PatientHomeState extends State<PatientHome> {
   @override
   void initState() {
     super.initState();
-    
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       int? hostId = context.read<DataStore>().patientData?['id'];
       print(
           'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
-          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
+      print(
+          'hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
       if (hostId != null) {
         final chatStore = context.read<ChatStore>();
 
@@ -261,13 +262,8 @@ class PatientHomeBody extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.0),
-          Container(
-              height: 170,
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(8)),
-              child: Row(children: [
-                AdvertisementCarousel(),
-              ])),
+          AdvertisementCarousel(),
+
           SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -326,58 +322,59 @@ class PopularsState extends State<Populars> {
     fetchDoctors();
   }
 
-Future<void> fetchDoctors() async {
-  try {
-    final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse(
-        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
+  Future<void> fetchDoctors() async {
+    try {
+      final String baseUrl = dotenv.env['API_URL']!;
+      final Uri url = Uri.parse(
+          '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
 
-    final response = await http.get(url);
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
 
-      setState(() {
-        doctors = data.map((doctor) {
-          String fullImageUrl =
-              'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
+        setState(() {
+          doctors = data.map((doctor) {
+            String fullImageUrl =
+                'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
 
-          if (doctor['profile_picture'] != null) {
-            fullImageUrl = '${doctor['profile_picture']}';
-          }
+            if (doctor['profile_picture'] != null) {
+              fullImageUrl = '${doctor['profile_picture']}';
+            }
 
-          doctor['full_image_url'] = fullImageUrl;
-          return doctor;
-        }).toList();
-        isLoading = false;
-      });
-    } else {
-      print('Failed to load doctors');
+            doctor['full_image_url'] = fullImageUrl;
+            return doctor;
+          }).toList();
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load doctors');
+        Fluttertoast.showToast(
+          msg: 'Failed to load doctors',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red[200],
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e) {
+      print('Error fetching doctors: $e');
       Fluttertoast.showToast(
-        msg: 'Failed to load doctors',
+        msg: 'Network error during fetch',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.red[200],
         textColor: Colors.white,
         fontSize: 16.0,
       );
-    }
-  } catch (e) {
-    print('Error fetching doctors: $e');
-    Fluttertoast.showToast(
-      msg: 'Network error during fetch',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.red[200],
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
 
-    setState(() {
-      isLoading = false; // Ensure to update loading state even if there's an error
-    });
+      setState(() {
+        isLoading =
+            false; // Ensure to update loading state even if there's an error
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {

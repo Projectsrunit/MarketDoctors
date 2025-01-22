@@ -10,25 +10,50 @@ class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
     Map? patientData = Provider.of<DataStore>(context).patientData;
  
 
-    return AppBar(
+     return AppBar(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.black
+          : Colors.white,
       automaticallyImplyLeading: false,
+      elevation: 5,
       title: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.person),
+              radius: 20, // Adjust radius as needed
+              child: Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: Colors.grey, width: 2), // Black border
+                ),
+                child: ClipOval(
+                  child: patientData?['profile_picture'] != null
+                      ? Image.network(
+                          patientData?['profile_picture'],
+                          width: 112,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(Icons.person),
+                ),
+              ),
             ),
             SizedBox(width: 8),
             Flexible(
               child: Text(
-                'Hi, ${patientData?['firstName']} ${patientData?['lastName']}!',
+                '${patientData?['firstName']} ${patientData?['lastName']}',
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.nunito(
-                  fontSize: 19, // Reduces the size of the text
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 22, 91, 148), // Customize color if needed
+                  fontSize: 15,
                 ),
               ),
             ),
@@ -43,6 +68,7 @@ class PatientAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: () {},
           ),
         ),
+        // ),
       ],
     );
   }
