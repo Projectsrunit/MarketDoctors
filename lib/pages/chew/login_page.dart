@@ -20,6 +20,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _role = 4;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   // Function to handle login
   Future<void> _loginUser() async {
@@ -206,7 +207,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -221,6 +222,18 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                           prefixIcon: const Icon(Icons.lock),
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.bold, // Make label text bold
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {

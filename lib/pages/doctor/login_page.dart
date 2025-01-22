@@ -22,6 +22,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _role = 3;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   String? firstName;
   String? lastName;
@@ -213,7 +214,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -228,6 +229,18 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                           prefixIcon: const Icon(Icons.lock),
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.bold, // Make label text bold
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {
