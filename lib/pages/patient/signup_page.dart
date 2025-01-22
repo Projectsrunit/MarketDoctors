@@ -115,7 +115,6 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -312,6 +311,8 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
   }
 
   Widget _buildPhoneField() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Expanded(
@@ -349,7 +350,11 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('(${country['code']})'),
+                      Text('(${country['code']})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )),
                     ],
                   ),
                 );

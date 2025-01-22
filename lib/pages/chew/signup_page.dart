@@ -312,6 +312,8 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
   }
 
   Widget _buildPhoneField() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Expanded(
@@ -349,7 +351,11 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('(${country['code']})'),
+                      Text('(${country['code']})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )),
                     ],
                   ),
                 );
