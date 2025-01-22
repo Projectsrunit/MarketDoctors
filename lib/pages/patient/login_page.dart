@@ -22,97 +22,98 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
   bool _isLoading = false;
 
   void _showMessage(String message, {bool isError = true}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      backgroundColor: isError ? Colors.red : Colors.green,
-    ),
-  );
-}
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
+  }
 
-Future<void> _loginUser() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    String? baseUrl = dotenv.env['API_URL'];
-
-    try {
-      var url = Uri.parse('$baseUrl/api/auth/login');
-      var response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'role': _role,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
-        var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
-        final fullRecord = await http.get(url);
-        if (fullRecord.statusCode == 200) {
-          var recordBody = jsonDecode(fullRecord.body);
-          _showMessage('Welcome Back!', isError: false);
-          context.read<DataStore>().updatePatientData(recordBody);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PatientHome()));
-        }
-        
-        // // Extract patient details
-        // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
-        // String firstName = responseBody['user']['firstName']; // Get the first name
-        // String lastName = responseBody['user']['lastName']; // Get the last name
-        // String fullName = '$firstName $lastName'; // Combine first and last names
-        
-        // // Store the user ID in SharedPreferences
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('userId', userId);
-
-        // _showMessage('Welcome Back!', isError: false);
-        
-        // // Navigate to PatientHome and pass patientId and patientName
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => PatientHome(
-        //       patientId: userId, // Pass the userId
-        //       patientName: fullName, // Pass the full name
-        //     ),
-        //   ),
-        // );
-
-      } else {
-        var errorResponse = jsonDecode(response.body);
-        String errorMessage = errorResponse['error']?['message'] ?? 'Login failed. Please try again.';
-
-        if (errorMessage == 'Role does not match') {
-          _showMessage('Please log in with a different user type.');
-        } else {
-          _showMessage(errorMessage);
-        }
-      }
-    } catch (error) {
-      _showMessage('An error occurred. Please try again.');
-    } finally {
+  Future<void> _loginUser() async {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      String? baseUrl = dotenv.env['API_URL'];
+
+      try {
+        var url = Uri.parse('$baseUrl/api/auth/login');
+        var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'email': email,
+            'password': password,
+            'role': _role,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          var responseBody = jsonDecode(response.body);
+          var url = Uri.parse(
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          final fullRecord = await http.get(url);
+          if (fullRecord.statusCode == 200) {
+            var recordBody = jsonDecode(fullRecord.body);
+            _showMessage('Welcome Back!', isError: false);
+            context.read<DataStore>().updatePatientData(recordBody);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PatientHome()));
+          }
+
+          // // Extract patient details
+          // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
+          // String firstName = responseBody['user']['firstName']; // Get the first name
+          // String lastName = responseBody['user']['lastName']; // Get the last name
+          // String fullName = '$firstName $lastName'; // Combine first and last names
+
+          // // Store the user ID in SharedPreferences
+          // SharedPreferences prefs = await SharedPreferences.getInstance();
+          // await prefs.setString('userId', userId);
+
+          // _showMessage('Welcome Back!', isError: false);
+
+          // // Navigate to PatientHome and pass patientId and patientName
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => PatientHome(
+          //       patientId: userId, // Pass the userId
+          //       patientName: fullName, // Pass the full name
+          //     ),
+          //   ),
+          // );
+        } else {
+          var errorResponse = jsonDecode(response.body);
+          String errorMessage = errorResponse['error']?['message'] ??
+              'Login failed. Please try again.';
+
+          if (errorMessage == 'Role does not match') {
+            _showMessage('Please log in with a different user type.');
+          } else {
+            _showMessage(errorMessage);
+          }
+        }
+      } catch (error) {
+        _showMessage('An error occurred. Please try again.');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
@@ -123,9 +124,13 @@ Future<void> _loginUser() async {
             children: [
               const SizedBox(height: 160),
               Text(
-                'Welcome Back,',
+                'Welcome Back!',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
               Text(
                 'Login to your account',
@@ -180,9 +185,10 @@ Future<void> _loginUser() async {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[850]
-                              : Colors.white,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[850]
+                                  : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
@@ -221,9 +227,10 @@ Future<void> _loginUser() async {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[850]
-                              : Colors.white,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[850]
+                                  : Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none, // Remove border
@@ -243,7 +250,8 @@ Future<void> _loginUser() async {
                         },
                       ),
                     ),
-                    const SizedBox(height: 40), // Increased spacing before login button
+                    const SizedBox(
+                        height: 40), // Increased spacing before login button
                     _isLoading
                         ? const CircularProgressIndicator()
                         : TextButton(
@@ -254,7 +262,8 @@ Future<void> _loginUser() async {
                                 borderRadius: BorderRadius.circular(22),
                               ),
                               foregroundColor: Colors.white,
-                              backgroundColor: const Color.fromARGB(255, 111, 136, 223),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 111, 136, 223),
                             ),
                             child: const Text(
                               'Log In',

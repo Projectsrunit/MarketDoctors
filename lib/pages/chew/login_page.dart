@@ -49,7 +49,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           //to get full user record with profile picture etc
-          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          var url = Uri.parse(
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
@@ -94,6 +95,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
@@ -104,9 +107,13 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             children: [
               const SizedBox(height: 160),
               Text(
-                'Welcome Back,',
+                'Welcome Back!',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
               Text(
                 'Login to your account',
