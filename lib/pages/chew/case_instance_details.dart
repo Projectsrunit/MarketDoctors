@@ -37,6 +37,11 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _existingConditionController = TextEditingController();
   final _currentPrescriptionController = TextEditingController();
   final _chewsNotesController = TextEditingController();
+  List<String> symptoms = [];
+  bool showAddSymptom = false;
+  String? selectedBodyPart;
+  String? selectedCategory;
+  String? selectedExample;
 
   @override
   void initState() {
@@ -63,6 +68,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
         : widget.caseData['gender'];
     _heightController.addListener(_calcBmi);
     _weightController.addListener(_calcBmi);
+    symptoms = List<String>.from(widget.caseData['symptoms']);
   }
 
   void _calcBmi() {
@@ -146,6 +152,183 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               ),
               _buildTextArea('CHEW\'s Notes', _chewsNotesController),
               SizedBox(height: 20),
+              Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Symptoms',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      if (symptoms.isNotEmpty)
+                        ...symptoms.map(
+                          (symptom) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Card(
+                              child: ListTile(
+                                title: Text(symptom),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.delete,
+                                      color: widget.editable
+                                          ? Colors.red
+                                          : Colors.grey),
+                                  onPressed: () {
+                                    if (widget.editable) {
+                                      setState(() {
+                                        symptoms.remove(symptom);
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (symptoms.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text('No symptoms added'),
+                        ),
+                      const SizedBox(height: 16.0),
+                      if (showAddSymptom && widget.editable)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            DropdownButton<String>(
+                              value: selectedBodyPart,
+                              hint: const Text('Choose body part'),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedBodyPart = newValue;
+                                  selectedCategory = null;
+                                  selectedExample = null;
+                                });
+                              },
+                              items: context
+                                  .read<DataStore>()
+                                  .addCaseData['symptoms']!
+                                  .keys
+                                  .map<DropdownMenuItem<String>>(
+                                    (bodyPart) => DropdownMenuItem(
+                                      value: bodyPart,
+                                      child: Text(bodyPart),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                            if (selectedBodyPart != null)
+                              DropdownButton<String>(
+                                value: selectedCategory,
+                                hint: const Text('Choose category'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    selectedCategory = newValue;
+                                    selectedExample = null;
+                                  });
+                                },
+                                items: context
+                                    .read<DataStore>()
+                                    .addCaseData['symptoms']![selectedBodyPart]!
+                                    .keys
+                                    .map<DropdownMenuItem<String>>(
+                                      (String category) => DropdownMenuItem<String>(
+                                        value: category,
+                                        child: Text(category),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            if (selectedCategory != null)
+                              DropdownButton<String>(
+                                value: selectedExample,
+                                hint: const Text('Choose symptom example'),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    selectedExample = newValue;
+                                  });
+                                },
+                                items: context
+                                    .read<DataStore>()
+                                    .addCaseData['symptoms']![
+                                        selectedBodyPart]![selectedCategory]!
+                                    .map<DropdownMenuItem<String>>(
+                                      (String example) => DropdownMenuItem<String>(
+                                        value: example,
+                                        child: Text(example),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            const SizedBox(height: 16.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: selectedExample == null
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            symptoms.add(selectedExample!);
+                                            showAddSymptom = false;
+                                          });
+                                        },
+                                  child: const Text('Add'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      showAddSymptom = false;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey,
+                                  ),
+                                  child: const Text('Back'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      else if (widget.editable)
+                        Center(
+                          child: FractionallySizedBox(
+                            widthFactor: 0.8,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  showAddSymptom = true;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                        .textButtonTheme
+                                        .style
+                                        ?.backgroundColor
+                                        ?.resolve({}) ??
+                                    const Color(0xFF617DEF),
+                                foregroundColor: Theme.of(context)
+                                        .textButtonTheme
+                                        .style
+                                        ?.foregroundColor
+                                        ?.resolve({}) ??
+                                    Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text("Add Symptom"),
+                            ),
+                          ),
+                        ),
+                    ],
+                  )),
               if (widget.editable)
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -157,81 +340,6 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                   onPressed: () => _saveData(widget.index),
                   child: Text(
                     'Save',
-                  ),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.caseData['questionnaire']['title'] ?? 'No Title',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      // Display the selected answers
-                      ...widget.caseData['questionnaire'].entries
-                          .where((entry) => entry.key != 'title')
-                          .map((entry) {
-                        final questionText = entry.key;
-                        final answerData = entry.value;
-                        final List<dynamic> answers =
-                            answerData[0]; // All possible answers
-                        final int selectedIndex =
-                            answerData[1]; // Index of the selected answer
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Question text with grey background
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 8.0),
-                              padding: const EdgeInsets.all(12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              child: Text(
-                                '\u2022 $questionText',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-
-                            // Answers with the selected one checked and disabled
-                            Wrap(
-                              spacing: 8.0,
-                              runSpacing: 8.0,
-                              children: answers.asMap().entries.map((entry) {
-                                // final int index = entry.key;
-                                final String answer = entry.value;
-
-                                return Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Radio<String>(
-                                      value: answer,
-                                      groupValue: answers[selectedIndex],
-                                      onChanged:
-                                          null, // Disable the radio button
-                                    ),
-                                    Text(answer),
-                                  ],
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(
-                                height: 16.0), // Add spacing between questions
-                          ],
-                        );
-                      }).toList(),
-                    ],
                   ),
                 )
             ],
@@ -253,7 +361,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/cases/${widget.saveId}');
-    //the questionnaire is not edited and not saved again
+
     try {
       final updatedData = {
         'gender': _selectedGender,
@@ -272,6 +380,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
             : null,
         'existing_condition': _existingConditionController.text,
         'current_prescription': _currentPrescriptionController.text,
+        'symptoms': symptoms,
         'chews_notes': _chewsNotesController.text,
       };
 

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
-import 'package:market_doctor/pages/chew/add_case_form_q.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/chew/add_case_form1.dart';
 import 'package:provider/provider.dart';
 
 class AddCaseFormTwo extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,98 +19,30 @@ class AddCaseFormTwo extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.48,
                 width: double.infinity,
                 decoration: BoxDecoration(
+                  color: Colors.blue,
                   image: DecorationImage(
-                    image: AssetImage('assets/images/silh.jpeg'),
-                    fit: BoxFit.cover,
+                    image: AssetImage('assets/images/silh.png'),
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-              Positioned(
-                top: 16,
-                left: 16,
-                child: Text(
-                  'Click on body part for possible complications',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 36,
-                left: 16,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Logic for the button
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(12),
-                        backgroundColor:
-                            Colors.white, // Button background color
-                        foregroundColor: Colors.blue, // Icon color
-                      ),
-                      child: Icon(Icons.sync,
-                          size: 24), // Replace with desired icon
-                    ),
-                    SizedBox(height: 8), // Spacing between the button and text
-                    Text(
-                      'Flip for Posterior view',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey, // Text color
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Positioned(
+              //   top: 16,
+              //   left: 16,
+              //   child: Text(
+              //     'Click on body part for possible complications',
+              //     style: TextStyle(
+              //       fontSize: 18,
+              //       fontWeight: FontWeight.bold,
+              //       color: Colors.grey,
+              //     ),
+              //   ),
+              // ),
             ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search body parts",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Logic for search button
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    minimumSize:
-                        Size(40, 40), // This makes button height consistent
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: Icon(Icons.arrow_forward, color: Colors.white),
-                ),
-              ],
-            ),
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Row(
@@ -121,8 +52,6 @@ class AddCaseFormTwo extends StatelessWidget {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<DataStore>().addCaseData['stage1Tap'] =
-                                'Head';
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -156,13 +85,11 @@ class AddCaseFormTwo extends StatelessWidget {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<DataStore>().addCaseData['stage1Tap'] =
-                                'Hand';
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        AddCaseSigns(buttonName: 'Hand')));
+                                        AddCaseSigns(buttonName: 'Chest')));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -178,7 +105,7 @@ class AddCaseFormTwo extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'Hand',
+                            'Chest',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -196,13 +123,11 @@ class AddCaseFormTwo extends StatelessWidget {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<DataStore>().addCaseData['stage1Tap'] =
-                                'Neck';
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        AddCaseSigns(buttonName: 'Neck')));
+                                        AddCaseSigns(buttonName: 'General')));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -218,7 +143,45 @@ class AddCaseFormTwo extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'Neck',
+                            'General',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddCaseSigns(buttonName: 'Stomach')));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            elevation: 8,
+                            shadowColor: Colors.black.withOpacity(0.4),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                              side: BorderSide(
+                                  color: Colors.grey[300]!, width: 1),
+                            ),
+                          ),
+                          child: Text(
+                            'Stomach',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -231,13 +194,11 @@ class AddCaseFormTwo extends StatelessWidget {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<DataStore>().addCaseData['stage1Tap'] =
-                                'Leg';
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        AddCaseSigns(buttonName: 'Leg')));
+                                        AddCaseSigns(buttonName: 'Skin')));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -253,7 +214,7 @@ class AddCaseFormTwo extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'Leg',
+                            'Skin',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -274,23 +235,19 @@ class AddCaseFormTwo extends StatelessWidget {
   }
 }
 
-class AddCaseSigns extends StatefulWidget {
+class AddCaseSigns extends StatelessWidget {
   final String buttonName;
+  final List? showCategory;
+  final String? pictureName;
 
-  AddCaseSigns({required this.buttonName});
+  AddCaseSigns({required this.buttonName, this.showCategory, this.pictureName});
 
-  @override
-  State<AddCaseSigns> createState() => _AddCaseSignsState();
-}
-
-class _AddCaseSignsState extends State<AddCaseSigns> {
-  String? selectedItem;
   @override
   Widget build(BuildContext context) {
-    final data =
-        context.read<DataStore>().addCaseData['headings'][widget.buttonName];
-    List? greyList = data['greyList'];
-    List? whiteButtons = data['whiteButtons'];
+    final data = context.read<DataStore>().addCaseData['symptoms']?[buttonName];
+    final picture =
+        context.read<DataStore>().addCaseData['pictures']?[buttonName] ?? context.read<DataStore>().addCaseData['pictures']?[pictureName];
+    List? whiteButtons = data?.keys.toList();
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -302,53 +259,11 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                 height: MediaQuery.of(context).size.height * 0.48,
                 width: double.infinity,
                 decoration: BoxDecoration(
+                  color: Colors.blue,
                   image: DecorationImage(
-                    image: AssetImage('assets/images/silh.jpeg'),
-                    fit: BoxFit.cover,
+                    image: AssetImage(picture),
+                    fit: BoxFit.contain,
                   ),
-                ),
-              ),
-              Positioned(
-                top: 16,
-                left: 16,
-                child: Text(
-                  'Click on body part for possible complications',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 36,
-                left: 16,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Logic for the button
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(12),
-                        backgroundColor:
-                            Colors.white, // Button background color
-                        foregroundColor: Colors.blue, // Icon color
-                      ),
-                      child: Icon(Icons.sync,
-                          size: 24), // Replace with desired icon
-                    ),
-                    SizedBox(height: 8), // Spacing between the button and text
-                    Text(
-                      'Flip for Posterior view',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey, // Text color
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
@@ -359,7 +274,6 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Blue button heading
                   Align(
                     alignment: Alignment.centerLeft,
                     child: ElevatedButton(
@@ -373,13 +287,11 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      child: Text(widget.buttonName,
-                          style: TextStyle(fontSize: 16)),
+                      child: Text(buttonName, style: TextStyle(fontSize: 16)),
                     ),
                   ),
                   SizedBox(height: 16),
-
-                  if (whiteButtons != null)
+                  if (whiteButtons != null && showCategory == null)
                     Wrap(
                       spacing: 16, // Space between buttons horizontally
                       runSpacing: 16, // Space between rows of buttons
@@ -387,13 +299,13 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                       children: whiteButtons.map((name) {
                         return ElevatedButton(
                           onPressed: () {
-                            context.read<DataStore>().addCaseData['stage1Tap'] =
-                                name;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddCaseSigns(buttonName: name)));
+                                    builder: (context) => AddCaseSigns(
+                                        buttonName: name,
+                                        pictureName: buttonName,
+                                        showCategory: data[name])));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -412,55 +324,54 @@ class _AddCaseSignsState extends State<AddCaseSigns> {
                         );
                       }).toList(),
                     ),
-                  if (whiteButtons != null) SizedBox(height: 24),
-
-                  if (greyList != null)
+                  if (whiteButtons != null && showCategory == null)
+                    SizedBox(height: 24),
+                  if (showCategory != null)
                     Container(
-                        color: Colors.grey[300],
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16),
-                        margin: EdgeInsets.only(
-                            bottom: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Possible Complications',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                      color: Colors.grey[300],
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16),
+                      margin: EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Possible Complications',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                            SizedBox(height: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: greyList.map((item) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedItem = item;
-                                    });
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormQue(selectedKey: selectedItem!)));
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0),
-                                    child: Text(
-                                      item,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: selectedItem == item
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                      ),
+                          ),
+                          SizedBox(height: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: showCategory!.map((item) {
+                              return GestureDetector(
+                                onTap: () {
+                                  List<String> tempSymptoms= context
+                                      .read<DataStore>().tempSymptoms;
+                                      tempSymptoms.add(item);
+                                  context.read<DataStore>().updateCaseSymptom(
+                                    tempSymptoms
+                                  );
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormOne()));
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4.0),
+                                  child: Text(
+                                    item,
+                                    style: TextStyle(
+                                      fontSize: 14,
                                     ),
                                   ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
+                    ),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: ElevatedButton(
