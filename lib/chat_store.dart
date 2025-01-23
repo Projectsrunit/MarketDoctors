@@ -35,11 +35,11 @@ class ChatStore extends ChangeNotifier {
   void resetStore() {
     _messages = {};
     latestMessageDates = {};
+    storedHost = null;
     idsWithUnreadMessages = [];
     dbInitialised = false;
     _isReconnecting = false;
     isSocketInitialized = false;
-    conn?.cancel();
     socket?.disconnect();
     notifyListeners();
   }

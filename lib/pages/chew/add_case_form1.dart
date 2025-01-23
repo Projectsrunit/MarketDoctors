@@ -4,9 +4,12 @@ import 'package:market_doctor/pages/chew/add_case_form2.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 
 class AddCaseFormOne extends StatefulWidget {
-
   @override
   AddCaseFormOneState createState() => AddCaseFormOneState();
 }
@@ -26,8 +29,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
   final TextEditingController _bmiController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _existingConditionController =
-      TextEditingController();
+  // final TextEditingController _existingConditionController = TextEditingController();
 
   @override
   void initState() {
@@ -52,6 +54,26 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
   @override
   Widget build(BuildContext context) {
     int chewId = context.watch<DataStore>().chewData?['id'];
+    Map<String, dynamic> caseData =
+        context.read<DataStore>().addCaseData['caseData']!;
+    List<String> tempSymptoms = context.read<DataStore>().tempSymptoms;
+
+    if (caseData.isNotEmpty) {
+      _firstNameController.text = caseData['first_name'] ?? '';
+      _lastNameController.text = caseData['last_name'] ?? '';
+      _prescriptionController.text = caseData['current_prescription'] ?? '';
+      _chewsNotesController.text = caseData['chews_notes'] ?? '';
+      _emailController.text = caseData['email'] ?? '';
+      _bloodPressureController.text =
+          caseData['blood_pressure']?.toString() ?? '';
+      _weightController.text = caseData['weight']?.toString() ?? '';
+      _bmiController.text = caseData['bmi']?.toString() ?? '';
+      _phoneController.text = caseData['phone_number'] ?? '';
+      _heightController.text = caseData['height']?.toString() ?? '';
+      _bloodGlucoseController.text =
+          caseData['blood_glucose']?.toString() ?? '';
+      _selectedGender = caseData['gender'];
+    }
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -108,17 +130,10 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
-                      ),
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                          )),
                     ),
                     SizedBox(width: 10),
                     Expanded(
@@ -127,12 +142,12 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return 'This field is required';
+                        //   }
+                        //   return null;
+                        // },
                         keyboardType: TextInputType.phone,
                       ),
                     ),
@@ -224,8 +239,14 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                             items: ['Male', 'Female'].map((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value,
-                                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),),
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
                               );
                             }).toList(),
                             onChanged: (String? newValue) {
@@ -242,16 +263,64 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Existing Condition',
+                  'Symptoms',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
-                TextFormField(
-                  controller: _existingConditionController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    labelText: 'Enter existing condition',
-                    border: OutlineInputBorder(),
+                if (tempSymptoms.isNotEmpty)
+                  ...List<String>.from(tempSymptoms).map(
+                    (symptom) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Card(
+                        child: ListTile(
+                          title: Text(symptom),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              tempSymptoms.remove(symptom);
+                              context
+                                  .read<DataStore>()
+                                  .updateCaseSymptom(tempSymptoms);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (tempSymptoms.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text('No symptoms added yet'),
+                  ),
+                Center(
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _saveData(chewId);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context)
+                                .textButtonTheme
+                                .style
+                                ?.backgroundColor
+                                ?.resolve({}) ??
+                            Color(0xFF617DEF),
+                        foregroundColor: Theme.of(context)
+                                .textButtonTheme
+                                .style
+                                ?.foregroundColor
+                                ?.resolve({}) ??
+                            Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text("Add Symptom"),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -281,7 +350,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     labelText: 'Enter note of a patient\'s health challenge',
                     border: OutlineInputBorder(),
                   ),
-                ),                
+                ),
                 SizedBox(height: 20),
                 Center(
                   child: FractionallySizedBox(
@@ -289,7 +358,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _saveData(chewId);
+                          _uploadData(chewId);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -310,7 +379,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Text("Proceed to Symptoms"),
+                      child: Text("Save Case Data"),
                     ),
                   ),
                 ),
@@ -324,34 +393,113 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
   }
 
   Future<void> _saveData(chewId) async {
-    context.read<DataStore>().addCaseData['maleOrFemale'] = _selectedGender;
+    final caseData = {
+      'first_name': _firstNameController.text,
+      'last_name': _lastNameController.text,
+      'gender': _selectedGender,
+      'email': _emailController.text,
+      if (_parseNumber(_phoneController.text) != null)
+        'phone_number': _phoneController.text,
+      if (_parseNumber(_bloodPressureController.text) != null)
+        'blood_pressure': _parseNumber(_bloodPressureController.text),
+      if (_parseNumber(_weightController.text) != null)
+        'weight': _parseNumber(_weightController.text),
+      if (_parseNumber(_heightController.text) != null)
+        'height': _parseNumber(_heightController.text),
+      if (_parseNumber(_bmiController.text) != null)
+        'bmi': _parseNumber(_bmiController.text),
+      if (_parseNumber(_bloodGlucoseController.text) != null)
+        'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+      'current_prescription': _prescriptionController.text,
+      'symptoms': context.read<DataStore>().tempSymptoms,
+      'chews_notes': _chewsNotesController.text,
+      'chew': chewId
+    };
 
-      final caseData = {
-        'first_name': _firstNameController.text,
-        'last_name': _lastNameController.text,
-        'gender': _selectedGender,
-        'email': _emailController.text,
-        if (_parseNumber(_phoneController.text) != null)
-          'phone_number': _phoneController.text,
-        if (_parseNumber(_bloodPressureController.text) != null)
-          'blood_pressure': _parseNumber(_bloodPressureController.text),
-        if (_parseNumber(_weightController.text) != null)
-          'weight': _parseNumber(_weightController.text),
-        if (_parseNumber(_heightController.text) != null)
-          'height': _parseNumber(_heightController.text),
-        if (_parseNumber(_bmiController.text) != null)
-          'bmi': _parseNumber(_bmiController.text),
-        if (_parseNumber(_bloodGlucoseController.text) != null)
-          'blood_glucose': _parseNumber(_bloodGlucoseController.text),
-        'existing_condition': _existingConditionController.text,
-        'current_prescription': _prescriptionController.text,
-        'chews_notes': _chewsNotesController.text,
-        'chew': chewId
-      };
+    context.read<DataStore>().changeTheCaseData(caseData);
 
-      context.read<DataStore>().addCaseData['caseData'] = caseData;
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddCaseFormTwo()));
+  }
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormTwo()));
+  Future<void> _uploadData(chewId) async {
+    final caseData = {
+      'first_name': _firstNameController.text,
+      'last_name': _lastNameController.text,
+      'gender': _selectedGender,
+      'email': _emailController.text,
+      if (_parseNumber(_phoneController.text) != null)
+        'phone_number': _phoneController.text,
+      if (_parseNumber(_bloodPressureController.text) != null)
+        'blood_pressure': _parseNumber(_bloodPressureController.text),
+      if (_parseNumber(_weightController.text) != null)
+        'weight': _parseNumber(_weightController.text),
+      if (_parseNumber(_heightController.text) != null)
+        'height': _parseNumber(_heightController.text),
+      if (_parseNumber(_bmiController.text) != null)
+        'bmi': _parseNumber(_bmiController.text),
+      if (_parseNumber(_bloodGlucoseController.text) != null)
+        'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+      'current_prescription': _prescriptionController.text,
+      'symptoms': context.read<DataStore>().tempSymptoms,
+      'chews_notes': _chewsNotesController.text,
+      'chew': chewId
+    };
+
+    Fluttertoast.showToast(
+      msg: 'Saving...',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    final String baseUrl = dotenv.env['API_URL']!;
+    final Uri url = Uri.parse('$baseUrl/api/cases');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'data': caseData}),
+      );
+
+      if (response.statusCode == 200) {
+        context.read<DataStore>().changeTheCaseData({});
+        context.read<DataStore>().updateCaseSymptom([]);
+        var jsoned = jsonDecode(response.body);
+        context.read<DataStore>().addCase(
+            {'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+
+        Fluttertoast.showToast(
+          msg: 'Case added successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => AddCaseFormOne()));
+      } else {
+        print('this is the response ${response.body}');
+        throw Exception('Something went wrong');
+      }
+    } catch (e) {
+      print('this is the error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed. Please try again',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
   double? _parseNumber(String text) {

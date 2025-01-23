@@ -61,8 +61,13 @@ flutter:
     - assets/images/cases-image.png
     - assets/images/pills-image.png
     - assets/images/advert-image.png
-    - assets/images/silh.jpeg
+    - assets/images/silh.png
     - assets/.env
+    - assets/images/head.png
+    - assets/images/chest.png
+    - assets/images/stomach.png
+    - assets/images/skin.png
+    - assets/images/general.png
 
 
   # assets:
