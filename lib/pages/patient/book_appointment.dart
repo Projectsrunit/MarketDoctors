@@ -29,9 +29,10 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
             // Spacing between icons and next section
 
             DocLikeCard(
-              imageUrl: widget.doctorCard['profile_picture'] ?? 
+              imageUrl: widget.doctorCard['profile_picture'] ??
                   'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-              name: 'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
+              name:
+                  'Dr. ${widget.doctorCard['firstName']} ${widget.doctorCard['lastName']}',
               profession: (widget.doctorCard['specialisation'] != null &&
                       widget.doctorCard['specialisation'].isNotEmpty)
                   ? widget.doctorCard['specialisation']
@@ -86,12 +87,14 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
                               .textButtonTheme
                               .style
                               ?.backgroundColor
-                              ?.resolve({}) ?? Colors.white,
+                              ?.resolve({}) ??
+                          Colors.white,
                       foregroundColor: Theme.of(context)
                               .textButtonTheme
                               .style
                               ?.foregroundColor
-                              ?.resolve({}) ?? Colors.blue,
+                              ?.resolve({}) ??
+                          Colors.blue,
                       padding: EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -122,11 +125,13 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
 
   // About Doctor section
   Widget _buildAboutDoctorSection() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
@@ -145,11 +150,12 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.blue[800],
+              color: isDarkMode ? Colors.white : Colors.blue[800],
             ),
           ),
           SizedBox(height: 10),
-          widget.doctorCard['about'] != null && widget.doctorCard['about'].isNotEmpty
+          widget.doctorCard['about'] != null &&
+                  widget.doctorCard['about'].isNotEmpty
               ? GestureDetector(
                   onTap: () {
                     setState(() {
@@ -164,19 +170,27 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
                               0,
                               widget.doctorCard['about'].length > 100
                                   ? 100
-                                  : widget.doctorCard['about'].length), // Shortened description
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                                  : widget.doctorCard['about']
+                                      .length), // Shortened description
+                      style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 16),
                       children: [
-                        if (!_isExpanded && widget.doctorCard['about'].length > 100)
+                        if (!_isExpanded &&
+                            widget.doctorCard['about'].length > 100)
                           TextSpan(
                             text: '... read more',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(
+                              color:
+                                  isDarkMode ? Colors.white : Colors.blue[800],
+                            ),
                           ),
                       ],
                     ),
                   ),
                 )
-              : Text('No description provided', style: TextStyle(color: Colors.grey)),
+              : Text('No description provided',
+                  style: TextStyle(color: Colors.grey)),
         ],
       ),
     );
@@ -184,122 +198,22 @@ class _DoctorAppointmentPagState extends State<DoctorAppointmentPag> {
 
   // Consultation Fee Section
   // Consultation Fee Section
-Widget _buildConsultationFeeSection() {
-  // Fetch the consultation fee and ensure it's an integer or double
-  var consultationFee = widget.doctorCard['consultation_fee'] != null
-      ? double.tryParse(widget.doctorCard['consultation_fee'].toString()) ?? 0.0
-      : 0.0;
+  Widget _buildConsultationFeeSection() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    var consultationFee = widget.doctorCard['consultation_fee'] != null
+        ? double.tryParse(widget.doctorCard['consultation_fee'].toString()) ??
+            0.0
+        : 0.0;
 
-  const double bookingFee = 1000.0; // Constant booking fee
-  double totalFee = consultationFee + bookingFee; // Calculate total fee
+    const double bookingFee = 1000.0; // Constant booking fee
+    double totalFee = consultationFee + bookingFee; // Calculate total fee
 
-  return Container(
-    padding: EdgeInsets.all(16.0),
-    margin: EdgeInsets.symmetric(vertical: 10.0),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10.0),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.3),
-          spreadRadius: 2,
-          blurRadius: 10,
-          offset: Offset(0, 5),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Consultation Fee',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
-            Text(
-              'N${consultationFee.toStringAsFixed(1)}', // Displaying the consultation fee
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 10), // Add spacing between lines
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Booking Fee',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
-            Text(
-              'N${bookingFee.toStringAsFixed(1)}', // Displaying the constant booking fee
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 10), // Add spacing between lines
-        Divider(), // Optional: Add a divider for clarity
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Total Fee',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
-            Text(
-              'N${totalFee.toStringAsFixed(1)}', // Displaying the total fee
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-
-  // Availability section with date and time centered
-  // Availability section with date and time centered
-  Widget _buildAvailabilitySection() {
-  DateTime today = DateTime.now(); // Get today's date
-
-  // Filter availabilities to only include today and future dates
-  List<dynamic> upcomingAvailabilities = widget.doctorCard['doctor_availabilities']
-      .where((availability) {
-        DateTime availabilityDate = DateTime.parse(availability['date']);
-        return availabilityDate.isAfter(today) || availabilityDate.isAtSameMomentAs(today);
-      }).toList();
-
-  return Center(
-    child: Container(
-      width: double.infinity,
+    return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // color: Colors.white,
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
@@ -311,93 +225,211 @@ Widget _buildConsultationFeeSection() {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Availability',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[800],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Consultation Fee',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue[800],
+                ),
+              ),
+              Text(
+                'N${consultationFee.toStringAsFixed(1)}', // Displaying the consultation fee
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 10),
-          upcomingAvailabilities.isNotEmpty
-              ? Column(
-                  children: List.generate(
-                    upcomingAvailabilities.length,
-                    (index) {
-                      var availability = upcomingAvailabilities[index];
-                      var formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(availability['date']));
-                      bool isTimeVisible = false;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: StatefulBuilder(
-                          builder: (context, setState) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isTimeVisible = !isTimeVisible;
-                                });
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.blue.withOpacity(0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 6,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Date: $formattedDate',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue[700],
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    if (isTimeVisible)
-                                      Column(
-                                        children: List.generate(
-                                          availability['available_time'].length,
-                                          (timeIndex) {
-                                            var timeSlot = availability['available_time'][timeIndex];
-                                            return Padding(
-                                              padding: const EdgeInsets.only(bottom: 5.0),
-                                              child: Text(
-                                                '${timeSlot['start_time']} - ${timeSlot['end_time']}',
-                                                style: TextStyle(color: Colors.grey[800]),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                )
-              : Text('No availability times provided', style: TextStyle(color: Colors.grey)),
+          SizedBox(height: 10), // Add spacing between lines
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Booking Fee',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue[800],
+                ),
+              ),
+              Text(
+                'N${bookingFee.toStringAsFixed(1)}', // Displaying the constant booking fee
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10), // Add spacing between lines
+          Divider(), // Optional: Add a divider for clarity
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Fee',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue[800],
+                ),
+              ),
+              Text(
+                'N${totalFee.toStringAsFixed(1)}', // Displaying the total fee
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-    ),
-  );
-}
+    );
+  }
+
+  // Availability section with date and time centered
+  // Availability section with date and time centered
+  Widget _buildAvailabilitySection() {
+    DateTime today = DateTime.now(); // Get today's date
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    // Filter availabilities to only include today and future dates
+    List<dynamic> upcomingAvailabilities =
+        widget.doctorCard['doctor_availabilities'].where((availability) {
+      DateTime availabilityDate = DateTime.parse(availability['date']);
+      return availabilityDate.isAfter(today) ||
+          availabilityDate.isAtSameMomentAs(today);
+    }).toList();
+
+    return Center(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.0),
+        margin: EdgeInsets.symmetric(vertical: 10.0),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Availability',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue[800],
+              ),
+            ),
+            SizedBox(height: 10),
+            upcomingAvailabilities.isNotEmpty
+                ? Column(
+                    children: List.generate(
+                      upcomingAvailabilities.length,
+                      (index) {
+                        var availability = upcomingAvailabilities[index];
+                        var formattedDate = DateFormat('dd-MM-yyyy')
+                            .format(DateTime.parse(availability['date']));
+                        bool isTimeVisible = false;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: StatefulBuilder(
+                            builder: (context, setState) {
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    isTimeVisible = !isTimeVisible;
+                                  });
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode
+                                        ? Colors.grey[800]
+                                        : Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        spreadRadius: 1,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Date: $formattedDate',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.blue[700],
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      if (isTimeVisible)
+                                        Column(
+                                          children: List.generate(
+                                            availability['available_time']
+                                                .length,
+                                            (timeIndex) {
+                                              var timeSlot =
+                                                  availability['available_time']
+                                                      [timeIndex];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 5.0),
+                                                child: Text(
+                                                  '${timeSlot['start_time']} - ${timeSlot['end_time']}',
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.grey[800],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : Text('No availability times provided',
+                    style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
 }

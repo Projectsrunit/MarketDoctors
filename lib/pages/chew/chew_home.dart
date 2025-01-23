@@ -26,7 +26,8 @@ class ChewHomeState extends State<ChewHome> {
       int? hostId = context.read<DataStore>().chewData?['id'];
       print(
           'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
-          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
+      print(
+          'hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
       if (hostId != null) {
         final chatStore = context.read<ChatStore>();
 
@@ -224,14 +225,7 @@ class ChewHomeBody extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.0),
-          Container(
-            height: 170,
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(8)),
-            child: Row(
-              children: [AdvertisementCarousel()],
-            ),
-          ),
+          AdvertisementCarousel(),
           SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

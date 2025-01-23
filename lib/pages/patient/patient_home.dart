@@ -20,6 +20,7 @@ import 'package:market_doctor/pages/patient/view_doc_profile.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:market_doctor/pages/choose_action.dart';
 import 'package:market_doctor/chat_store.dart';
+import 'package:market_doctor/pages/chew/populars.dart';
 
 class PatientHome extends StatefulWidget {
   @override
@@ -30,12 +31,13 @@ class _PatientHomeState extends State<PatientHome> {
   @override
   void initState() {
     super.initState();
-    
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       int? hostId = context.read<DataStore>().patientData?['id'];
       print(
           'db initialisation state is ======= ${context.read<ChatStore>().dbInitialised}');
-          print('hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
+      print(
+          'hostId is $hostId and socket initialisation state is ${context.read<ChatStore>().isSocketInitialized}');
       if (hostId != null) {
         final chatStore = context.read<ChatStore>();
 
@@ -261,25 +263,15 @@ class PatientHomeBody extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.0),
-          Container(
-              height: 170,
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(8)),
-              child: Row(children: [
-                AdvertisementCarousel(),
-              ])),
+          AdvertisementCarousel(),
+
           SizedBox(height: 16.0),
-          Row(
+            Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Popular Doctors',
-                style: GoogleFonts.nunito(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextButton(
                 onPressed: () {
@@ -288,17 +280,11 @@ class PatientHomeBody extends StatelessWidget {
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: const Color.fromARGB(0, 202, 23, 23),
+                  backgroundColor: Colors.transparent,
                 ),
                 child: Text(
                   'See all',
-                  style: GoogleFonts.nunito(
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  style: TextStyle(color: Colors.blue),
                 ),
               ),
             ],
@@ -308,184 +294,7 @@ class PatientHomeBody extends StatelessWidget {
         ],
       ),
     );
-  }
-}
 
-class Populars extends StatefulWidget {
-  @override
-  PopularsState createState() => PopularsState();
-}
-
-class PopularsState extends State<Populars> {
-  List<dynamic> doctors = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchDoctors();
-  }
-
-Future<void> fetchDoctors() async {
-  try {
-    final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse(
-        '$baseUrl/api/users?filters[role][\$eq]=3&populate=*&pagination[pageSize]=2&pagination[start]=0');
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-
-      setState(() {
-        doctors = data.map((doctor) {
-          String fullImageUrl =
-              'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg'; // Default image with base URL
-
-          if (doctor['profile_picture'] != null) {
-            fullImageUrl = '${doctor['profile_picture']}';
-          }
-
-          doctor['full_image_url'] = fullImageUrl;
-          return doctor;
-        }).toList();
-        isLoading = false;
-      });
-    } else {
-      print('Failed to load doctors');
-      Fluttertoast.showToast(
-        msg: 'Failed to load doctors',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red[200],
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
-  } catch (e) {
-    print('Error fetching doctors: $e');
-    Fluttertoast.showToast(
-      msg: 'Network error during fetch',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.red[200],
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-
-    setState(() {
-      isLoading = false; // Ensure to update loading state even if there's an error
-    });
-  }
-}
-
-  @override
-  Widget build(BuildContext context) {
-    return Flex(
-      direction: Axis.vertical,
-      children: [
-        if (isLoading) ...[
-          SizedBox(
-            height: 100,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ] else if (doctors.isNotEmpty) ...[
-          DoctorCard(
-            id: doctors[0]['id'],
-            imageUrl: doctors[0]['profile_picture'], // Use full_image_url
-            name: 'Dr. ${doctors[0]['firstName']} ${doctors[0]['lastName']}',
-            profession: doctors[0]['specialisation'] ?? 'General Practice',
-            rating: doctors[0]['total_overall_rating'] != null
-                ? doctors[0]['total_overall_rating'] /
-                    (doctors[0]['total_raters'] ?? 1)
-                : 0,
-            onChatPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChattingPage(
-                    guestId: doctors[0]['id'],
-                    guestName:
-                        '${doctors[0]['firstName']} ${doctors[0]['lastName']}',
-                    guestImage: doctors[0]['profile_picture'] ??
-                        'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                    guestPhoneNumber: doctors[0]['phone'],
-                  ),
-                ),
-              );
-            },
-            onViewProfilePressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ViewDocProfile(doctorCard: doctors[0]),
-                ),
-              );
-            },
-            onBookAppointmentPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      DoctorAppointmentPag(doctorCard: doctors[0]),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16.0),
-          if (doctors.length > 1) ...[
-            DoctorCard(
-              id: doctors[1]['id'],
-              imageUrl: doctors[1]['full_image_url'], // Use full_image_url
-              name: 'Dr. ${doctors[1]['firstName']} ${doctors[1]['lastName']}',
-              profession: (doctors[1]['specialisation'] != null &&
-                      doctors[1]['specialisation'].isNotEmpty)
-                  ? doctors[1]['specialisation']
-                  : 'General Practice',
-              rating: 4.0,
-              onChatPressed: () {
-                // context.read<ChatStore>().setCurrentGuestId(doctors[1]['id']);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChattingPage(
-                              guestId: doctors[1]['id'],
-                              guestName:
-                                  '${doctors[1]['firstName']} ${doctors[1]['lastName']}',
-                              guestImage: doctors[1]['profile_picture'] ??
-                                  'https://res.cloudinary.com/dqkofl9se/image/upload/v1727171512/Mobklinic/qq_jz1abw.jpg',
-                              guestPhoneNumber: doctors[1]['phone'],
-                            )));
-              },
-              onViewProfilePressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ViewDocProfile(doctorCard: doctors[1]),
-                  ),
-                );
-              },
-              onBookAppointmentPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DoctorAppointmentPag(doctorCard: doctors[1]),
-                  ),
-                );
-              },
-            ),
-          ],
-        ] else ...[
-          SizedBox(
-            height: 100,
-            child: Center(child: Text('No doctors available')),
-          )
-        ]
-      ],
-    );
+    
   }
 }

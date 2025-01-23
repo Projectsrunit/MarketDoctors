@@ -20,6 +20,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _role = 4;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   // Function to handle login
   Future<void> _loginUser() async {
@@ -49,7 +50,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           //to get full user record with profile picture etc
-          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          var url = Uri.parse(
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
@@ -94,6 +96,8 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
@@ -104,15 +108,21 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             children: [
               const SizedBox(height: 160),
               Text(
-                'Welcome Back,',
+                'Welcome Back!',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
-              Text(
-                'Login to your account',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text('Login to your account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -199,7 +209,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -214,6 +224,18 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                           prefixIcon: const Icon(Icons.lock),
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.bold, // Make label text bold
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {

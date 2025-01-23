@@ -16,13 +16,13 @@ class DoctorLoginPage extends StatefulWidget {
   State<DoctorLoginPage> createState() => _DoctorLoginPageState();
 }
 
-
 class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _role = 3;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   String? firstName;
   String? lastName;
@@ -56,14 +56,15 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
           //to get full user record with profile picture etc
-          var url = Uri.parse('$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+          var url = Uri.parse(
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
             _showMessage('Welcome Back!', isError: false);
             context.read<DataStore>().updateDoctorData(recordBody);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => DashboardPage()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => DashboardPage()));
           }
         } else {
           var errorResponse = jsonDecode(response.body);
@@ -101,6 +102,8 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
@@ -111,15 +114,21 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
             children: [
               const SizedBox(height: 160),
               Text(
-                'Welcome Back,',
+                'Welcome Back!',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
-              Text(
-                'Login to your account',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text('Login to your account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -206,7 +215,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -221,6 +230,18 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                           prefixIcon: const Icon(Icons.lock),
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.bold, // Make label text bold
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {

@@ -5,28 +5,35 @@ import 'package:market_doctor/pages/patient/success_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 
 class PatientVerificationPage extends StatefulWidget {
-  final String reference;  // Accept reference parameter
+  final String reference; // Accept reference parameter
 
   const PatientVerificationPage({super.key, required this.reference});
 
   @override
-  State<PatientVerificationPage> createState() => _PatientVerificationPageState();
+  State<PatientVerificationPage> createState() =>
+      _PatientVerificationPageState();
 }
 
 class _PatientVerificationPageState extends State<PatientVerificationPage> {
   final _otpControllers = List.generate(4, (index) => TextEditingController());
-  final _focusNodes = List.generate(4, (index) => FocusNode()); // Create FocusNodes
-  bool _isLoading = false;  // For loading state during API request
-  String baseUrl = dotenv.env['API_URL']!; // Get the API baseUrl from environment
+  final _focusNodes =
+      List.generate(4, (index) => FocusNode()); // Create FocusNodes
+  bool _isLoading = false; // For loading state during API request
+  String baseUrl =
+      dotenv.env['API_URL']!; // Get the API baseUrl from environment
 
   // This function will make a POST request to verify the OTP
   Future<void> _verifyOtp() async {
-    final otp = _otpControllers.map((controller) => controller.text).join(); // Concatenate OTP
+    final otp = _otpControllers
+        .map((controller) => controller.text)
+        .join(); // Concatenate OTP
 
     if (otp.length != 4) {
       // Show error if OTP is not 4 digits long
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 4-digit OTP sent to your Email.')),
+        const SnackBar(
+            content:
+                Text('Please enter a valid 4-digit OTP sent to your Email.')),
       );
       return;
     }
@@ -64,7 +71,8 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
       } else {
         // Show an error message if the verification failed
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verification failed. Please try again.')),
+          const SnackBar(
+              content: Text('OTP verification failed. Please try again.')),
         );
       }
     } catch (error) {
@@ -102,6 +110,8 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,12 +123,16 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                 'Verification',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Enter the OTP sent to your email',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -131,7 +145,7 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
                     width: 50,
                     child: TextField(
                       controller: _otpControllers[index],
-                      focusNode: _focusNodes[index],  // Assign FocusNode
+                      focusNode: _focusNodes[index], // Assign FocusNode
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1, // Only 1 digit per field
@@ -158,7 +172,9 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
 
               // Continue Button
               TextButton(
-                onPressed: _isLoading ? null : _verifyOtp,  // Disable button when loading
+                onPressed: _isLoading
+                    ? null
+                    : _verifyOtp, // Disable button when loading
                 style: TextButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -175,11 +191,11 @@ class _PatientVerificationPageState extends State<PatientVerificationPage> {
 
               // Resend OTP
               GestureDetector(
-                onTap: _isLoading ? null : _resendOtp,  // Disable if loading
-                child: const Text(
+                onTap: _isLoading ? null : _resendOtp, // Disable if loading
+                child: Text(
                   'Check your Inbox / Spam folder for the code',
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: isDarkMode ? Colors.white : Colors.blue,
                     decoration: TextDecoration.underline,
                   ),
                 ),

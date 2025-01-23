@@ -28,6 +28,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   final _dobController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   String _selectedCountryCode = '+234';
   bool _termsAccepted = false;
@@ -124,6 +125,8 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   @override
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).brightness == Brightness.dark
           ? Colors.black // Dark mode background
@@ -140,6 +143,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
                   'Let’s get you signed up',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                 ),
                 const SizedBox(height: 10),
@@ -274,7 +278,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
       ),
       child: TextFormField(
         controller: _passwordController,
-        obscureText: true,
+        obscureText: !_isPasswordVisible,
         decoration: InputDecoration(
           labelText: 'Password',
           labelStyle: const TextStyle(
@@ -293,6 +297,16 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none, // Remove border in light mode
           ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            ),
+            onPressed: () {
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            },
+          ),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -307,6 +321,8 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   }
 
   Widget _buildPhoneField() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Expanded(
@@ -344,7 +360,11 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      Text('(${country['code']})'),
+                      Text('(${country['code']})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )),
                     ],
                   ),
                 );
@@ -484,38 +504,39 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
   }
 
   Widget _buildTermsAndConditions() {
-  return Row(
-    children: [
-      Checkbox(
-        value: _termsAccepted,
-        onChanged: (value) {
-          setState(() {
-            _termsAccepted = value ?? false;
-          });
-        },
-      ),
-      Expanded(
-        child: GestureDetector(
-         onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => TermsAndConditions(),
-              ),
-            );
+    return Row(
+      children: [
+        Checkbox(
+          value: _termsAccepted,
+          onChanged: (value) {
+            setState(() {
+              _termsAccepted = value ?? false;
+            });
           },
-          child: const Text(
-            'I accept the terms and conditions',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF4672ff), // Make the text blue and clickable
-              decoration: TextDecoration.underline, // Add underline for emphasis
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TermsAndConditions(),
+                ),
+              );
+            },
+            child: const Text(
+              'I accept the terms and conditions',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4672ff), // Make the text blue and clickable
+                decoration:
+                    TextDecoration.underline, // Add underline for emphasis
+              ),
             ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   Widget _buildSignUpButton() {
     return ElevatedButton(

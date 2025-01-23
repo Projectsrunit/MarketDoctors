@@ -9,7 +9,7 @@ import 'package:market_doctor/data/countries.dart';
 import 'package:market_doctor/pages/terms.dart';
 import 'package:market_doctor/pages/patient/verification_page.dart';
 
-  class PatientSignUpPage extends StatefulWidget {
+class PatientSignUpPage extends StatefulWidget {
   const PatientSignUpPage({super.key});
 
   @override
@@ -24,6 +24,7 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   final _dobController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   String _selectedCountryCode = '+234';
   bool _termsAccepted = false;
@@ -40,72 +41,73 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
     super.dispose();
   }
 
-Future<void> _signUp() async {
-  if (_formKey.currentState?.validate() ?? false) {
-    if (!_termsAccepted) {
-      _showSnackBar('Please accept the terms and conditions');
-    } else {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // API request setup
-      String baseUrl = dotenv.env['API_URL']!;
-      String url = '$baseUrl/api/auth/register';
-
-      // Prepare the data to be sent to the backend
-      Map<String, dynamic> signUpData = {
-        "firstName": _firstNameController.text.trim(),
-        "lastName": _lastNameController.text.trim(),
-        "email": _emailController.text.trim(),
-        "password": _passwordController.text,
-        "dateOfBirth": _dobController.text,
-        "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
-        "role": 5
-      };
-
-      try {
-        // Make the POST request
-        http.Response response = await http.post(
-          Uri.parse(url),
-          headers: {"Content-Type": "application/json"},
-          body: json.encode(signUpData),
-        );
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          // Parse the response
-          Map<String, dynamic> responseData = json.decode(response.body);
-
-          // Check if the OTP was sent successfully
-          if (responseData['message'] == "OTP sent successfully") {
-            // Show a message to the user
-            _showSnackBar('OTP message was sent to your email, check your inbox or spam');
-          }
-
-          // Get the reference from the response
-          String reference = responseData['sendchampResponse']['data']['reference'];
-
-          // Navigate to PatientVerificationPage with the reference
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => PatientVerificationPage(reference: reference),
-            ),
-          );
-        } else {
-          _showSnackBar('Sign up failed: ${response.body}');
-        }
-      } catch (e) {
-        _showSnackBar('Error: $e');
-      } finally {
+  Future<void> _signUp() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      if (!_termsAccepted) {
+        _showSnackBar('Please accept the terms and conditions');
+      } else {
         setState(() {
-          _isLoading = false;
+          _isLoading = true;
         });
+
+        // API request setup
+        String baseUrl = dotenv.env['API_URL']!;
+        String url = '$baseUrl/api/auth/register';
+
+        // Prepare the data to be sent to the backend
+        Map<String, dynamic> signUpData = {
+          "firstName": _firstNameController.text.trim(),
+          "lastName": _lastNameController.text.trim(),
+          "email": _emailController.text.trim(),
+          "password": _passwordController.text,
+          "dateOfBirth": _dobController.text,
+          "phone": '$_selectedCountryCode${_phoneController.text.trim()}',
+          "role": 5
+        };
+
+        try {
+          // Make the POST request
+          http.Response response = await http.post(
+            Uri.parse(url),
+            headers: {"Content-Type": "application/json"},
+            body: json.encode(signUpData),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            // Parse the response
+            Map<String, dynamic> responseData = json.decode(response.body);
+
+            // Check if the OTP was sent successfully
+            if (responseData['message'] == "OTP sent successfully") {
+              // Show a message to the user
+              _showSnackBar(
+                  'OTP message was sent to your email, check your inbox or spam');
+            }
+
+            // Get the reference from the response
+            String reference =
+                responseData['sendchampResponse']['data']['reference'];
+
+            // Navigate to PatientVerificationPage with the reference
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) =>
+                    PatientVerificationPage(reference: reference),
+              ),
+            );
+          } else {
+            _showSnackBar('Sign up failed: ${response.body}');
+          }
+        } catch (e) {
+          _showSnackBar('Error: $e');
+        } finally {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
-}
-
-
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context)
@@ -113,52 +115,52 @@ Future<void> _signUp() async {
   }
 
   @override
-  @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Theme.of(context).brightness == Brightness.dark
-        ? Colors.black   // Dark mode background
-        : Colors.white,  // Light mode background
-    body: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Let’s get you signed up',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+  Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.black // Dark mode background
+          : Colors.white, // Light mode background
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text('Let’s get you signed up',
+                    style: TextStyle(
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 10),
-              _buildLoginPrompt(),
-              const SizedBox(height: 20),
-              _buildSignUpForm(),
-            ],
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    )),
+                const SizedBox(height: 10),
+                _buildLoginPrompt(),
+                const SizedBox(height: 20),
+                _buildSignUpForm(),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildLoginPrompt() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-         Text(
-        "Already Signed Up? ",
-        style: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white  // White text in dark mode
-              : Colors.black,  // Black text in light mode
-          fontSize: 16,
+        Text(
+          "Already Signed Up? ",
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white // White text in dark mode
+                : Colors.black, // Black text in light mode
+            fontSize: 16,
+          ),
         ),
-      ),
         GestureDetector(
           onTap: () {
             // Navigator.of(context).push(
@@ -247,128 +249,209 @@ Widget build(BuildContext context) {
     );
   }
 
-Widget _buildPasswordField() {
-  return Container(
-     height: 60,
-    decoration: BoxDecoration(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850] // Dark mode background
-          : Colors.grey[300], // Light mode grey background
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: Offset(0, 2), // Shadow position
-        ),
-      ],
-    ),
-    child: TextFormField(
-      controller: _passwordController,
-      obscureText: true,
-      decoration: InputDecoration(
-        labelText: 'Password',
-         labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-        prefixIcon: const Icon(Icons.lock),
-        filled: true,
-        fillColor: Colors.transparent, // Set fill color to transparent
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        } else if (value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
-    ),
-  );
-}
-
-
-
-
-
-Widget _buildPhoneField() {
-  return Row(
-    children: [
-      Expanded(
-        flex: 2,
-        child: Container(
-           height: 60,
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[850] // Dark mode background
-                : Colors.grey[300], // Light mode grey background
-                
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: Offset(0, 2), // Shadow position
-              ),
-            ],
+  Widget _buildPasswordField() {
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850] // Dark mode background
+            : Colors.grey[300], // Light mode grey background
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 2), // Shadow position
           ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedCountryCode,
-            items: countryCodes.map((country) {
-              return DropdownMenuItem<String>(
-                value: country['code'],
-                child: Row(
-                  children: [
-                    Image.network(
-                      country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
-                      width: 32,
-                      height: 20,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.flag);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Text('(${country['code']})'),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
+        ],
+      ),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: !_isPasswordVisible,
+        decoration: InputDecoration(
+          labelText: 'Password',
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold, // Make the label text bold
+          ),
+          prefixIcon: const Icon(Icons.lock),
+          filled: true,
+          fillColor: Colors.transparent, // Set fill color to transparent
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            ),
+            onPressed: () {
               setState(() {
-                _selectedCountryCode = value!;
+                _isPasswordVisible = !_isPasswordVisible;
               });
             },
-            decoration: InputDecoration(
-              fillColor: Colors.transparent, // Set fill color to transparent
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none, // Remove border in light mode
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none, // Remove border in light mode
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your password';
+          } else if (value.length < 6) {
+            return 'Password must be at least 6 characters';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildPhoneField() {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[850] // Dark mode background
+                  : Colors.grey[300], // Light mode grey background
+
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 2), // Shadow position
+                ),
+              ],
+            ),
+            child: DropdownButtonFormField<String>(
+              value: _selectedCountryCode,
+              items: countryCodes.map((country) {
+                return DropdownMenuItem<String>(
+                  value: country['code'],
+                  child: Row(
+                    children: [
+                      Image.network(
+                        country['flagUrl'] ?? 'https://flagcdn.com/w320/ng.png',
+                        width: 32,
+                        height: 20,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.flag);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Text('(${country['code']})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          )),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedCountryCode = value!;
+                });
+              },
+              decoration: InputDecoration(
+                fillColor: Colors.transparent, // Set fill color to transparent
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
               ),
             ),
           ),
         ),
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        flex: 3,
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 3,
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[850] // Dark mode background
+                  : Colors.grey[300], // Light mode grey background
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 2), // Shadow position
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [LengthLimitingTextInputFormatter(10)],
+              decoration: InputDecoration(
+                prefixText: '$_selectedCountryCode ',
+                labelText: 'Phone Number',
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.bold, // Make the label text bold
+                ),
+                filled: true,
+                fillColor: Colors.transparent, // Set fill color to transparent
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none, // Remove border in light mode
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your phone number';
+                }
+                return null;
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDobField() {
+    return GestureDetector(
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime(2000),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+        );
+        if (pickedDate != null) {
+          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+          _dobController.text = formattedDate;
+        }
+      },
+      child: AbsorbPointer(
         child: Container(
-           height: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.grey[850] // Dark mode background
@@ -384,18 +467,17 @@ Widget _buildPhoneField() {
             ],
           ),
           child: TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [LengthLimitingTextInputFormatter(10)],
+            controller: _dobController,
             decoration: InputDecoration(
-              prefixText: '$_selectedCountryCode ',
-              labelText: 'Phone Number',
-               labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
+              labelText: 'Date of Birth',
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold, // Make the label text bold
+              ),
+              prefixIcon: const Icon(Icons.calendar_today),
               filled: true,
               fillColor: Colors.transparent, // Set fill color to transparent
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none, // Remove border in light mode
@@ -405,190 +487,120 @@ Widget _buildPhoneField() {
                 borderSide: BorderSide.none, // Remove border in light mode
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              return null;
-            },
           ),
         ),
       ),
-    ],
-  );
-}
-Widget _buildDobField() {
-  return GestureDetector(
-    onTap: () async {
-      DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime(2000),
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
-      );
-      if (pickedDate != null) {
-        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-        _dobController.text = formattedDate;
-      }
-    },
-    child: AbsorbPointer(
-      child: Container(
-         height: 60,
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[850] // Dark mode background
-              : Colors.grey[300], // Light mode grey background
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, 2), // Shadow position
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: _dobController,
-          decoration: InputDecoration(
-            labelText: 'Date of Birth',
-             labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-            prefixIcon: const Icon(Icons.calendar_today),
-            filled: true,
-            fillColor: Colors.transparent, // Set fill color to transparent
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none, // Remove border in light mode
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none, // Remove border in light mode
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
+    );
+  }
 
- Widget _buildTermsAndConditions() {
-  return Row(
-    children: [
-      Checkbox(
-        value: _termsAccepted,
-        onChanged: (value) {
-          setState(() {
-            _termsAccepted = value ?? false;
-          });
-        },
-      ),
-      Expanded(
-        child: GestureDetector(
-         onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => TermsAndConditions(),
-              ),
-            );
+  Widget _buildTermsAndConditions() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _termsAccepted,
+          onChanged: (value) {
+            setState(() {
+              _termsAccepted = value ?? false;
+            });
           },
-          child: const Text(
-            'I accept the terms and conditions',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF4672ff), // Make the text blue and clickable
-              decoration: TextDecoration.underline, // Add underline for emphasis
-            ),
-          ),
         ),
-      ),
-    ],
-  );
-}
-
-
- Widget _buildSignUpButton() {
-  return ElevatedButton(
-    onPressed: _isLoading ? null : _signUp,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue, // Background color
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      minimumSize: const Size(double.infinity, 48),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-    ),
-    child: _isLoading
-        ? const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          )
-        : const Text(
-            'Sign Up',
-            style: TextStyle(
-              color: Colors.white, // Text color
-              fontWeight: FontWeight.bold, // Bold text
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TermsAndConditions(),
+                ),
+              );
+            },
+            child: const Text(
+              'I accept the terms and conditions',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4672ff), // Make the text blue and clickable
+                decoration:
+                    TextDecoration.underline, // Add underline for emphasis
+              ),
             ),
           ),
-  );
-}
-
-
-Widget _buildTextField({
-  required TextEditingController controller,
-  required String labelText,
-  TextInputType? keyboardType,
-  Widget? prefixIcon,
-  String? Function(String?)? validator,
-  double height = 60.0, // Default height, adjust as needed
-}) {
-  return Container(
-    height: height, // Set the height of the container
-    decoration: BoxDecoration(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[850] // Dark mode background
-          : Colors.grey[300], // Light mode grey background
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: Offset(0, 2), // Shadow position
         ),
       ],
-    ),
-    child: TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: labelText,
-         labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, // Make the label text bold
-        ),
-        prefixIcon: prefixIcon,
-        filled: true,
-        fillColor: Colors.transparent, // Set fill color to transparent
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // Increased vertical padding
-        enabledBorder: OutlineInputBorder(
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _signUp,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue, // Background color
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Remove border in light mode
         ),
       ),
-      validator: validator,
-    ),
-  );
+      child: _isLoading
+          ? const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            )
+          : const Text(
+              'Sign Up',
+              style: TextStyle(
+                color: Colors.white, // Text color
+                fontWeight: FontWeight.bold, // Bold text
+              ),
+            ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    TextInputType? keyboardType,
+    Widget? prefixIcon,
+    String? Function(String?)? validator,
+    double height = 60.0, // Default height, adjust as needed
+  }) {
+    return Container(
+      height: height, // Set the height of the container
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850] // Dark mode background
+            : Colors.grey[300], // Light mode grey background
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 2), // Shadow position
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold, // Make the label text bold
+          ),
+          prefixIcon: prefixIcon,
+          filled: true,
+          fillColor: Colors.transparent, // Set fill color to transparent
+          contentPadding: const EdgeInsets.symmetric(
+              vertical: 16, horizontal: 12), // Increased vertical padding
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Remove border in light mode
+          ),
+        ),
+        validator: validator,
+      ),
+    );
+  }
 }
-
-
-
-
-
-}
-
-

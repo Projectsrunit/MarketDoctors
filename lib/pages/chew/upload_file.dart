@@ -76,8 +76,7 @@ class _ChewUploadCredentialsPageState extends State<ChewUploadCredentialsPage> {
   }
 
   Future<void> _sendFileUrlToServer(String fileUrl, String fileName) async {
-    final chewData =
-        Provider.of<DataStore>(context, listen: false).chewData;
+    final chewData = Provider.of<DataStore>(context, listen: false).chewData;
 
     if (chewData == null || chewData['id'] == null) {
       _showSnackBar('No Chew data available. Please log in again.');
@@ -210,7 +209,19 @@ class _ChewUploadCredentialsPageState extends State<ChewUploadCredentialsPage> {
                 ),
               ),
             ),
-            if (_isLoading) CircularProgressIndicator(),
+            if (_isLoading) ...[
+              const SizedBox(height: 10),
+              Column(
+                children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 10),
+                  Text(
+                    'Uploading... Please wait',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
