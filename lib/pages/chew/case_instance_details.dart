@@ -109,7 +109,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               SizedBox(height: 20),
               Text(
                 'Medical Details',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               SizedBox(height: 10),
               _buildTextField('Blood Pressure', _bloodPressureController,
@@ -162,6 +162,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                         style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
+                          color: Colors.blue,
                         ),
                       ),
                       const SizedBox(height: 16.0),
