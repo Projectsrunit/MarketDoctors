@@ -47,8 +47,8 @@ class _ChewVerificationPageState extends State<ChewVerificationPage> {
     try {
       // Create the body of the request
       final body = jsonEncode({
-        "verification_reference": widget.reference,
-        "verification_code": otp,
+        "email": widget.reference,
+        "otp": otp,
       });
 
       // Make the API request

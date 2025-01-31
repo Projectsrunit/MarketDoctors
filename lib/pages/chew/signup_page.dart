@@ -84,14 +84,13 @@ class _ChewSignUpPageState extends State<ChewSignUpPage> {
             }
 
             // Get the reference from the response
-            String reference =
-                responseData['sendchampResponse']['data']['reference'];
+            String email = responseData['user']['email'];
 
             // Navigate to PatientVerificationPage with the reference
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) =>
-                    ChewVerificationPage(reference: reference),
+                    ChewVerificationPage(reference: email),
               ),
             );
           } else {

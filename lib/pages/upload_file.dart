@@ -128,28 +128,7 @@ class UploadCredentialsPage extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Select File from Gallery Button
-                    OutlinedButton(
-                      onPressed: () {
-                        _pickFile(context);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 50,
-                        ),
-                        side: const BorderSide(color: Color(0xFF617DEF)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Select File from Gallery',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF617DEF),
-                        ),
-                      ),
-                    ),
+                   
                   ],
                 ),
               ),

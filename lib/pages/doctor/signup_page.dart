@@ -89,8 +89,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
             }
 
             // Get the reference from the response
-            String reference =
-                responseData['sendchampResponse']['data']['reference'];
+           String email = responseData['user']['email'];
 
             final fullRecord = await http.get(url);
             if (fullRecord.statusCode == 200) {
@@ -101,7 +100,7 @@ class _DoctorSignUpPageState extends State<DoctorSignUpPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          DoctorVerificationPage(reference: reference)));
+                          DoctorVerificationPage(reference: email)));
             }
           } else {
             _showSnackBar('Sign up failed: ${response.body}');
