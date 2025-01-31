@@ -304,6 +304,7 @@ class ChatStore extends ChangeNotifier {
       }
     }
     print('now going to set those green lights ==========');
+    notifyListeners();
   }
 
   void ackWasSuccess(

@@ -107,7 +107,12 @@ class ProfilePage extends StatelessWidget {
         ),
         Divider(color: Colors.grey[300], thickness: 1),
         _buildNoArrowRow(context, Icons.logout, "Log out", () {
-          context.read<DataStore>().updateChewData(null);
+          final datastore = context.read<DataStore>();
+          datastore.updateChewData(null);
+          datastore.changeTheCaseData({});
+          datastore.updateCaseSymptom([]);
+          datastore.changeTheCaseVisitData({});
+
           context.read<ChatStore>().resetStore();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => ChewHome()));

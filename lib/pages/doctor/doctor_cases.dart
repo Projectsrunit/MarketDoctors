@@ -351,6 +351,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
   final _heightController = TextEditingController();
   final _bmiController = TextEditingController();
   final _bloodGlucoseController = TextEditingController();
+  final _ageController = TextEditingController();
   final _existingConditionController = TextEditingController();
   final _currentPrescriptionController = TextEditingController();
   final _chewsNotesController = TextEditingController();
@@ -389,6 +390,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     _bmiController.text = widget.caseData['bmi']?.toString() ?? '';
     _bloodGlucoseController.text =
         widget.caseData['blood_glucose']?.toString() ?? '';
+    _ageController.text = widget.caseData['age']?.toString() ?? '';
     _existingConditionController.text =
         widget.caseData['existing_condition']?.toString() ?? '';
     _currentPrescriptionController.text =
@@ -423,7 +425,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
               ),
               SizedBox(height: 10),
               _buildTextField(
-                  'Blood Pressure', _bloodGlucoseController, 'mmHg'),
+                  'Blood Pressure', _bloodPressureController, 'mmHg'),
               SizedBox(
                 height: 4,
               ),
@@ -436,6 +438,10 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                 height: 4,
               ),
               _buildTextField('Height', _heightController, 'cm'),
+              SizedBox(
+                height: 4,
+              ),
+              _buildTextField('Age', _ageController, 'yrs'),
               SizedBox(
                 height: 4,
               ),
@@ -500,6 +506,8 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           'height': _parseNumber(_heightController.text),
         if (_parseNumber(_bmiController.text) != null)
           'bmi': _parseNumber(_bmiController.text),
+        if (_parseNumber(_ageController.text) != null)
+          'age': _parseNumber(_ageController.text),
         if (_parseNumber(_bloodGlucoseController.text) != null)
           'blood_glucose': _parseNumber(_bloodGlucoseController.text),
         'existing_condition': _existingConditionController.text,
