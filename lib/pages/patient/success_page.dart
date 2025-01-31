@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/choose_action.dart';
+import 'package:market_doctor/pages/patient/login_page.dart';
 
 class PatientSuccessPage extends StatelessWidget {
   const PatientSuccessPage({super.key});
@@ -50,7 +50,7 @@ class PatientSuccessPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ChooseActionPage(),
+                      builder: (context) => const PatientLoginPage(),
                     ),
                   );
                 },
@@ -61,7 +61,7 @@ class PatientSuccessPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Exit'),
+                child: const Text('Proceed to Login'),
               ),
             ],
           ),

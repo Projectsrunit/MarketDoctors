@@ -21,6 +21,7 @@ class DoctorsUploadCredentialsPage extends StatefulWidget {
 class _DoctorsUploadCredentialsPageState
     extends State<DoctorsUploadCredentialsPage> {
   bool _isLoading = false;
+  bool _isFileUploaded = false;
 
   String? _fileName; // To store the file name dynamically
 
@@ -126,7 +127,7 @@ class _DoctorsUploadCredentialsPageState
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 70),
                     const Text(
                       'Upload Credentials',
                       style:
@@ -228,6 +229,7 @@ class _DoctorsUploadCredentialsPageState
                 'Submit',
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
+              
             ),
           ],
         ),

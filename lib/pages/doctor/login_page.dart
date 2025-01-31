@@ -55,6 +55,11 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
+          
+          if (responseBody['user']['confirmed'] == false) {
+            _showMessage('Your account is not yet confirmed. Contact Market Doctor Admin');
+            return;
+          }
           //to get full user record with profile picture etc
           var url = Uri.parse(
               '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
