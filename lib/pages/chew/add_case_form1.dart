@@ -6,10 +6,15 @@ import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class AddCaseFormOne extends StatefulWidget {
+  final int? updatingId;
+
+  const AddCaseFormOne({Key? key, this.updatingId}) : super(key: key);
+
   @override
   AddCaseFormOneState createState() => AddCaseFormOneState();
 }
@@ -29,21 +34,24 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
   final TextEditingController _bmiController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  // final TextEditingController _existingConditionController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _heightController.addListener(_calcBmi);
     _weightController.addListener(_calcBmi);
+    _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   void _calcBmi() {
-    final input1 = double.tryParse(_heightController.text);
-    final input2 = double.tryParse(_weightController.text);
+    final height = double.tryParse(_heightController.text);
+    final weight = double.tryParse(_weightController.text);
 
-    if (input1 != null && input2 != null) {
-      _bmiController.text = (((input2 * 10) / input1).round() / 10).toString();
+    if (height != null && weight != null) {
+      _bmiController.text =
+          ((weight / (height * height)).round() / 10 * 10).toString();
     } else {
       setState(() {
         _bmiController.text = '';
@@ -53,26 +61,31 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
 
   @override
   Widget build(BuildContext context) {
-    int chewId = context.watch<DataStore>().chewData?['id'];
-    Map<String, dynamic> caseData =
-        context.read<DataStore>().addCaseData['caseData']!;
-    List<String> tempSymptoms = context.read<DataStore>().tempSymptoms;
+    final datastore = context.read<DataStore>();
+    int? chewId = context.watch<DataStore>().chewData?['id'];
+    Map<String, dynamic> caseData = datastore.addCaseData['caseData']!;
+    Map<String, dynamic> caseVisitData =
+        datastore.addCaseData['caseVisitData']!;
+    List<String> tempSymptoms = datastore.tempSymptoms;
 
     if (caseData.isNotEmpty) {
       _firstNameController.text = caseData['first_name'] ?? '';
       _lastNameController.text = caseData['last_name'] ?? '';
+      _emailController.text = caseData['email'] ?? '';
+      _phoneController.text = caseData['phone_number'] ?? '';
+      _selectedGender = caseData['gender'];
+      _ageController.text = caseData['age']?.toString() ?? '';
+    }
+
+    if (caseVisitData.isNotEmpty) {
       _prescriptionController.text = caseData['current_prescription'] ?? '';
       _chewsNotesController.text = caseData['chews_notes'] ?? '';
-      _emailController.text = caseData['email'] ?? '';
       _bloodPressureController.text =
           caseData['blood_pressure']?.toString() ?? '';
       _weightController.text = caseData['weight']?.toString() ?? '';
-      _bmiController.text = caseData['bmi']?.toString() ?? '';
-      _phoneController.text = caseData['phone_number'] ?? '';
       _heightController.text = caseData['height']?.toString() ?? '';
       _bloodGlucoseController.text =
           caseData['blood_glucose']?.toString() ?? '';
-      _selectedGender = caseData['gender'];
     }
 
     return Scaffold(
@@ -124,8 +137,23 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
-                Text('Contact Details'),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _ageController,
+                        decoration: InputDecoration(
+                          labelText: 'Age',
+                        ),
+                        keyboardType: TextInputType.phone,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    dateWidget(context),
+                  ],
+                ),
+                SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -142,12 +170,6 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
                         ),
-                        // validator: (value) {
-                        //   if (value == null || value.isEmpty) {
-                        //     return 'This field is required';
-                        //   }
-                        //   return null;
-                        // },
                         keyboardType: TextInputType.phone,
                       ),
                     ),
@@ -298,7 +320,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _saveData(chewId);
+                          _saveData();
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -392,58 +414,95 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     );
   }
 
-  Future<void> _saveData(chewId) async {
+  Expanded dateWidget(BuildContext context) {
+    return Expanded(
+      child: TextFormField(
+        controller: _dateController,
+        readOnly: true,
+        decoration: const InputDecoration(
+          labelText: 'Date registered',
+          suffixIcon: Icon(Icons.calendar_today),
+        ),
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+          if (pickedDate != null) {
+            _dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _saveData() async {
     final caseData = {
       'first_name': _firstNameController.text,
       'last_name': _lastNameController.text,
       'gender': _selectedGender,
       'email': _emailController.text,
+      if (_parseNumber(_ageController.text) != null)
+        'age': _parseNumber(_ageController.text),
       if (_parseNumber(_phoneController.text) != null)
-        'phone_number': _phoneController.text,
+        'phone_number': _phoneController.text
+    };
+
+    final caseVisitData = {
       if (_parseNumber(_bloodPressureController.text) != null)
         'blood_pressure': _parseNumber(_bloodPressureController.text),
       if (_parseNumber(_weightController.text) != null)
         'weight': _parseNumber(_weightController.text),
       if (_parseNumber(_heightController.text) != null)
         'height': _parseNumber(_heightController.text),
-      if (_parseNumber(_bmiController.text) != null)
-        'bmi': _parseNumber(_bmiController.text),
       if (_parseNumber(_bloodGlucoseController.text) != null)
         'blood_glucose': _parseNumber(_bloodGlucoseController.text),
       'current_prescription': _prescriptionController.text,
       'symptoms': context.read<DataStore>().tempSymptoms,
       'chews_notes': _chewsNotesController.text,
-      'chew': chewId
+      'date':
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(_dateController.text)),
     };
 
     context.read<DataStore>().changeTheCaseData(caseData);
+    context.read<DataStore>().changeTheCaseVisitData(caseVisitData);
 
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddCaseFormTwo()));
   }
 
-  Future<void> _uploadData(chewId) async {
+  Future<void> _uploadData(chewId, [int? updatingId]) async {
     final caseData = {
       'first_name': _firstNameController.text,
       'last_name': _lastNameController.text,
       'gender': _selectedGender,
       'email': _emailController.text,
+      if (_parseNumber(_ageController.text) != null)
+        'age': _parseNumber(_ageController.text),
       if (_parseNumber(_phoneController.text) != null)
         'phone_number': _phoneController.text,
+      'chew': chewId
+    };
+
+    print('Date from controller: ${_dateController.text}');
+
+    final caseVisitData = {
       if (_parseNumber(_bloodPressureController.text) != null)
         'blood_pressure': _parseNumber(_bloodPressureController.text),
       if (_parseNumber(_weightController.text) != null)
         'weight': _parseNumber(_weightController.text),
       if (_parseNumber(_heightController.text) != null)
         'height': _parseNumber(_heightController.text),
-      if (_parseNumber(_bmiController.text) != null)
-        'bmi': _parseNumber(_bmiController.text),
       if (_parseNumber(_bloodGlucoseController.text) != null)
         'blood_glucose': _parseNumber(_bloodGlucoseController.text),
       'current_prescription': _prescriptionController.text,
       'symptoms': context.read<DataStore>().tempSymptoms,
       'chews_notes': _chewsNotesController.text,
-      'chew': chewId
+      'date':
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(_dateController.text)),
+      if (updatingId != null) 'case': updatingId
     };
 
     Fluttertoast.showToast(
@@ -456,22 +515,41 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       fontSize: 16.0,
     );
     final String baseUrl = dotenv.env['API_URL']!;
-    final Uri url = Uri.parse('$baseUrl/api/cases');
+
+    final Uri urlAdd = Uri.parse('$baseUrl/api/casewithvisit/add');
+    final Uri urlEdit = Uri.parse('$baseUrl/api/casevisits');
+
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'data': caseData}),
-      );
+      var response;
+      if (updatingId == null) {
+
+        response = await http.post(
+          urlAdd,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({
+            'data': {'caseData': caseData, 'visitData': caseVisitData}
+          }),
+        );
+      } else {
+        response = await http.post(
+          urlEdit,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({'data': caseVisitData}),
+        );
+      }
 
       if (response.statusCode == 200) {
-        context.read<DataStore>().changeTheCaseData({});
-        context.read<DataStore>().updateCaseSymptom([]);
+        final datastore = context.read<DataStore>();
+        datastore.changeTheCaseData({});
+        datastore.updateCaseSymptom([]);
+        datastore.changeTheCaseVisitData({});
+
         var jsoned = jsonDecode(response.body);
-        context.read<DataStore>().addCase(
-            {'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+        context.read<DataStore>().addCase({...jsoned['case'], 'casevisits': [jsoned['caseVisit']]});
 
         Fluttertoast.showToast(
           msg: 'Case added successfully',

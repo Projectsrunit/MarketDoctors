@@ -26,18 +26,6 @@ class AddCaseFormTwo extends StatelessWidget {
                   ),
                 ),
               ),
-              // Positioned(
-              //   top: 16,
-              //   left: 16,
-              //   child: Text(
-              //     'Click on body part for possible complications',
-              //     style: TextStyle(
-              //       fontSize: 18,
-              //       fontWeight: FontWeight.bold,
-              //       color: Colors.grey,
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           Expanded(

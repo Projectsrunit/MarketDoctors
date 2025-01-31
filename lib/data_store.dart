@@ -12,6 +12,7 @@ class DataStore with ChangeNotifier {
 
   Map<String, Map<String, dynamic>> addCaseData = {
     'caseData': {},
+    'caseVisitData': {},
     'pictures': {
       'Head': 'assets/images/head.png',
       'Chest': 'assets/images/chest.png',
@@ -140,7 +141,15 @@ class DataStore with ChangeNotifier {
     notifyListeners();
   }
 
-    void updateCaseSymptom(List<String> newData) {
+  void changeTheCaseVisitData(Map<String, dynamic> newData) {
+    addCaseData = {
+      ...addCaseData,
+      'caseVisitData': newData
+    };
+    notifyListeners();
+  }
+
+  void updateCaseSymptom(List<String> newData) {
     tempSymptoms = newData;
     notifyListeners();
   }
