@@ -85,14 +85,13 @@ class _PatientSignUpPage extends State<PatientSignUpPage> {
             }
 
             // Get the reference from the response
-            String reference =
-                responseData['sendchampResponse']['data']['reference'];
+                        String email = responseData['user']['email'];
 
             // Navigate to PatientVerificationPage with the reference
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) =>
-                    PatientVerificationPage(reference: reference),
+                    PatientVerificationPage(reference: email),
               ),
             );
           } else {

@@ -100,17 +100,17 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
               children: [
                 Text(
                   'Patient Personal Details',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
                 ),
                 SizedBox(height: 10),
-                Text('Name'),
+                
                 Row(
                   children: [
                     Expanded(
                       child: TextFormField(
                         controller: _firstNameController,
                         decoration: InputDecoration(
-                          labelText: 'First Name',
+                          labelText: 'First Name *',
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -125,7 +125,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                       child: TextFormField(
                         controller: _lastNameController,
                         decoration: InputDecoration(
-                          labelText: 'Last Name',
+                          labelText: 'Last Name *',
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -168,7 +168,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                       child: TextFormField(
                         controller: _phoneController,
                         decoration: InputDecoration(
-                          labelText: 'Phone Number',
+                          labelText: 'Phone Number *',
                         ),
                         keyboardType: TextInputType.phone,
                       ),
@@ -178,7 +178,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Patient Medical Details',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
                 ),
                 SizedBox(height: 10),
                 Row(
@@ -286,7 +286,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Symptoms',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
                 ),
                 SizedBox(height: 10),
                 if (tempSymptoms.isNotEmpty)
@@ -348,7 +348,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Prescriptions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
                 ),
                 SizedBox(height: 10),
                 TextFormField(
@@ -362,7 +362,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'CHEW\'s notes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
                 ),
                 SizedBox(height: 10),
                 TextFormField(

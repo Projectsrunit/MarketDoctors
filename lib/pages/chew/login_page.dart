@@ -49,6 +49,13 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
+          
+          // Check if user is confirmed - using direct true/false check
+          if (responseBody['user']['confirmed'] == false) {
+            _showMessage('Your account is not yet confirmed. Contact Market Doctor Admin');
+            return;
+          }
+
           //to get full user record with profile picture etc
           var url = Uri.parse(
               '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
@@ -127,7 +134,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don’t have an account? ",
+                    "Don't have an account? ",
                     style: TextStyle(fontSize: 18),
                   ),
                   GestureDetector(

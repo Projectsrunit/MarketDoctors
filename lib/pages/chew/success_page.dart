@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:market_doctor/pages/chew/login_page.dart';
+import 'package:market_doctor/pages/choose_action.dart';
 
 class ChewSuccessPage extends StatelessWidget {
   const ChewSuccessPage({super.key});
@@ -50,7 +50,7 @@ class ChewSuccessPage extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ChewLoginPage(),
+                      builder: (context) => const ChooseActionPage(),
                     ),
                   );
                 },
@@ -61,7 +61,7 @@ class ChewSuccessPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Proceed to Login'),
+                child: const Text('Exit'),
               ),
             ],
           ),

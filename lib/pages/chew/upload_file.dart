@@ -126,7 +126,7 @@ class _ChewUploadCredentialsPageState extends State<ChewUploadCredentialsPage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 70),
                     const Text(
                       'Upload Credentials',
                       style:
@@ -139,7 +139,7 @@ class _ChewUploadCredentialsPageState extends State<ChewUploadCredentialsPage> {
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 140),
                     GestureDetector(
                       onTap: _pickFile,
                       child: DottedBorder(
@@ -190,21 +190,7 @@ class _ChewUploadCredentialsPageState extends State<ChewUploadCredentialsPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    OutlinedButton(
-                      onPressed: _pickFile,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 50),
-                        side: const BorderSide(color: Color(0xFF617DEF)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: const Text(
-                        'Select File from Gallery',
-                        style:
-                            TextStyle(fontSize: 18, color: Color(0xFF617DEF)),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
