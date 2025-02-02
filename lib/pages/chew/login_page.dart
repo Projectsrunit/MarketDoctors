@@ -58,7 +58,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
 
           //to get full user record with profile picture etc
           var url = Uri.parse(
-              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=cases.casevisits');
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
