@@ -134,18 +134,12 @@ class DataStore with ChangeNotifier {
   }
 
   void changeTheCaseData(Map<String, dynamic> newData) {
-    addCaseData = {
-      ...addCaseData,
-      'caseData': newData
-    };
+    addCaseData = {...addCaseData, 'caseData': newData};
     notifyListeners();
   }
 
   void changeTheCaseVisitData(Map<String, dynamic> newData) {
-    addCaseData = {
-      ...addCaseData,
-      'caseVisitData': newData
-    };
+    addCaseData = {...addCaseData, 'caseVisitData': newData};
     notifyListeners();
   }
 
@@ -161,6 +155,19 @@ class DataStore with ChangeNotifier {
       }
       userData!['cases'].add(newCase);
       notifyListeners();
+    }
+  }
+
+  void editCase(String caseId, Map newVisit) {
+    if (userData != null && userData!['cases'] != null) {
+      for (var c in userData!['cases']) {
+        if (c['id'] == caseId) {
+          c['caseVisits'] ??= [];
+          c['caseVisits'].add(newVisit);
+          notifyListeners();
+          break;
+        }
+      }
     }
   }
 

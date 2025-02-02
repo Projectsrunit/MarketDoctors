@@ -66,6 +66,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           () => _calcBmi(heightController, weightController, bmiController));
 
       return {
+        'id': visit['id'].toString(),
         'bloodPressure': TextEditingController(
             text: visit['blood_pressure']?.toString() ?? ''),
         'weight': weightController,
@@ -382,8 +383,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     Map<String, Map<String, dynamic>> updatedCaseVisits = {};
 
     for (var controllers in _controllersList) {
-      String id =
-          controllers['id']; // Assuming 'id' is the key for the controller's ID
+      String id = controllers['id']; 
       updatedCaseVisits[id] = {
         'blood_pressure': controllers['bloodPressure'].text,
         'weight': controllers['weight'].text,

@@ -87,6 +87,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       _bloodGlucoseController.text =
           caseData['blood_glucose']?.toString() ?? '';
     }
+    print('this is the updatingid: ${widget.updatingId}');
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -380,7 +381,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _uploadData(chewId);
+                          _uploadData(chewId, widget.updatingId);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -474,6 +475,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
   }
 
   Future<void> _uploadData(chewId, [int? updatingId]) async {
+    print('this is the functional updatingId: $updatingId');
     final caseData = {
       'first_name': _firstNameController.text,
       'last_name': _lastNameController.text,
@@ -485,8 +487,6 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
         'phone_number': _phoneController.text,
       'chew': chewId
     };
-
-    print('Date from controller: ${_dateController.text}');
 
     final caseVisitData = {
       if (_parseNumber(_bloodPressureController.text) != null)
@@ -522,6 +522,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     try {
       var response;
       if (updatingId == null) {
+    print('because no functional updatingId: $updatingId');
 
         response = await http.post(
           urlAdd,
@@ -533,6 +534,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
           }),
         );
       } else {
+            print('because yes functional updatingId: $updatingId');
         response = await http.post(
           urlEdit,
           headers: {
@@ -549,7 +551,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
         datastore.changeTheCaseVisitData({});
 
         var jsoned = jsonDecode(response.body);
+        if (updatingId == null) {
         context.read<DataStore>().addCase({...jsoned['case'], 'casevisits': [jsoned['caseVisit']]});
+        } else {
+          context.read<DataStore>().editCase(jsoned['data']['id'], {'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+        }
 
         Fluttertoast.showToast(
           msg: 'Case added successfully',
