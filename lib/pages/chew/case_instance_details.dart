@@ -400,7 +400,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
         Uri.parse('$baseUrl/api/casewithvisit/edit'); //${widget.saveId}
 
     try {
-      final response = await http.put(
+      final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
