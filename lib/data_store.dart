@@ -9,6 +9,7 @@ class DataStore with ChangeNotifier {
   Map? get patientData => userData;
   Map? get doctorData => userData;
   List<String> tempSymptoms = [];
+  int? updatingId;
 
   Map<String, Map<String, dynamic>> addCaseData = {
     'caseData': {},
@@ -103,6 +104,11 @@ class DataStore with ChangeNotifier {
     notifyListeners();
   }
 
+  void setUpdatingid(int? fig) {
+    updatingId = fig;
+    notifyListeners();
+  }
+
   void removePayment(int index) {
     if (userData != null && userData?['payments'] != null) {
       userData?['payments'].removeAt(index);
@@ -158,12 +164,16 @@ class DataStore with ChangeNotifier {
     }
   }
 
-  void editCase(String caseId, Map newVisit) {
+  void editCase(int caseId, Map newVisit) {
+    print('matching to check for id $caseId');
     if (userData != null && userData!['cases'] != null) {
       for (var c in userData!['cases']) {
+        print('this id is ${c['id']}');
         if (c['id'] == caseId) {
-          c['caseVisits'] ??= [];
-          c['caseVisits'].add(newVisit);
+          print('found it.');
+          print('new visit is $newVisit and current visit ======= ${c['casevisits']}');
+          c['casevisits'] ??= [];
+          c['casevisits'].add(newVisit);
           notifyListeners();
           break;
         }

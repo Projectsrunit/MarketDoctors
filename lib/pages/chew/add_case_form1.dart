@@ -11,10 +11,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class AddCaseFormOne extends StatefulWidget {
-  final int? updatingId;
-
-  const AddCaseFormOne({Key? key, this.updatingId}) : super(key: key);
-
   @override
   AddCaseFormOneState createState() => AddCaseFormOneState();
 }
@@ -67,6 +63,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     Map<String, dynamic> caseVisitData =
         datastore.addCaseData['caseVisitData']!;
     List<String> tempSymptoms = datastore.tempSymptoms;
+    int? updatingId;
+
+    setState(() {
+      updatingId = datastore.updatingId;
+    });
 
     if (caseData.isNotEmpty) {
       _firstNameController.text = caseData['first_name'] ?? '';
@@ -87,7 +88,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       _bloodGlucoseController.text =
           caseData['blood_glucose']?.toString() ?? '';
     }
-    print('this is the updatingid: ${widget.updatingId}');
+    print('this is the updatingid: $updatingId');
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -101,10 +102,13 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
               children: [
                 Text(
                   'Patient Personal Details',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
                 SizedBox(height: 10),
-                
                 Row(
                   children: [
                     Expanded(
@@ -179,7 +183,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Patient Medical Details',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
                 SizedBox(height: 10),
                 Row(
@@ -287,7 +295,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Symptoms',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
                 SizedBox(height: 10),
                 if (tempSymptoms.isNotEmpty)
@@ -349,7 +361,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'Prescriptions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
                 SizedBox(height: 10),
                 TextFormField(
@@ -363,7 +379,11 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 SizedBox(height: 20),
                 Text(
                   'CHEW\'s notes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue,),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
                 SizedBox(height: 10),
                 TextFormField(
@@ -378,31 +398,67 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 Center(
                   child: FractionallySizedBox(
                     widthFactor: 0.8,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _uploadData(chewId, widget.updatingId);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context)
-                                .textButtonTheme
-                                .style
-                                ?.backgroundColor
-                                ?.resolve({}) ??
-                            Color(0xFF617DEF),
-                        foregroundColor: Theme.of(context)
-                                .textButtonTheme
-                                .style
-                                ?.foregroundColor
-                                ?.resolve({}) ??
-                            Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _uploadData(chewId);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context)
+                                    .textButtonTheme
+                                    .style
+                                    ?.backgroundColor
+                                    ?.resolve({}) ??
+                                Color(0xFF617DEF),
+                            foregroundColor: Theme.of(context)
+                                    .textButtonTheme
+                                    .style
+                                    ?.foregroundColor
+                                    ?.resolve({}) ??
+                                Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(updatingId == null
+                              ? "Save Case Data"
+                              : "Add New Visit"),
                         ),
-                      ),
-                      child: Text("Save Case Data"),
+                        if (updatingId != null) ...[
+                          SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              datastore.setUpdatingid(null);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context)
+                                      .textButtonTheme
+                                      .style
+                                      ?.backgroundColor
+                                      ?.resolve({}) ??
+                                  Color(
+                                      0xFF617DEF), // You might want to adjust this color
+                              foregroundColor: Theme.of(context)
+                                      .textButtonTheme
+                                      .style
+                                      ?.foregroundColor
+                                      ?.resolve({}) ??
+                                  Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text("Cancel New Visit"),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
@@ -474,7 +530,9 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
         context, MaterialPageRoute(builder: (context) => AddCaseFormTwo()));
   }
 
-  Future<void> _uploadData(chewId, [int? updatingId]) async {
+  Future<void> _uploadData(chewId) async {
+    final updatingId = context.read<DataStore>().updatingId;
+
     print('this is the functional updatingId: $updatingId');
     final caseData = {
       'first_name': _firstNameController.text,
@@ -522,7 +580,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     try {
       var response;
       if (updatingId == null) {
-    print('because no functional updatingId: $updatingId');
+        print('because no functional updatingId: $updatingId');
 
         response = await http.post(
           urlAdd,
@@ -534,7 +592,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
           }),
         );
       } else {
-            print('because yes functional updatingId: $updatingId');
+        print('because yes functional updatingId: $updatingId');
         response = await http.post(
           urlEdit,
           headers: {
@@ -552,13 +610,26 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
 
         var jsoned = jsonDecode(response.body);
         if (updatingId == null) {
-        context.read<DataStore>().addCase({...jsoned['case'], 'casevisits': [jsoned['caseVisit']]});
+          context.read<DataStore>().addCase({
+            ...jsoned['case'],
+            'casevisits': [jsoned['caseVisit']]
+          });
         } else {
-          context.read<DataStore>().editCase(jsoned['data']['id'], {'id': jsoned['data']['id'], ...jsoned['data']['attributes']});
+          Map newVisit = {
+            'id': jsoned['data']['id'],
+            ...jsoned['data']['attributes'],
+            'current_prescription':
+                jsoned['data']['attributes']['current_prescription'] ?? '',
+            'chews_notes': jsoned['data']['attributes']['chews_notes'] ?? '',
+          };
+          print('adding this visit: $newVisit');
+          context.read<DataStore>().editCase(updatingId, newVisit);
         }
 
         Fluttertoast.showToast(
-          msg: 'Case added successfully',
+          msg: updatingId == null
+              ? 'Case added successfully'
+              : 'Case Visit added',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
