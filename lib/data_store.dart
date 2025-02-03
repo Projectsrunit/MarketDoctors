@@ -104,7 +104,7 @@ class DataStore with ChangeNotifier {
     notifyListeners();
   }
 
-  void setUpdatingid(int? fig) {
+  void setUpdatingId(int? fig) {
     updatingId = fig;
     notifyListeners();
   }
@@ -133,9 +133,9 @@ class DataStore with ChangeNotifier {
     }
   }
 
-  void updateCase(int index, Map updates) {
+  void updateCase(int index, List updates) {
     if (userData != null && userData?['cases'] != null) {
-      userData?['cases'][index] = {...userData?['cases'][index], ...updates};
+      userData?['cases'][index]['casevisits'] = updates;
     }
   }
 
