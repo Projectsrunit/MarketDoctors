@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/add_case_form2.dart';
 import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/chew/cases_page.dart';
 import 'package:market_doctor/pages/chew/chew_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -88,7 +89,6 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       _bloodGlucoseController.text =
           caseData['blood_glucose']?.toString() ?? '';
     }
-    print('this is the updatingid: $updatingId');
 
     return Scaffold(
       appBar: ChewAppBar(),
@@ -426,14 +426,14 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                             ),
                           ),
                           child: Text(updatingId == null
-                              ? "Save Case Data"
+                              ? "Save New Case"
                               : "Add New Visit"),
                         ),
                         if (updatingId != null) ...[
                           SizedBox(height: 12),
                           ElevatedButton(
                             onPressed: () {
-                              datastore.setUpdatingid(null);
+                              datastore.setUpdatingId(null);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context)
@@ -617,13 +617,10 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
         } else {
           Map newVisit = {
             'id': jsoned['data']['id'],
-            ...jsoned['data']['attributes'],
-            'current_prescription':
-                jsoned['data']['attributes']['current_prescription'] ?? '',
-            'chews_notes': jsoned['data']['attributes']['chews_notes'] ?? '',
+            ...jsoned['data']['attributes']
           };
           print('adding this visit: $newVisit');
-          context.read<DataStore>().editCase(updatingId, newVisit);
+          datastore.editCase(updatingId, newVisit);
         }
 
         Fluttertoast.showToast(
@@ -637,11 +634,17 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddCaseFormOne()));
+        if (updatingId == null) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AddCaseFormOne()));
+        } else {
+          datastore.setUpdatingId(null);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CasesPage()));
+        }
       } else {
         print('this is the response ${response.body}');
-        throw Exception('Something went wrong');
+        throw Exception('There is an error ${response.body}');
       }
     } catch (e) {
       print('this is the error: $e');

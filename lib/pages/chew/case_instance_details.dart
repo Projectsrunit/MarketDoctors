@@ -54,6 +54,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     List<dynamic> caseVisits = widget.caseData['casevisits'] ?? [];
 
     _controllersList = caseVisits.map((visit) {
+      print('this is the date here ====== ${visit['date']}');
       var heightController =
           TextEditingController(text: visit['height']?.toString() ?? '');
       var weightController =
@@ -67,6 +68,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
 
       return {
         'id': visit['id'].toString(),
+        'date': visit['date'],
         'bloodPressure': TextEditingController(
             text: visit['blood_pressure']?.toString() ?? ''),
         'weight': weightController,
@@ -120,12 +122,12 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           ...caseVisits.asMap().entries.map((entry) {
             int index = entry.key;
             var visit = entry.value;
-            if (index == caseVisits.length - 1 &&
-                _controllersList.length != caseVisits.length) {
+            var controllers;            
+            try {
+              controllers = _controllersList[index];
+            } catch (e) {
               return SizedBox();
             }
-            var controllers = _controllersList[index];
-
             return Container(
               margin: EdgeInsets.only(bottom: 12),
               padding: EdgeInsets.all(8),
@@ -178,7 +180,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                 };
                 final datastore = context.read<DataStore>();
                 datastore.changeTheCaseData(caseData);
-                datastore.setUpdatingid(widget.saveId);
+                datastore.setUpdatingId(widget.saveId);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AddCaseFormOne()),
@@ -385,23 +387,31 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     );
 
     Map<String, Map<String, dynamic>> updatedCaseVisits = {};
+    List<Map<String, dynamic>> localCaseUpdates = [];
 
     for (var controllers in _controllersList) {
       String id = controllers['id'];
-      updatedCaseVisits[id] = {
-        'blood_pressure': controllers['bloodPressure'].text,
-        'weight': controllers['weight'].text,
-        'height': controllers['height'].text,
-        'blood_glucose': controllers['bloodGlucose'].text,
+      var map = {
+        if (_parseNumber(controllers['bloodPressure'].text) != null)
+        'blood_pressure': _parseNumber(controllers['bloodPressure'].text),
+        if (_parseNumber(controllers['weight'].text) != null)
+        'weight': _parseNumber(controllers['weight'].text),
+        if (_parseNumber(controllers['height'].text) != null)
+        'height': _parseNumber(controllers['height'].text),
+        if (_parseNumber(controllers['bloodGlucose'].text) != null)
+        'blood_glucose': _parseNumber(controllers['bloodGlucose'].text),
         'current_prescription': controllers['currentPrescription'].text,
         'chews_notes': controllers['chewsNotes'].text,
         'symptoms': controllers['symptoms'],
       };
+      updatedCaseVisits[id] = map;
+      localCaseUpdates.add(map);
+      localCaseUpdates.last['date'] = controllers['date']; //add date only this side
     }
 
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url =
-        Uri.parse('$baseUrl/api/casewithvisit/edit'); //${widget.saveId}
+        Uri.parse('$baseUrl/api/casewithvisit/edit');
 
     try {
       final response = await http.post(
@@ -415,7 +425,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
       );
 
       if (response.statusCode == 200) {
-        context.read<DataStore>().updateCase(index, updatedCaseVisits);
+        context.read<DataStore>().updateCase(index, localCaseUpdates);
         Fluttertoast.showToast(
           msg: 'Data successfully updated',
           toastLength: Toast.LENGTH_SHORT,
@@ -427,7 +437,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
         );
       } else {
         print('this is the response ${response.body}');
-        throw Exception('Something went wrong');
+        throw Exception('Something went wrong.');
       }
     } catch (e) {
       print('this is the error: $e');
