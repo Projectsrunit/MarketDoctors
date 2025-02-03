@@ -120,7 +120,10 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           ...caseVisits.asMap().entries.map((entry) {
             int index = entry.key;
             var visit = entry.value;
-            if (index == caseVisits.length - 1) return SizedBox();
+            if (index == caseVisits.length - 1 &&
+                _controllersList.length != caseVisits.length) {
+              return SizedBox();
+            }
             var controllers = _controllersList[index];
 
             return Container(
