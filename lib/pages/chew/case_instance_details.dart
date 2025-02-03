@@ -120,6 +120,10 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           ...caseVisits.asMap().entries.map((entry) {
             int index = entry.key;
             var visit = entry.value;
+            if (index == caseVisits.length - 1 &&
+                _controllersList.length != caseVisits.length) {
+              return SizedBox();
+            }
             var controllers = _controllersList[index];
 
             return Container(
@@ -172,12 +176,12 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                   if (_parseNumber(_phoneController.text) != null)
                     'phone_number': _phoneController.text
                 };
-                context.read<DataStore>().changeTheCaseData(caseData);
+                final datastore = context.read<DataStore>();
+                datastore.changeTheCaseData(caseData);
+                datastore.setUpdatingid(widget.saveId);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddCaseFormOne(updatingId: widget.saveId)),
+                  MaterialPageRoute(builder: (context) => AddCaseFormOne()),
                 );
               },
               child: Text('New Visit'),
@@ -383,7 +387,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     Map<String, Map<String, dynamic>> updatedCaseVisits = {};
 
     for (var controllers in _controllersList) {
-      String id = controllers['id']; 
+      String id = controllers['id'];
       updatedCaseVisits[id] = {
         'blood_pressure': controllers['bloodPressure'].text,
         'weight': controllers['weight'].text,
