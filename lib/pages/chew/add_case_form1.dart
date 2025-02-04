@@ -48,7 +48,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
 
     if (height != null && weight != null) {
       _bmiController.text =
-          ((weight / (height * height)).round() / 10 * 10).toString();
+          ((weight * 10000 / (height * height)).round() / 10 * 10).toString();
     } else {
       setState(() {
         _bmiController.text = '';
@@ -208,7 +208,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                         controller: _heightController,
                         decoration: InputDecoration(
                           labelText: 'Height',
-                          suffixText: 'meters',
+                          suffixText: 'cm',
                         ),
                         keyboardType: TextInputType.number,
                       ),
@@ -501,21 +501,21 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       'last_name': _lastNameController.text,
       'gender': _selectedGender,
       'email': _emailController.text,
-      if (_parseNumber(_ageController.text) != null)
-        'age': _parseNumber(_ageController.text),
-      if (_parseNumber(_phoneController.text) != null)
+      if (_parseNumberNew(_ageController.text) != null)
+        'age': _parseNumberNew(_ageController.text),
+      if (_parseNumberNew(_phoneController.text) != null)
         'phone_number': _phoneController.text
     };
 
     final caseVisitData = {
-      if (_parseNumber(_bloodPressureController.text) != null)
-        'blood_pressure': _parseNumber(_bloodPressureController.text),
-      if (_parseNumber(_weightController.text) != null)
-        'weight': _parseNumber(_weightController.text),
-      if (_parseNumber(_heightController.text) != null)
-        'height': _parseNumber(_heightController.text),
-      if (_parseNumber(_bloodGlucoseController.text) != null)
-        'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+      if (_parseNumberNew(_bloodPressureController.text) != null)
+        'blood_pressure': _parseNumberNew(_bloodPressureController.text),
+      if (_parseNumberNew(_weightController.text) != null)
+        'weight': _parseNumberNew(_weightController.text),
+      if (_parseNumberNew(_heightController.text) != null)
+        'height': _parseNumberNew(_heightController.text),
+      if (_parseNumberNew(_bloodGlucoseController.text) != null)
+        'blood_glucose': _parseNumberNew(_bloodGlucoseController.text),
       'current_prescription': _prescriptionController.text,
       'symptoms': context.read<DataStore>().tempSymptoms,
       'chews_notes': _chewsNotesController.text,
@@ -539,22 +539,18 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       'last_name': _lastNameController.text,
       'gender': _selectedGender,
       'email': _emailController.text,
-      if (_parseNumber(_ageController.text) != null)
-        'age': _parseNumber(_ageController.text),
-      if (_parseNumber(_phoneController.text) != null)
+      if (_parseNumberNew(_ageController.text) != null)
+        'age': _parseNumberNew(_ageController.text),
+      if (_parseNumberNew(_phoneController.text) != null)
         'phone_number': _phoneController.text,
       'chew': chewId
     };
 
     final caseVisitData = {
-      if (_parseNumber(_bloodPressureController.text) != null)
-        'blood_pressure': _parseNumber(_bloodPressureController.text),
-      if (_parseNumber(_weightController.text) != null)
-        'weight': _parseNumber(_weightController.text),
-      if (_parseNumber(_heightController.text) != null)
-        'height': _parseNumber(_heightController.text),
-      if (_parseNumber(_bloodGlucoseController.text) != null)
-        'blood_glucose': _parseNumber(_bloodGlucoseController.text),
+      'blood_pressure': _parseNumberNew(_bloodPressureController.text),
+      'weight': _parseNumberNew(_weightController.text),
+      'height': _parseNumberNew(_heightController.text),
+      'blood_glucose': _parseNumberNew(_bloodGlucoseController.text),
       'current_prescription': _prescriptionController.text,
       'symptoms': context.read<DataStore>().tempSymptoms,
       'chews_notes': _chewsNotesController.text,
@@ -562,6 +558,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
           DateFormat('yyyy-MM-dd').format(DateTime.parse(_dateController.text)),
       if (updatingId != null) 'case': updatingId
     };
+    print('================== $caseVisitData');
 
     Fluttertoast.showToast(
       msg: 'Saving...',
@@ -619,7 +616,6 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
             'id': jsoned['data']['id'],
             ...jsoned['data']['attributes']
           };
-          print('adding this visit: $newVisit');
           datastore.editCase(updatingId, newVisit);
         }
 
@@ -660,8 +656,9 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     }
   }
 
-  double? _parseNumber(String text) {
-    final value = double.tryParse(text);
-    return value;
-  }
+dynamic _parseNumberNew(String value) {
+  if (value.isEmpty) return null;
+  return value.contains('.') ? double.tryParse(value) : int.tryParse(value);
+}
+
 }
