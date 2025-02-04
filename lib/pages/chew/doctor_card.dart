@@ -25,8 +25,7 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unreadList =
-        context.read<ChatStore>().idsWithUnreadMessages;
+    final unreadList = context.read<ChatStore>().idsWithUnreadMessages;
     return Container(
         margin: EdgeInsets.only(top: 0, bottom: 8, right: 5, left: 5),
         decoration: BoxDecoration(
@@ -67,12 +66,24 @@ class DoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   direction: Axis.vertical,
                   children: [
-                    Text(name,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        )),
-                    Text(profession),
+                    SizedBox(
+                      width: 200,
+                      child: Text(name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          profession,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
                     GestureDetector(
                       onTap: onViewProfilePressed,
                       child: Container(
