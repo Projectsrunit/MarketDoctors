@@ -24,7 +24,7 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
         dotenv.env['API_URL']!; // Ensure this is correctly set
     final Uri url = Uri.parse('$baseUrl/api/health-tips');
     final response = await http.get(url);
-    // final respo = await http.get(Uri.parse('{{BASE_URL}}/api/health-tips'));
+    
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -67,18 +67,21 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Image section
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10)),
-                          child: Image.network(
-                            tip['feauture_image'],
-                            width: double.infinity,
-                            height: 200,
-                            fit: BoxFit.cover,
+                        // Conditionally show image only if feauture_image exists and is not null
+                        if (tip['feauture_image'] != null && 
+                            tip['feauture_image'].isNotEmpty)
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                            child: Image.network(
+                              tip['feauture_image'],
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(); // Return empty container if image fails to load
+                              },
+                            ),
                           ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -94,10 +97,6 @@ class _HealthTipsPageState extends State<HealthTipsPage> {
                                 ),
                               ),
                               SizedBox(height: 8),
-                              // Text(
-                              //   tip['description'],
-                              //   style: TextStyle(fontSize: 16),
-                              // ),
                               Text(
                                 tip['description'],
                                 style: TextStyle(
