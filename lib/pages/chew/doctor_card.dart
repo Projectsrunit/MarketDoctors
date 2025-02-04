@@ -66,11 +66,14 @@ class DoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   direction: Axis.vertical,
                   children: [
-                    Text(name,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        )),
+                    SizedBox(
+                      width: 200,
+                      child: Text(name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ),
                     SizedBox(
                       width: 200,
                       child: SingleChildScrollView(

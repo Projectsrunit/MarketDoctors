@@ -54,7 +54,6 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     List<dynamic> caseVisits = widget.caseData['casevisits'] ?? [];
 
     _controllersList = caseVisits.map((visit) {
-      print('this is the date here ====== ${visit['date']}');
       var heightController =
           TextEditingController(text: visit['height']?.toString() ?? '');
       var weightController =
@@ -91,7 +90,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
     final weight = double.tryParse(weightCtrl.text);
 
     if (height != null && weight != null && height > 0) {
-      bmiCtrl.text = (weight / (height * height)).toStringAsFixed(1);
+      bmiCtrl.text = (weight * 10000 / (height * height)).toStringAsFixed(1);
     } else {
       bmiCtrl.text = '';
     }
@@ -149,7 +148,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                   _buildTextField('Weight', controllers['weight'],
                       unit: 'kg', isDigitsOnly: true),
                   _buildTextField('Height', controllers['height'],
-                      unit: 'meters', isDigitsOnly: true),
+                      unit: 'cm', isDigitsOnly: true),
                   _buildTextField('Blood Glucose', controllers['bloodGlucose'],
                       unit: 'mg/dL', isDigitsOnly: true),
                   _buildTextField('Current Prescription',

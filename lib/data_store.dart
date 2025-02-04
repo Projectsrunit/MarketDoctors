@@ -168,10 +168,8 @@ class DataStore with ChangeNotifier {
     print('matching to check for id $caseId');
     if (userData != null && userData!['cases'] != null) {
       for (var c in userData!['cases']) {
-        print('this id is ${c['id']}');
         if (c['id'] == caseId) {
           print('found it.');
-          print('new visit is $newVisit and current visit ======= ${c['casevisits']}');
           c['casevisits'] ??= [];
           c['casevisits'].add(newVisit);
           notifyListeners();
