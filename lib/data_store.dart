@@ -155,6 +155,7 @@ class DataStore with ChangeNotifier {
   }
 
   void addCase(Map newCase) {
+    print('adding case === $newCase');
     if (userData != null) {
       if (userData!['cases'] == null) {
         userData!['cases'] = [];
