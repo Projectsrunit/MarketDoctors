@@ -40,6 +40,29 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     _heightController.addListener(_calcBmi);
     _weightController.addListener(_calcBmi);
     _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final caseData = context.read<DataStore>().addCaseData['caseData']!;
+    final caseVisitData =
+        context.read<DataStore>().addCaseData['caseVisitData']!;
+
+    if (caseData.isNotEmpty) {
+      setState(() {
+        _selectedGender = caseData['gender'];
+      });
+    }
+
+    if (caseVisitData.isNotEmpty) {
+      _prescriptionController.text =
+          caseVisitData['current_prescription'] ?? '';
+      _chewsNotesController.text = caseVisitData['chews_notes'] ?? '';
+      _bloodPressureController.text =
+          caseVisitData['blood_pressure']?.toString() ?? '';
+      _weightController.text = caseVisitData['weight']?.toString() ?? '';
+      _heightController.text = caseVisitData['height']?.toString() ?? '';
+      _bloodGlucoseController.text =
+          caseVisitData['blood_glucose']?.toString() ?? '';
+      _dateController.text = caseVisitData['date'] ?? '';
+    }
   }
 
   void _calcBmi() {
@@ -61,8 +84,6 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     final datastore = context.read<DataStore>();
     int? chewId = context.watch<DataStore>().chewData?['id'];
     Map<String, dynamic> caseData = datastore.addCaseData['caseData']!;
-    Map<String, dynamic> caseVisitData =
-        datastore.addCaseData['caseVisitData']!;
     List<String> tempSymptoms = datastore.tempSymptoms;
     int? updatingId;
 
@@ -75,19 +96,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
       _lastNameController.text = caseData['last_name'] ?? '';
       _emailController.text = caseData['email'] ?? '';
       _phoneController.text = caseData['phone_number'] ?? '';
-      _selectedGender = caseData['gender'];
       _ageController.text = caseData['age']?.toString() ?? '';
-    }
-
-    if (caseVisitData.isNotEmpty) {
-      _prescriptionController.text = caseData['current_prescription'] ?? '';
-      _chewsNotesController.text = caseData['chews_notes'] ?? '';
-      _bloodPressureController.text =
-          caseData['blood_pressure']?.toString() ?? '';
-      _weightController.text = caseData['weight']?.toString() ?? '';
-      _heightController.text = caseData['height']?.toString() ?? '';
-      _bloodGlucoseController.text =
-          caseData['blood_glucose']?.toString() ?? '';
     }
 
     return Scaffold(
@@ -508,21 +517,17 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     };
 
     final caseVisitData = {
-      if (_parseNumberNew(_bloodPressureController.text) != null)
-        'blood_pressure': _parseNumberNew(_bloodPressureController.text),
-      if (_parseNumberNew(_weightController.text) != null)
-        'weight': _parseNumberNew(_weightController.text),
-      if (_parseNumberNew(_heightController.text) != null)
-        'height': _parseNumberNew(_heightController.text),
-      if (_parseNumberNew(_bloodGlucoseController.text) != null)
-        'blood_glucose': _parseNumberNew(_bloodGlucoseController.text),
+      'blood_pressure': _parseNumberNew(_bloodPressureController.text),
+      'weight': _parseNumberNew(_weightController.text),
+      'height': _parseNumberNew(_heightController.text),
+      'blood_glucose': _parseNumberNew(_bloodGlucoseController.text),
       'current_prescription': _prescriptionController.text,
       'symptoms': context.read<DataStore>().tempSymptoms,
       'chews_notes': _chewsNotesController.text,
       'date':
           DateFormat('yyyy-MM-dd').format(DateTime.parse(_dateController.text)),
     };
-
+    print('saving this casevisit == $caseVisitData');
     context.read<DataStore>().changeTheCaseData(caseData);
     context.read<DataStore>().changeTheCaseVisitData(caseVisitData);
 
@@ -635,8 +640,8 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
               MaterialPageRoute(builder: (context) => AddCaseFormOne()));
         } else {
           datastore.setUpdatingId(null);
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CasesPage()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => CasesPage()));
         }
       } else {
         print('this is the response ${response.body}');
@@ -656,9 +661,8 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     }
   }
 
-dynamic _parseNumberNew(String value) {
-  if (value.isEmpty) return null;
-  return value.contains('.') ? double.tryParse(value) : int.tryParse(value);
-}
-
+  dynamic _parseNumberNew(String value) {
+    if (value.isEmpty) return null;
+    return value.contains('.') ? double.tryParse(value) : int.tryParse(value);
+  }
 }
