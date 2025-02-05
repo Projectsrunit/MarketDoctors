@@ -72,8 +72,6 @@ class ChewOrPatientCard extends StatelessWidget {
                   children: [
                     Consumer<ChatStore>(
                       builder: (context, chatStore, child) {
-                        print(
-                            'Consumer builder called! this is the list: ${chatStore.idsWithUnreadMessages}');
                         return Row(
                           children: [
                             Text(

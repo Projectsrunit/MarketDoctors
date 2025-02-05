@@ -144,8 +144,6 @@ class DoctorCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Consumer<ChatStore>(builder: (context, chatStore, child) {
-                        print(
-                            'Consumer builder called! this is the list: ${chatStore.idsWithUnreadMessages}');
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
