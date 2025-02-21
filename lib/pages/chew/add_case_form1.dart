@@ -580,7 +580,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     final Uri urlEdit = Uri.parse('$baseUrl/api/casevisits');
 
     try {
-      var response;
+      http.Response response;
       if (updatingId == null) {
         print('because no functional updatingId: $updatingId');
 

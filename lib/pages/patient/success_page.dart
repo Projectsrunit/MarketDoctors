@@ -24,24 +24,18 @@ class PatientSuccessPage extends StatelessWidget {
 
               // Success Message
               const Text(
-                'Submission Successful!',
+                'Verification Successful!',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
+
               const SizedBox(height: 20),
 
               // Additional Information
-              const Text(
-                'Please wait for 72 hours for approval.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
+             
               const SizedBox(height: 30),
 
               // Go to Login Button

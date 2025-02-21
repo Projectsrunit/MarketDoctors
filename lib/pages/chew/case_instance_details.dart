@@ -121,7 +121,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
           ...caseVisits.asMap().entries.map((entry) {
             int index = entry.key;
             var visit = entry.value;
-            var controllers;            
+            Map<String, dynamic> controllers;            
             try {
               controllers = _controllersList[index];
             } catch (e) {
@@ -158,7 +158,7 @@ class _CaseInstanceDetailsState extends State<CaseInstanceDetails> {
                 ],
               ),
             );
-          }).toList(),
+          }),
           if (widget.editable)
             ElevatedButton(
               onPressed: () => _saveData(widget.index),

@@ -52,6 +52,25 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           
           // Check if user is confirmed - using direct true/false check
           if (responseBody['user']['confirmed'] == false) {
+            // Send notification email to admin
+            try {
+              var notifyUrl = Uri.parse('$baseUrl/api/auth/notify-admin');
+              await http.post(
+                notifyUrl,
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: jsonEncode({
+                  'userEmail': email,
+                  'userName': responseBody['user']['username'] ?? 'New User',
+                  'subject': 'New User Approval Required',
+                  'message': 'A new user requires approval to access the system.'
+                }),
+              );
+            } catch (e) {
+              print('Failed to send admin notification: $e');
+            }
+            
             _showMessage('Your account is not yet confirmed. Contact Market Doctor Admin');
             return;
           }
