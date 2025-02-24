@@ -23,7 +23,7 @@ class DoctorProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -432,7 +432,7 @@ class ManagePaymentsDoctorState extends State<ManagePaymentsDoctor> {
   Widget build(BuildContext context) {
     Map? doctorData = context.watch<DataStore>().doctorData;
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -670,7 +670,7 @@ class UpdateProfileDoctorState extends State<UpdateProfileDoctor> {
     phoneNumberController.text = doctorData['phone'] ?? '';
 
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),

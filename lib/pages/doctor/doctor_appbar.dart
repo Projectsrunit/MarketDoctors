@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
 import 'package:provider/provider.dart';
 
-class DoctorApp extends StatelessWidget implements PreferredSizeWidget {
+class DoctorAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     Map? doctorData = Provider.of<DataStore>(context).doctorData;
@@ -29,9 +29,9 @@ class DoctorApp extends StatelessWidget implements PreferredSizeWidget {
                       Border.all(color: Colors.grey, width: 2), // Black border
                 ),
                 child: ClipOval(
-                  child: doctorData?['profile_picture'] != null
+                  child: doctorData?['picture_url'] != null
                       ? Image.network(
-                          doctorData?['profile_picture'],
+                          doctorData?['picture_url'],
                           width: 112,
                           height: 120,
                           fit: BoxFit.cover,

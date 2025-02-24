@@ -98,7 +98,7 @@ class DoctorsChatsState extends State<DoctorsChats> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(

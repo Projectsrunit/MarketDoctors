@@ -94,7 +94,7 @@ class _DoctorPharmacyListPageState extends State<DoctorPharmacyListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: FutureBuilder<List<DoctorPharmacy>>(
         future: futurePharmacies,
         builder: (context, snapshot) {

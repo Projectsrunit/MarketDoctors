@@ -263,7 +263,7 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:
-          DoctorApp(),
+          DoctorAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(

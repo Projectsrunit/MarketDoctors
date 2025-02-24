@@ -7,6 +7,7 @@ import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/doctors_chats.dart';
 import 'package:market_doctor/pages/doctor/profile_page.dart';
 import 'package:market_doctor/pages/doctor/upcoming_appointment.dart';
+import 'package:market_doctor/pages/doctor/add_case_form1.dart';
 
 class DoctorBottomNavBar extends StatefulWidget {
   @override
@@ -136,6 +137,100 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   items: [
+                    PopupMenuItem(
+                      padding: EdgeInsets.zero,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10),
+                          Icon(Icons.add, color: Colors.blue),
+                          SizedBox(width: 10),
+                          Text('Add a case'),
+                          SizedBox(width: 10),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddCaseFormOne(),
+                          ),
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      padding: EdgeInsets.zero,
+                      child: StatefulBuilder(
+                        builder: (context, setState) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    isPrescriptionExpanded = !isPrescriptionExpanded;
+                                  });
+                                },
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Icon(Icons.medication, color: Colors.green),
+                                    SizedBox(width: 10),
+                                    Text('Prescription'),
+                                    Icon(
+                                      isPrescriptionExpanded
+                                          ? Icons.arrow_drop_up
+                                          : Icons.arrow_drop_down,
+                                    ),
+                                    SizedBox(width: 10),
+                                  ],
+                                ),
+                              ),
+                              if (isPrescriptionExpanded) ...[
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[700]
+                                        : Colors.grey[300],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        dense: true,
+                                        title: Center(
+                                          child: Text('Make prescription'),
+                                        ),
+                                        onTap: () {
+                                          // TODO: Implement make prescription
+                                        },
+                                      ),
+                                      Divider(
+                                        color: Theme.of(context).dividerColor,
+                                        thickness: 1.0,
+                                        height: 0,
+                                      ),
+                                      ListTile(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        dense: true,
+                                        title: Center(
+                                          child: Text('Track prescription'),
+                                        ),
+                                        onTap: () {
+                                          // TODO: Implement track prescription
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                     PopupMenuItem(
                       padding: EdgeInsets.zero,
                       child: Row(

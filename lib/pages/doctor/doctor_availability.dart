@@ -229,7 +229,7 @@ class _DoctorAvailabilityState extends State<DoctorAvailability> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: Column(
         children: [
           Expanded(

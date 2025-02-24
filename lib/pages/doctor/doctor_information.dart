@@ -93,7 +93,7 @@ class _DoctorInformationPageState extends State<DoctorInformation> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(

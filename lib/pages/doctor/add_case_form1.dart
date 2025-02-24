@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
-import 'package:market_doctor/pages/chew/add_case_form2.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/cases_page.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
+import 'package:market_doctor/pages/doctor/add_case_form2.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_cases.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -100,7 +100,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
     }
 
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -476,7 +476,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 

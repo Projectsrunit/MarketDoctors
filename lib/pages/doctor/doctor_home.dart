@@ -92,7 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
       return PopScope(
         canPop: false,
         child: Scaffold(
-          appBar: DoctorApp(),
+          appBar: DoctorAppBar(),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(6.0),
             child: Column(
@@ -179,7 +179,7 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DoctorCasesPage()),
+              MaterialPageRoute(builder: (context) => CasesPage()),
             );
           },
         ),

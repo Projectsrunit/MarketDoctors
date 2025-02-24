@@ -105,7 +105,7 @@ class _DoctorUpdateProfileImagePageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

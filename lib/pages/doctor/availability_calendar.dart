@@ -28,7 +28,7 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DoctorApp(),
+      appBar: DoctorAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(

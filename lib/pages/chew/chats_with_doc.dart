@@ -70,7 +70,7 @@ class _ChatsWithDocState extends State<ChatsWithDoc> {
   }
 
   Future<void> fetchDocs() async {
-    int chewId = context.read<DataStore>().chewData?['id'];
+    int chewId = context.read<DataStore>().doctorData?['id'];
     final String baseUrl = dotenv.env['API_URL']!;
     final Uri url = Uri.parse('$baseUrl/api/getchatsfor');
     try {

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:market_doctor/data_store.dart';
-import 'package:market_doctor/pages/chew/bottom_nav_bar.dart';
-import 'package:market_doctor/pages/chew/chew_app_bar.dart';
-import 'package:market_doctor/pages/chew/add_case_form1.dart';
+import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
+import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/add_case_form1.dart';
 import 'package:provider/provider.dart';
 
 class AddCaseFormTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -218,7 +218,7 @@ class AddCaseFormTwo extends StatelessWidget {
           )
         ],
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }
@@ -238,7 +238,7 @@ class AddCaseSigns extends StatelessWidget {
     List? whiteButtons = data?.keys.toList();
 
     return Scaffold(
-      appBar: ChewAppBar(),
+      appBar: DoctorAppBar(),
       body: Column(
         children: [
           Stack(
@@ -384,7 +384,7 @@ class AddCaseSigns extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: DoctorBottomNavBar(),
     );
   }
 }
