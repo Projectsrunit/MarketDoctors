@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:market_doctor/pages/doctor/bottom_nav_bar.dart';
 import 'package:market_doctor/pages/doctor/doctor_appbar.dart';
+import 'package:market_doctor/pages/doctor/add_case_forms.dart';
 import 'package:provider/provider.dart';
 
 enum IconType { information, edit, delete }
@@ -258,6 +259,16 @@ class DoctorCasesPageState extends State<DoctorCasesPage> {
         ),
       ),
       bottomNavigationBar: DoctorBottomNavBar(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddCaseFormOne()),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
     );
   }
 }

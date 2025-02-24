@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:market_doctor/pages/doctor/availability_calendar.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/doctors_chats.dart';
@@ -75,25 +76,7 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
                   Text("Appointments"),
                 ],
               ),
-               Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.message,
-                      size: 36,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DoctorsChats()));
-                    },
-                  ),
-                  Text("Chat"),
-                ],
-              ),
+              SizedBox(width: 70),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -135,7 +118,74 @@ class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
             ],
           ),
         ),
-        
+        Positioned(
+          top: -12,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                isMenuVisible = !isMenuVisible;
+                if (isPrescriptionExpanded) {
+                  isPrescriptionExpanded = false;
+                }
+              });
+              Future.delayed(Duration.zero, () {
+                showMenu(
+                  context: context,
+                  position: RelativeRect.fromLTRB(100, 600, 100, 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  items: [
+                    PopupMenuItem(
+                      padding: EdgeInsets.zero,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10),
+                          Icon(FontAwesomeIcons.whatsapp, color: Colors.orange),
+                          SizedBox(width: 10),
+                          Text('Chat History'),
+                          SizedBox(width: 10),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DoctorsChats(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ).then((_) {
+                  setState(() {
+                    isMenuVisible = false;
+                  });
+                });
+              });
+            },
+            child: AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: Container(
+                key: ValueKey<bool>(isMenuVisible),
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isMenuVisible ? Icons.arrow_downward : Icons.arrow_upward,
+                  size: 40,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
