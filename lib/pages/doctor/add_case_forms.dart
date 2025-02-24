@@ -387,7 +387,7 @@ class AddCaseFormOneState extends State<AddCaseFormOne> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'CHEW\'s notes',
+                  'DOCTOR\'s notes',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
