@@ -316,7 +316,12 @@ class AddCaseSigns extends StatelessWidget {
                     SizedBox(height: 24),
                   if (showCategory != null)
                     Container(
-                      color: Colors.grey[300],
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       width: double.infinity,
                       padding: EdgeInsets.all(16),
                       margin: EdgeInsets.only(bottom: 12),
@@ -327,32 +332,44 @@ class AddCaseSigns extends StatelessWidget {
                             'Possible Complications',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 18,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
                             ),
                           ),
-                          SizedBox(height: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
                             children: showCategory!.map((item) {
-                              return GestureDetector(
-                                onTap: () {
-                                  List<String> tempSymptoms= context
-                                      .read<DataStore>().tempSymptoms;
-                                      tempSymptoms.add(item);
-                                  context.read<DataStore>().updateCaseSymptom(
-                                    tempSymptoms
-                                  );
+                              return ElevatedButton(
+                                onPressed: () {
+                                  List<String> tempSymptoms = context.read<DataStore>().tempSymptoms;
+                                  tempSymptoms.add(item);
+                                  context.read<DataStore>().updateCaseSymptom(tempSymptoms);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => AddCaseFormOne()));
                                 },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Text(
-                                    item,
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.blueGrey[700]
+                                      : Colors.white,
+                                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  elevation: 2,
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: Colors.blue.withOpacity(0.5),
+                                      width: 1,
                                     ),
                                   ),
+                                ),
+                                child: Text(
+                                  item,
+                                  style: TextStyle(fontSize: 14),
                                 ),
                               );
                             }).toList(),

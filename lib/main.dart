@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:market_doctor/services/notification_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -20,6 +21,7 @@ void main() async {
   await dotenv.load(fileName: "assets/.env");
   await Firebase.initializeApp();
   await initializeNotifications();
+  await NotificationService.initializeNotifications();
 
   runApp(
     MultiProvider(

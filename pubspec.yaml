@@ -36,6 +36,7 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   connectivity_plus: ^5.0.1
+  onesignal_flutter: ^5.0.4
 
 dev_dependencies:
   flutter_test:
