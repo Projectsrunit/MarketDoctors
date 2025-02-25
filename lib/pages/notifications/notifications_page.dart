@@ -35,6 +35,13 @@ class NotificationItem {
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 
+  static Future<void> addNotification(NotificationItem notification) async {
+    final prefs = await SharedPreferences.getInstance();
+    final notificationsJson = prefs.getStringList('notifications') ?? [];
+    notificationsJson.insert(0, json.encode(notification.toJson()));
+    await prefs.setStringList('notifications', notificationsJson);
+  }
+
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
@@ -63,13 +70,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final notificationsJson = notifications
         .map((item) => json.encode(item.toJson()))
         .toList();
-    await prefs.setStringList('notifications', notificationsJson);
-  }
-
-  static Future<void> addNotification(NotificationItem notification) async {
-    final prefs = await SharedPreferences.getInstance();
-    final notificationsJson = prefs.getStringList('notifications') ?? [];
-    notificationsJson.insert(0, json.encode(notification.toJson()));
     await prefs.setStringList('notifications', notificationsJson);
   }
 
