@@ -22,11 +22,11 @@ class NotificationService {
       _handleNotificationOpened(event);
     });
 
-    // Set notification received handler
+    // Set notification received handler for foreground notifications
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print("Notification received in foreground: ${event.notification.body}");
       // You can either display the notification or prevent it from being displayed
-      event.display(); // This will show the notification
+      event.notification.display(); // This will show the notification
     });
   }
 
