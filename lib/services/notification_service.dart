@@ -25,7 +25,7 @@ class NotificationService {
   }
 
   static Future<String?> getPlayerId() async {
-    final deviceState = await OneSignal.User.pushSubscription;
+    final deviceState = OneSignal.User.pushSubscription;
     return deviceState.id;
   }
 
@@ -51,7 +51,7 @@ class NotificationService {
       }
     } catch (e) {
       print('Failed to update OneSignal player ID: $e');
-      throw e;
+      rethrow;
     }
   }
 
