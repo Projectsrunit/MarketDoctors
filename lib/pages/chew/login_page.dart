@@ -6,6 +6,7 @@ import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
 import 'package:provider/provider.dart';
+import 'package:market_doctor/services/notification_service.dart';
 
 class ChewLoginPage extends StatefulWidget {
   const ChewLoginPage({super.key});
@@ -81,6 +82,10 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
+            
+            // Register for notifications
+            await NotificationService.handleLogin(recordBody['id'].toString(), 'chew');
+            
             _showMessage('Welcome Back!', isError: false);
             context.read<DataStore>().updateChewData(recordBody);
             Navigator.push(
