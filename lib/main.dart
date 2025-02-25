@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:market_doctor/services/notification_service.dart';
+import 'package:market_doctor/pages/notifications/notifications_page.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -83,6 +84,8 @@ class MyApp extends StatelessWidget {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
+      title: 'Market Doctor',
+      navigatorKey: NotificationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       home: FutureBuilder<bool>(
         future: _checkFirstTimeUser(),
@@ -156,6 +159,9 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: Colors.grey,
         ),
       ),
+      routes: {
+        '/notifications': (context) => const NotificationsPage(),
+      },
     );
   }
 

@@ -2,8 +2,13 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:market_doctor/pages/notifications/notifications_page.dart';
+import 'package:shared_preferences.dart';
 
 class NotificationService {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   static Future<void> initializeNotifications() async {
     // Initialize OneSignal
     OneSignal.initialize('69587fc7-f7c9-4119-acf4-c632d8646c01');
@@ -18,28 +23,60 @@ class NotificationService {
     // Set notification opened handler
     OneSignal.Notifications.addClickListener((event) {
       print("Notification clicked: ${event.notification.body}");
-      // Handle notification tap here
       _handleNotificationOpened(event);
     });
 
     // Set notification received handler for foreground notifications
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print("Notification received in foreground: ${event.notification.body}");
+      // Store the notification
+      _storeNotification(event.notification);
       // You can either display the notification or prevent it from being displayed
       event.notification.display(); // This will show the notification
     });
   }
 
+  static Future<void> _storeNotification(OSNotification notification) async {
+    final notificationItem = NotificationItem(
+      title: notification.title ?? 'Notification',
+      message: notification.body ?? '',
+      timestamp: DateTime.now().toIso8601String(),
+      data: notification.additionalData,
+    );
+    await NotificationsPage.addNotification(notificationItem);
+  }
+
   static void _handleNotificationOpened(OSNotificationClickEvent event) {
-    // Handle the notification click based on the notification data
     final data = event.notification.additionalData;
     if (data != null) {
-      final String? type = data['type'] as String?;
-      final String? targetScreen = data['targetScreen'] as String?;
+      final String route = data['route'] as String? ?? '/notifications';
+      final bool requiresAuth = data['requiresAuth'] as bool? ?? true;
       
-      // Handle navigation or other actions based on the notification data
-      print('Notification type: $type, target screen: $targetScreen');
-      // TODO: Implement navigation logic here
+      // Store the notification
+      _storeNotification(event.notification);
+
+      // Navigate to the appropriate screen
+      if (requiresAuth) {
+        // Check if user is logged in
+        _checkAuthAndNavigate(route);
+      } else {
+        navigatorKey.currentState?.pushNamed(route);
+      }
+    } else {
+      // Default to notifications page if no data
+      navigatorKey.currentState?.pushNamed('/notifications');
+    }
+  }
+
+  static Future<void> _checkAuthAndNavigate(String route) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getString('token') != null;
+
+    if (isLoggedIn) {
+      navigatorKey.currentState?.pushNamed(route);
+    } else {
+      // Navigate to login page with return route
+      navigatorKey.currentState?.pushNamed('/login', arguments: {'returnRoute': route});
     }
   }
 
