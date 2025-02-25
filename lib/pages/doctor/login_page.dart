@@ -8,6 +8,7 @@ import 'package:market_doctor/data_store.dart';
 import 'package:market_doctor/pages/doctor/doctor_home.dart';
 import 'package:market_doctor/pages/doctor/signup_page.dart';
 import 'package:provider/provider.dart';
+import 'package:market_doctor/services/notification_service.dart';
 
 class DoctorLoginPage extends StatefulWidget {
   const DoctorLoginPage({super.key});
@@ -66,6 +67,10 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
           final fullRecord = await http.get(url);
           if (fullRecord.statusCode == 200) {
             var recordBody = jsonDecode(fullRecord.body);
+            
+            // Register for notifications
+            await NotificationService.handleLogin(recordBody['id'].toString(), 'doctor');
+            
             _showMessage('Welcome Back!', isError: false);
             context.read<DataStore>().updateDoctorData(recordBody);
             Navigator.push(context,
@@ -138,7 +143,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don’t have an account? ",
+                    "Don't have an account? ",
                     style: TextStyle(fontSize: 18),
                   ),
                   GestureDetector(

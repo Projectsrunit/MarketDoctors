@@ -7,7 +7,9 @@ class NotificationService {
   static Future<void> initializeNotifications() async {
     // Initialize OneSignal
     OneSignal.initialize('69587fc7-f7c9-4119-acf4-c632d8646c01');
-
+    
+    // Enable notifications
+    OneSignal.Notifications.clearAll();
     
     // Request permission
     final accepted = await OneSignal.Notifications.requestPermission(true);
@@ -17,7 +19,28 @@ class NotificationService {
     OneSignal.Notifications.addClickListener((event) {
       print("Notification clicked: ${event.notification.body}");
       // Handle notification tap here
+      _handleNotificationOpened(event);
     });
+
+    // Set notification received handler
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      print("Notification received in foreground: ${event.notification.body}");
+      // You can either display the notification or prevent it from being displayed
+      event.display(); // This will show the notification
+    });
+  }
+
+  static void _handleNotificationOpened(OSNotificationClickEvent event) {
+    // Handle the notification click based on the notification data
+    final data = event.notification.additionalData;
+    if (data != null) {
+      final String? type = data['type'] as String?;
+      final String? targetScreen = data['targetScreen'] as String?;
+      
+      // Handle navigation or other actions based on the notification data
+      print('Notification type: $type, target screen: $targetScreen');
+      // TODO: Implement navigation logic here
+    }
   }
 
   static Future<void> setExternalUserId(String userId) async {
@@ -59,17 +82,25 @@ class NotificationService {
     await OneSignal.User.addTags(tags);
   }
 
+  static Future<void> setUserType(String userType) async {
+    await setUserTags({
+      'user_type': userType.toLowerCase(), // 'doctor', 'patient', or 'chew'
+    });
+  }
+
   static Future<void> removeUserTags(List<String> tagKeys) async {
     await OneSignal.User.removeTags(tagKeys);
   }
 
-  static Future<void> handleLogin(String userId) async {
+  static Future<void> handleLogin(String userId, String userType) async {
     await setExternalUserId(userId);
+    await setUserType(userType);
     await updatePlayerIdForUser(userId);
   }
 
   static Future<void> handleLogout() async {
     await OneSignal.logout();
+    await removeUserTags(['user_type']);
   }
 
   static Future<void> sendNotification({
