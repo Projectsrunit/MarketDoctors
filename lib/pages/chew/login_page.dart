@@ -7,6 +7,9 @@ import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:market_doctor/pages/chew/notifications_page.dart';
+import 'package:market_doctor/models/notification_item.dart';
 
 class ChewLoginPage extends StatefulWidget {
   const ChewLoginPage({super.key});
@@ -76,20 +79,50 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             return;
           }
 
-          //to get full user record with profile picture etc
-          var url = Uri.parse(
-              '$baseUrl/api/users/${responseBody['user']['id']}?populate=cases.casevisits');
-          final fullRecord = await http.get(url);
-          if (fullRecord.statusCode == 200) {
-            var recordBody = jsonDecode(fullRecord.body);
-            
-            // Register for notifications
-            await NotificationService.handleLogin(recordBody['id'].toString(), 'chew');
-            
-            _showMessage('Welcome Back!', isError: false);
-            context.read<DataStore>().updateChewData(recordBody);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChewHome()));
+          // Store user info
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', responseBody['token']);
+          await prefs.setString('userType', _role);
+          await prefs.setString('userId', responseBody['user']['id'].toString());
+
+          // Initialize notifications for the logged-in user
+          await NotificationService.handleLogin(
+            responseBody['user']['id'].toString(),
+            _role,
+          );
+
+          // Check if we need to redirect to a specific route (from notification)
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          if (args != null && args.containsKey('returnRoute')) {
+            // If there was a pending notification, store it
+            if (args.containsKey('notification')) {
+              final notification = args['notification'] as Map<String, dynamic>;
+              await NotificationsPage.addNotification(
+                NotificationItem(
+                  title: notification['title'],
+                  message: notification['body'],
+                  timestamp: notification['timestamp'],
+                  data: notification['data'],
+                ),
+              );
+            }
+            // Navigate to the return route
+            Navigator.of(context).pushReplacementNamed(args['returnRoute']);
+          } else {
+            // Navigate to the default route based on role
+            switch (_role) {
+              case 'doctor':
+                Navigator.pushReplacementNamed(context, '/doctor/home');
+                break;
+              case 'chew':
+                Navigator.pushReplacementNamed(context, '/chew/home');
+                break;
+              case 'patient':
+                Navigator.pushReplacementNamed(context, '/patient/home');
+                break;
+              default:
+                Navigator.pushReplacementNamed(context, '/');
+            }
           }
         } else {
           var errorResponse = jsonDecode(response.body);

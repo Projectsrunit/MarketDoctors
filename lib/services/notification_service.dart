@@ -46,37 +46,40 @@ class NotificationService {
     await NotificationsPage.addNotification(notificationItem);
   }
 
-  static void _handleNotificationOpened(OSNotificationClickEvent event) {
+  static void _handleNotificationOpened(OSNotificationClickEvent event) async {
+    // Store the notification first
+    await _storeNotification(event.notification);
+    
     final data = event.notification.additionalData;
-    if (data != null) {
-      final String route = data['route'] as String? ?? '/notifications';
-      final bool requiresAuth = data['requiresAuth'] as bool? ?? true;
+    final route = data?['route'] as String? ?? '/notifications';
+    final requiresAuth = data?['requiresAuth'] as bool? ?? true;
+    
+    if (requiresAuth) {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final userType = prefs.getString('userType');
       
-      // Store the notification
-      _storeNotification(event.notification);
-
-      // Navigate to the appropriate screen
-      if (requiresAuth) {
-        // Check if user is logged in
-        _checkAuthAndNavigate(route);
-      } else {
+      if (token != null && userType != null) {
+        // User is logged in, navigate to notifications
         navigatorKey.currentState?.pushNamed(route);
+      } else {
+        // User is not logged in, navigate to login with return route
+        navigatorKey.currentState?.pushNamed(
+          '/login', 
+          arguments: {
+            'returnRoute': route,
+            'notification': {
+              'title': event.notification.title,
+              'body': event.notification.body,
+              'timestamp': DateTime.now().toIso8601String(),
+              'data': event.notification.additionalData,
+            }
+          }
+        );
       }
     } else {
-      // Default to notifications page if no data
-      navigatorKey.currentState?.pushNamed('/notifications');
-    }
-  }
-
-  static Future<void> _checkAuthAndNavigate(String route) async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getString('token') != null;
-
-    if (isLoggedIn) {
+      // No auth required, navigate directly
       navigatorKey.currentState?.pushNamed(route);
-    } else {
-      // Navigate to login page with return route
-      navigatorKey.currentState?.pushNamed('/login', arguments: {'returnRoute': route});
     }
   }
 
