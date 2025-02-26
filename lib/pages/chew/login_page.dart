@@ -91,19 +91,10 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             'chew', // Pass role type as string for notification service
           );
 
-          // Get the full user record
-          var fullRecordUrl = Uri.parse(
-              '$baseUrl/api/users/${responseBody['user']['id']}?populate=cases.casevisits');
-          final fullRecord = await http.get(fullRecordUrl);
-          if (fullRecord.statusCode == 200) {
-            var recordBody = jsonDecode(fullRecord.body);
-            context.read<DataStore>().updateChewData(recordBody);
-          }
-
-          // Check if this login was triggered by a notification
+          // Check if we need to redirect to a specific route (from notification)
           final args = ModalRoute.of(context)?.settings.arguments;
-          if (args != null && args is Map<String, dynamic> && args.containsKey('returnRoute')) {
-            // Handle notification-based login
+          if (args is Map<String, dynamic> && args.containsKey('returnRoute')) {
+            // If there was a pending notification, store it
             if (args.containsKey('notification')) {
               final notification = args['notification'] as Map<String, dynamic>;
               await NotificationsPage.addNotification(
@@ -117,14 +108,15 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
                 ),
               );
             }
-            Navigator.of(context).pushReplacementNamed(args['returnRoute'].toString());
+            // Navigate to the return route
+            if (args['returnRoute'] != null) {
+              Navigator.of(context).pushReplacementNamed(args['returnRoute'].toString());
+            } else {
+              Navigator.pushReplacementNamed(context, '/chew/home');
+            }
           } else {
-            // Normal login flow
-            _showMessage('Login successful', isError: false);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const ChewHome()),
-            );
+            // Navigate to the default route
+            Navigator.pushReplacementNamed(context, '/chew/home');
           }
         } else {
           var errorResponse = jsonDecode(response.body);
