@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:market_doctor/pages/notifications/notifications_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:market_doctor/models/notification_item.dart';
 
 class NotificationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
