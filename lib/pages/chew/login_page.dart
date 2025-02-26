@@ -22,7 +22,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final String _role = 'chew';
+  final int _role = 4; // Changed back to int
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
@@ -82,13 +82,13 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           // Store user info
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', responseBody['token']);
-          await prefs.setString('userType', _role);
+          await prefs.setString('userType', _role.toString());
           await prefs.setString('userId', responseBody['user']['id'].toString());
 
           // Initialize notifications for the logged-in user
           await NotificationService.handleLogin(
             responseBody['user']['id'].toString(),
-            _role,
+            'chew', // Pass role type as string for notification service
           );
 
           // Check if we need to redirect to a specific route (from notification)
@@ -109,7 +109,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             // Navigate to the return route
             Navigator.of(context).pushReplacementNamed(args['returnRoute']);
           } else {
-            // Navigate to the default route based on role
+            // Navigate to the default route
             Navigator.pushReplacementNamed(context, '/chew/home');
           }
         } else {
