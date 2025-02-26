@@ -7,9 +7,6 @@ import 'package:market_doctor/pages/chew/chew_home.dart';
 import 'package:market_doctor/pages/chew/signup_page.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/services/notification_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:market_doctor/pages/notifications/notifications_page.dart';
-import 'package:market_doctor/models/notification_item.dart';
 
 class ChewLoginPage extends StatefulWidget {
   const ChewLoginPage({super.key});
@@ -22,7 +19,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final int _role = 4; // Changed back to int
+  final _role = 4;
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
@@ -79,44 +76,20 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             return;
           }
 
-          // Store user info
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', responseBody['token']);
-          await prefs.setString('userType', _role.toString());
-          await prefs.setString('userId', responseBody['user']['id'].toString());
-
-          // Initialize notifications for the logged-in user
-          await NotificationService.handleLogin(
-            responseBody['user']['id'].toString(),
-            'chew', // Pass role type as string for notification service
-          );
-
-          // Check if we need to redirect to a specific route (from notification)
-          final args = ModalRoute.of(context)?.settings.arguments;
-          if (args is Map<String, dynamic> && args.containsKey('returnRoute')) {
-            // If there was a pending notification, store it
-            if (args.containsKey('notification')) {
-              final notification = args['notification'] as Map<String, dynamic>;
-              await NotificationsPage.addNotification(
-                NotificationItem(
-                  title: notification['title']?.toString() ?? 'Notification',
-                  message: notification['body']?.toString() ?? '',
-                  timestamp: notification['timestamp']?.toString() ?? DateTime.now().toIso8601String(),
-                  data: notification['data'] is Map<String, dynamic> 
-                      ? notification['data'] as Map<String, dynamic>
-                      : null,
-                ),
-              );
-            }
-            // Navigate to the return route
-            if (args['returnRoute'] != null) {
-              Navigator.of(context).pushReplacementNamed(args['returnRoute'].toString());
-            } else {
-              Navigator.pushReplacementNamed(context, '/chew/home');
-            }
-          } else {
-            // Navigate to the default route
-            Navigator.pushReplacementNamed(context, '/chew/home');
+          //to get full user record with profile picture etc
+          var url = Uri.parse(
+              '$baseUrl/api/users/${responseBody['user']['id']}?populate=cases.casevisits');
+          final fullRecord = await http.get(url);
+          if (fullRecord.statusCode == 200) {
+            var recordBody = jsonDecode(fullRecord.body);
+            
+            // Register for notifications
+            await NotificationService.handleLogin(recordBody['id'].toString(), 'chew');
+            
+            _showMessage('Welcome Back!', isError: false);
+            context.read<DataStore>().updateChewData(recordBody);
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ChewHome()));
           }
         } else {
           var errorResponse = jsonDecode(response.body);
