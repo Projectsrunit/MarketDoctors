@@ -8,7 +8,7 @@ import 'package:market_doctor/pages/chew/signup_page.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:market_doctor/pages/chew/notifications_page.dart';
+import 'package:market_doctor/pages/notifications/notifications_page.dart';
 import 'package:market_doctor/models/notification_item.dart';
 
 class ChewLoginPage extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _role = 4;
+  final String _role = 'chew';
   bool _isLoading = false;
   bool _isPasswordVisible = false;
 
@@ -110,19 +110,7 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
             Navigator.of(context).pushReplacementNamed(args['returnRoute']);
           } else {
             // Navigate to the default route based on role
-            switch (_role) {
-              case 'doctor':
-                Navigator.pushReplacementNamed(context, '/doctor/home');
-                break;
-              case 'chew':
-                Navigator.pushReplacementNamed(context, '/chew/home');
-                break;
-              case 'patient':
-                Navigator.pushReplacementNamed(context, '/patient/home');
-                break;
-              default:
-                Navigator.pushReplacementNamed(context, '/');
-            }
+            Navigator.pushReplacementNamed(context, '/chew/home');
           }
         } else {
           var errorResponse = jsonDecode(response.body);
