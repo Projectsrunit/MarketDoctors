@@ -92,22 +92,28 @@ class _ChewLoginPageState extends State<ChewLoginPage> {
           );
 
           // Check if we need to redirect to a specific route (from notification)
-          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          if (args != null && args.containsKey('returnRoute')) {
+          final args = ModalRoute.of(context)?.settings.arguments;
+          if (args is Map<String, dynamic> && args.containsKey('returnRoute')) {
             // If there was a pending notification, store it
             if (args.containsKey('notification')) {
               final notification = args['notification'] as Map<String, dynamic>;
               await NotificationsPage.addNotification(
                 NotificationItem(
-                  title: notification['title'],
-                  message: notification['body'],
-                  timestamp: notification['timestamp'],
-                  data: notification['data'],
+                  title: notification['title']?.toString() ?? 'Notification',
+                  message: notification['body']?.toString() ?? '',
+                  timestamp: notification['timestamp']?.toString() ?? DateTime.now().toIso8601String(),
+                  data: notification['data'] is Map<String, dynamic> 
+                      ? notification['data'] as Map<String, dynamic>
+                      : null,
                 ),
               );
             }
             // Navigate to the return route
-            Navigator.of(context).pushReplacementNamed(args['returnRoute']);
+            if (args['returnRoute'] != null) {
+              Navigator.of(context).pushReplacementNamed(args['returnRoute'].toString());
+            } else {
+              Navigator.pushReplacementNamed(context, '/chew/home');
+            }
           } else {
             // Navigate to the default route
             Navigator.pushReplacementNamed(context, '/chew/home');
