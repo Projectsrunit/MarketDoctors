@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
+import 'package:pay_with_paystack/pay_with_paystack.dart';
 import 'package:market_doctor/services/subscription_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -30,22 +30,32 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       String publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'] ?? '';
       String transactionRef = 'ref_${DateTime.now().millisecondsSinceEpoch}';
 
-      final transaction = await FlutterPaystackPlus.createTransaction(
+      final response = await PayWithPayStack().now(
         context: context,
-        publicKey: publicKey,
-        email: 'customer@email.com', // Get from user profile
-        amount: amount * 100, // Amount in kobo
+        secretKey: publicKey,
+        customerEmail: "customer@email.com", // Get from user profile
         reference: transactionRef,
+        amount: amount.toDouble(),
+        currency: "NGN",
+        callbackUrl: "https://your-callback-url.com", // Add your callback URL
+        transactionCompleted: (response) async {
+          // response is a Map<String, dynamic>
+          // Verify payment on backend
+          var result = await SubscriptionService.verifyPayment(transactionRef);
+          if (result['success']) {
+            _showMessage('Subscription successful!', isError: false);
+            Navigator.pop(context, true);
+          }
+        },
+        transactionNotCompleted: (String message) {
+          _showMessage('Payment not completed: $message');
+        },
+        metaData: {
+          'plan': plan,
+        },
       );
 
-      if (transaction != null) {
-        // Verify payment on backend
-        var result = await SubscriptionService.verifyPayment(transactionRef);
-        if (result['success']) {
-          _showMessage('Subscription successful!', isError: false);
-          Navigator.pop(context, true);
-        }
-      } else {
+      if (response == null) {
         _showMessage('Payment failed or was cancelled');
       }
     } catch (e) {
