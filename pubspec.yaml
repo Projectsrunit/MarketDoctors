@@ -37,6 +37,7 @@ dependencies:
   path: ^1.8.3
   connectivity_plus: ^5.0.1
   onesignal_flutter: ^5.0.4
+  flutter_paystack_plus: ^2.1.0  # Using this instead of flutter_paystack
 
 dev_dependencies:
   flutter_test:

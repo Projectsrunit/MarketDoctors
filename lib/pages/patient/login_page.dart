@@ -7,6 +7,8 @@ import 'package:market_doctor/pages/patient/patient_home.dart';
 import 'package:market_doctor/pages/patient/signup_page.dart';
 import 'package:provider/provider.dart';
 import 'package:market_doctor/services/notification_service.dart';
+import 'package:market_doctor/services/subscription_service.dart';
+import 'package:market_doctor/pages/patient/subscription_page.dart';
 
 class PatientLoginPage extends StatefulWidget {
   const PatientLoginPage({super.key});
@@ -34,9 +36,7 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
 
   Future<void> _loginUser() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
       String email = _emailController.text;
       String password = _passwordController.text;
@@ -58,6 +58,30 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
 
         if (response.statusCode == 200) {
           var responseBody = jsonDecode(response.body);
+          var userId = responseBody['user']['id'].toString();
+
+          // Check subscription status
+          var subscription = await SubscriptionService.checkSubscription(userId);
+          
+          if (subscription['status'] == 'none') {
+            // Create trial subscription for new users
+            await SubscriptionService.createTrialSubscription(userId);
+          } else if (subscription['status'] == 'expired') {
+            // Show subscription page if subscription has expired
+            bool? subscribed = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubscriptionPage(userId: userId),
+              ),
+            );
+            
+            if (subscribed != true) {
+              _showMessage('Please subscribe to continue');
+              setState(() => _isLoading = false);
+              return;
+            }
+          }
+
           var url = Uri.parse(
               '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
           final fullRecord = await http.get(url);
@@ -72,29 +96,6 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PatientHome()));
           }
-
-          // // Extract patient details
-          // String userId = responseBody['user']['id'].toString(); // Get the ID as a string
-          // String firstName = responseBody['user']['firstName']; // Get the first name
-          // String lastName = responseBody['user']['lastName']; // Get the last name
-          // String fullName = '$firstName $lastName'; // Combine first and last names
-
-          // // Store the user ID in SharedPreferences
-          // SharedPreferences prefs = await SharedPreferences.getInstance();
-          // await prefs.setString('userId', userId);
-
-          // _showMessage('Welcome Back!', isError: false);
-
-          // // Navigate to PatientHome and pass patientId and patientName
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => PatientHome(
-          //       patientId: userId, // Pass the userId
-          //       patientName: fullName, // Pass the full name
-          //     ),
-          //   ),
-          // );
         } else {
           var errorResponse = jsonDecode(response.body);
           String errorMessage = errorResponse['error']?['message'] ??
@@ -109,9 +110,7 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
       } catch (error) {
         _showMessage('An error occurred. Please try again.');
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
