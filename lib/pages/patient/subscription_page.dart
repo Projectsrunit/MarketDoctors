@@ -95,13 +95,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       String transactionRef = 'ref_${DateTime.now().millisecondsSinceEpoch}';
       
       final userEmail = context.read<DataStore>().patientData?['email'] ?? '';
-      print('Using email for payment: $userEmail'); // Debug log
+      print('Starting payment - Email: $userEmail, Amount: $amount, Plan: $plan');
 
       if (userEmail.isEmpty) {
         _showMessage('User email not found');
         setState(() => _isLoading = false);
         return;
       }
+
+      // Handle payment response before setting loading to false
+      bool paymentCompleted = false;
 
       final response = await PayWithPayStack().now(
         context: context,
@@ -112,12 +115,12 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         currency: "NGN",
         callbackUrl: "${dotenv.env['API_URL']}/api/subscriptions/verify-payment",
         transactionCompleted: (response) async {
-          print('Payment completed: $response');
-          // Pass the widget.userId instead of plan
+          print('Payment completed with response: $response');
+          paymentCompleted = true;
           var result = await SubscriptionService.verifyPayment(
             reference: transactionRef,
             userId: widget.userId,
-            plan: plan, // Add plan parameter
+            plan: plan,
           );
           
           if (result['success']) {
@@ -127,10 +130,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               MaterialPageRoute(builder: (context) => PatientHome()),
             );
           } else {
+            print('Verification failed: ${result['details']}');
             _showMessage(result['message'] ?? 'Payment verification failed');
           }
         },
         transactionNotCompleted: (String message) {
+          print('Transaction not completed: $message');
+          paymentCompleted = true;
           _showMessage('Payment not completed: $message');
         },
         metaData: {
@@ -139,14 +145,17 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         },
       );
 
-      if (response == null) {
+      // Only show payment cancelled if no other payment status was shown
+      if (response == null && !paymentCompleted) {
         _showMessage('Payment cancelled');
       }
     } catch (e) {
-      print('Payment error: $e'); // Debug log
+      print('Payment error: $e');
       _showMessage('Payment error: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
