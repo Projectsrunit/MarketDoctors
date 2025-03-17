@@ -3,6 +3,8 @@ import 'package:pay_with_paystack/pay_with_paystack.dart';
 import 'package:market_doctor/services/subscription_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:market_doctor/pages/patient/patient_home.dart';
+import 'package:provider/provider.dart';
+import 'package:market_doctor/data_store.dart';
 
 class SubscriptionPage extends StatefulWidget {
   final String userId;
@@ -91,13 +93,21 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     try {
       String publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'] ?? '';
       String transactionRef = 'ref_${DateTime.now().millisecondsSinceEpoch}';
-
-      print('Starting payment with key: $publicKey'); // Debug log
       
+      // Get user email from DataStore
+      final userEmail = context.read<DataStore>().patientData?['email'] ?? '';
+      print('Using email for payment: $userEmail'); // Debug log
+
+      if (userEmail.isEmpty) {
+        _showMessage('User email not found');
+        setState(() => _isLoading = false);
+        return;
+      }
+
       final response = await PayWithPayStack().now(
         context: context,
-        secretKey: publicKey, // Using publicKey as secretKey (this is the correct parameter name)
-        customerEmail: "customer@email.com",
+        secretKey: publicKey,
+        customerEmail: userEmail, // Use the user's actual email
         reference: transactionRef,
         amount: amount.toDouble(),
         currency: "NGN",
