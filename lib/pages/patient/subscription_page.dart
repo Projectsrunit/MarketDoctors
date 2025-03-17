@@ -14,6 +14,42 @@ class SubscriptionPage extends StatefulWidget {
 
 class _SubscriptionPageState extends State<SubscriptionPage> {
   bool _isLoading = false;
+  bool _hasActiveSubscription = false;
+  bool _hasExpiredTrial = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSubscriptionStatus();
+  }
+
+  Future<void> _checkSubscriptionStatus() async {
+    setState(() => _isLoading = true);
+    try {
+      print('Checking subscription for user: ${widget.userId}');
+      var result = await SubscriptionService.checkSubscription(widget.userId);
+      print('Subscription check result: $result');
+
+      if (result['status'] == 'active') {
+        // If user has active subscription, go directly to home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PatientHome()),
+        );
+      } else if (result['status'] == 'expired' && 
+                 result['subscription']?['plan'] == 'trial') {
+        setState(() => _hasExpiredTrial = true);
+        _showMessage('Your trial has expired. Please select a subscription plan.', isError: true);
+      } else if (result['status'] == 'none') {
+        setState(() => _hasExpiredTrial = false);
+      }
+    } catch (e) {
+      print('Error checking subscription: $e');
+      _showMessage('Error checking subscription status');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   void _showMessage(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -27,18 +63,23 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   Future<void> _startTrial() async {
     setState(() => _isLoading = true);
     try {
+      print('Creating trial subscription for user: ${widget.userId}');
       var result = await SubscriptionService.createTrialSubscription(widget.userId);
+      print('Trial creation result: $result');
+
       if (result['success']) {
         _showMessage('Trial activated successfully!', isError: false);
+        // Only navigate to home after successful trial creation
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => PatientHome()),
         );
       } else {
-        _showMessage('Could not activate trial');
+        _showMessage(result['message'] ?? 'Could not activate trial');
       }
     } catch (e) {
-      _showMessage('Error: $e');
+      print('Trial activation error: $e');
+      _showMessage('Error activating trial: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -54,18 +95,23 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       final response = await PayWithPayStack().now(
         context: context,
         secretKey: publicKey,
-        customerEmail: "customer@email.com", // Get from user profile
+        customerEmail: "customer@email.com",
         reference: transactionRef,
         amount: amount.toDouble(),
         currency: "NGN",
-        callbackUrl: "https://your-callback-url.com", // Add your callback URL
+        callbackUrl: "https://your-callback-url.com",
         transactionCompleted: (response) async {
-          // response is a Map<String, dynamic>
-          // Verify payment on backend
+          print('Payment completed: $response');
           var result = await SubscriptionService.verifyPayment(transactionRef);
+          
           if (result['success']) {
-            _showMessage('Subscription successful!', isError: false);
-            Navigator.pop(context, true);
+            _showMessage('Subscription activated!', isError: false);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => PatientHome()),
+            );
+          } else {
+            _showMessage(result['message'] ?? 'Payment verification failed');
           }
         },
         transactionNotCompleted: (String message) {
@@ -73,14 +119,15 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         },
         metaData: {
           'plan': plan,
+          'userId': widget.userId,
         },
       );
 
       if (response == null) {
-        _showMessage('Payment failed or was cancelled');
+        _showMessage('Payment cancelled');
       }
     } catch (e) {
-      _showMessage('Payment failed: $e');
+      _showMessage('Payment error: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -96,7 +143,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Choose Your Plan'),
+        title: Text(_hasExpiredTrial ? 'Choose a Plan' : 'Choose Your Plan'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: _isLoading
@@ -108,7 +155,9 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Select a Subscription Plan',
+                      _hasExpiredTrial 
+                          ? 'Your trial has expired.\nPlease select a subscription plan.'
+                          : 'Select a Subscription Plan',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             color: textColor,
                             fontWeight: FontWeight.bold,
@@ -116,8 +165,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
-                    _buildTrialCard(cardColor, textColor),
-                    const SizedBox(height: 16),
+                    if (!_hasExpiredTrial) _buildTrialCard(cardColor, textColor),
+                    if (!_hasExpiredTrial) const SizedBox(height: 16),
                     _buildSubscriptionCard(
                       'Annual Plan',
                       '₦5,000',

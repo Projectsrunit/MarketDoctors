@@ -63,34 +63,16 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
           // Store user data first
           context.read<DataStore>().updatePatientData(recordBody);
           
-          // Check subscription status
-          var subscription = await SubscriptionService.checkSubscription(userId);
-          
           // Register for notifications
           await NotificationService.handleLogin(userId, 'patient');
 
-          if (subscription['status'] == 'none') {
-            // For new users, create trial subscription
-            await SubscriptionService.createTrialSubscription(userId);
-          }
-
-          // Always show subscription page after login
-          bool? subscribed = await Navigator.push<bool>(
+          // Navigate to subscription page
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => SubscriptionPage(userId: userId),
             ),
           );
-          
-          if (subscribed == true) {
-            _showMessage('Welcome Back!', isError: false);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => PatientHome()),
-            );
-          } else {
-            _showMessage('Please choose a subscription plan', isError: true);
-          }
         } else {
           var errorResponse = jsonDecode(response.body);
           String errorMessage = errorResponse['error']?['message'] ??
