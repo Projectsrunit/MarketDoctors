@@ -92,14 +92,16 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       String publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'] ?? '';
       String transactionRef = 'ref_${DateTime.now().millisecondsSinceEpoch}';
 
+      print('Starting payment with key: $publicKey'); // Debug log
+      
       final response = await PayWithPayStack().now(
         context: context,
-        secretKey: publicKey,
+        secretKey: publicKey, // Using publicKey as secretKey (this is the correct parameter name)
         customerEmail: "customer@email.com",
         reference: transactionRef,
         amount: amount.toDouble(),
         currency: "NGN",
-        callbackUrl: "https://your-callback-url.com",
+        callbackUrl: "${dotenv.env['API_URL']}/api/subscriptions/verify-payment",
         transactionCompleted: (response) async {
           print('Payment completed: $response');
           var result = await SubscriptionService.verifyPayment(transactionRef);
@@ -127,6 +129,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
         _showMessage('Payment cancelled');
       }
     } catch (e) {
+      print('Payment error: $e'); // Debug log
       _showMessage('Payment error: $e');
     } finally {
       setState(() => _isLoading = false);
