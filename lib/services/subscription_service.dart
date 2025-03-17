@@ -6,19 +6,27 @@ class SubscriptionService {
   static String? baseUrl = dotenv.env['API_URL'];
 
   static Future<Map<String, dynamic>> checkSubscription(String userId) async {
-    var url = Uri.parse('$baseUrl/api/subscriptions/check/$userId');
-    var response = await http.get(url);
-    return jsonDecode(response.body);
+    try {
+      var url = Uri.parse('$baseUrl/api/subscriptions/check/$userId');
+      var response = await http.get(url);
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'status': 'error', 'message': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> createTrialSubscription(String userId) async {
-    var url = Uri.parse('$baseUrl/api/subscriptions/trial');
-    var response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': userId}),
-    );
-    return jsonDecode(response.body);
+    try {
+      var url = Uri.parse('$baseUrl/api/subscriptions/trial');
+      var response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': userId}),
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> verifyPayment(String reference) async {
