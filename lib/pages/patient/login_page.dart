@@ -38,20 +38,14 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      String email = _emailController.text;
-      String password = _passwordController.text;
-      String? baseUrl = dotenv.env['API_URL'];
-
       try {
-        var url = Uri.parse('$baseUrl/api/auth/login');
+        var url = Uri.parse('${dotenv.env['API_URL']}/api/auth/login');
         var response = await http.post(
           url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'email': email,
-            'password': password,
+            'email': _emailController.text,
+            'password': _passwordController.text,
             'role': _role,
           }),
         );
@@ -60,41 +54,42 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
           var responseBody = jsonDecode(response.body);
           var userId = responseBody['user']['id'].toString();
 
+          // First get the full user record
+          var userUrl = Uri.parse(
+              '${dotenv.env['API_URL']}/api/users/$userId?populate=*');
+          final fullRecord = await http.get(userUrl);
+          var recordBody = jsonDecode(fullRecord.body);
+
+          // Store user data first
+          context.read<DataStore>().updatePatientData(recordBody);
+          
           // Check subscription status
           var subscription = await SubscriptionService.checkSubscription(userId);
           
+          // Register for notifications
+          await NotificationService.handleLogin(userId, 'patient');
+
           if (subscription['status'] == 'none') {
-            // Create trial subscription for new users
+            // For new users, create trial subscription
             await SubscriptionService.createTrialSubscription(userId);
-          } else if (subscription['status'] == 'expired') {
-            // Show subscription page if subscription has expired
-            bool? subscribed = await Navigator.push<bool>(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SubscriptionPage(userId: userId),
-              ),
-            );
-            
-            if (subscribed != true) {
-              _showMessage('Please subscribe to continue');
-              setState(() => _isLoading = false);
-              return;
-            }
           }
 
-          var url = Uri.parse(
-              '$baseUrl/api/users/${responseBody['user']['id']}?populate=*');
-          final fullRecord = await http.get(url);
-          if (fullRecord.statusCode == 200) {
-            var recordBody = jsonDecode(fullRecord.body);
-            
-            // Register for notifications
-            await NotificationService.handleLogin(recordBody['id'].toString(), 'patient');
-            
+          // Always show subscription page after login
+          bool? subscribed = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SubscriptionPage(userId: userId),
+            ),
+          );
+          
+          if (subscribed == true) {
             _showMessage('Welcome Back!', isError: false);
-            context.read<DataStore>().updatePatientData(recordBody);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PatientHome()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => PatientHome()),
+            );
+          } else {
+            _showMessage('Please choose a subscription plan', isError: true);
           }
         } else {
           var errorResponse = jsonDecode(response.body);
@@ -107,8 +102,8 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
             _showMessage(errorMessage);
           }
         }
-      } catch (error) {
-        _showMessage('An error occurred. Please try again.');
+      } catch (e) {
+        _showMessage('An error occurred: $e');
       } finally {
         setState(() => _isLoading = false);
       }
