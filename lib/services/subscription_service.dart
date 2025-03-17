@@ -35,15 +35,21 @@ class SubscriptionService {
     }
   }
 
-  static Future<Map<String, dynamic>> verifyPayment(String reference) async {
+  static Future<Map<String, dynamic>> verifyPayment({
+    required String reference,
+    required String userId,
+    required String plan,
+  }) async {
     try {
-      print('Verifying payment: $reference'); // Debug log
+      print('Verifying payment - Reference: $reference, UserId: $userId, Plan: $plan'); // Debug log
       var url = Uri.parse('$baseUrl/api/subscriptions/verify-payment');
       var response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'reference': reference,
+          'userId': userId,
+          'plan': plan,
         }),
       );
       print('Payment verification response: ${response.body}'); // Debug log

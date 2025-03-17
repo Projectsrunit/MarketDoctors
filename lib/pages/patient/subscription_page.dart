@@ -94,7 +94,6 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       String publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'] ?? '';
       String transactionRef = 'ref_${DateTime.now().millisecondsSinceEpoch}';
       
-      // Get user email from DataStore
       final userEmail = context.read<DataStore>().patientData?['email'] ?? '';
       print('Using email for payment: $userEmail'); // Debug log
 
@@ -107,14 +106,19 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       final response = await PayWithPayStack().now(
         context: context,
         secretKey: publicKey,
-        customerEmail: userEmail, // Use the user's actual email
+        customerEmail: userEmail,
         reference: transactionRef,
         amount: amount.toDouble(),
         currency: "NGN",
         callbackUrl: "${dotenv.env['API_URL']}/api/subscriptions/verify-payment",
         transactionCompleted: (response) async {
           print('Payment completed: $response');
-          var result = await SubscriptionService.verifyPayment(transactionRef);
+          // Pass the widget.userId instead of plan
+          var result = await SubscriptionService.verifyPayment(
+            reference: transactionRef,
+            userId: widget.userId,
+            plan: plan, // Add plan parameter
+          );
           
           if (result['success']) {
             _showMessage('Subscription activated!', isError: false);
