@@ -249,7 +249,20 @@ class _PatientLoginPageState extends State<PatientLoginPage> {
                     const SizedBox(
                         height: 40), // Increased spacing before login button
                     _isLoading
-                        ? const CircularProgressIndicator()
+                        ? const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text(
+                                'Please wait...',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          )
                         : TextButton(
                             onPressed: _loginUser,
                             style: TextButton.styleFrom(
